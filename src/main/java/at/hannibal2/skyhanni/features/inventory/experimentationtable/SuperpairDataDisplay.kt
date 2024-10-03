@@ -5,7 +5,9 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.instantFindPattern
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.remainingClicksPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.waitingPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -49,7 +51,7 @@ object SuperpairDataDisplay {
     fun onInventoryClose(event: InventoryCloseEvent) {
         display = emptyList()
 
-        uncoveredItems = mutableMapOf()
+        uncoveredItems.clear()
         found.clear()
     }
 
@@ -100,19 +102,17 @@ object SuperpairDataDisplay {
         val since = clicksSinceSeparator(uncoveredItems)
 
         val lastReward = uncoveredItems.entries.last().value.reward
-        // TODO use repo patterns for "Instant Find"
-        if ((since >= 2 || (since == -1 && uncoveredItems.size >= 2)) && lastReward != "Instant Find") uncoveredItems[uncovered + 2] =
+        if ((since >= 2 || (since == -1 && uncoveredItems.size >= 2)) && !instantFindPattern.matches(lastReward)) uncoveredItems[uncovered + 2] =
             emptySuperpairItem
 
         display = drawDisplay()
     }
 
     private fun handlePowerUp(item: SuperpairItem, uncovered: Int) {
-        // TODO use repo patterns for "Instant Find"
-        if (item.reward != "Instant Find") uncoveredItems.remove(uncovered)
+        if (!instantFindPattern.matches(item.reward)) uncoveredItems.remove(uncovered)
 
         val itemData = FoundData(item = item)
-        found.getOrPut(FoundType.POWERUP) { mutableListOf(itemData) }.apply { if (!contains(itemData)) add(itemData) }
+        found.getOrPut(FoundType.POWERUP) { mutableListOf() }.add(itemData)
     }
 
     private fun handleReward(item: SuperpairItem, uncovered: Int) {
@@ -121,8 +121,7 @@ object SuperpairDataDisplay {
         if (isWaiting(last.reward)) return
 
         when {
-            // TODO use repo patterns for "Instant Find"
-            last.reward == "Instant Find" -> handleInstantFind(item, uncovered)
+            instantFindPattern.matches(last.reward) -> handleInstantFind(item, uncovered)
             hasFoundPair(item, last) -> handleFoundPair(item, last)
             hasFoundMatch(item) -> handleFoundMatch(item)
             else -> handleNormalReward(item)
@@ -151,8 +150,7 @@ object SuperpairDataDisplay {
         }
 
         val pairData = FoundData(first = first, second = second)
-
-        found.getOrPut(FoundType.PAIR) { mutableListOf(pairData) }.apply { if (!contains(pairData)) add(pairData) }
+        found.getOrPut(FoundType.PAIR) { mutableListOf() }.add(pairData)
     }
 
     private fun handleFoundMatch(item: SuperpairItem) {
@@ -181,7 +179,7 @@ object SuperpairDataDisplay {
         }
 
         val pairData = FoundData(first = item, second = match)
-        found.getOrPut(FoundType.MATCH) { mutableListOf(pairData) }.apply { if (!contains(pairData)) add(pairData) }
+        found.getOrPut(FoundType.MATCH) { mutableListOf() }.add(pairData)
     }
 
     private fun handleNormalReward(item: SuperpairItem) {
@@ -200,7 +198,7 @@ object SuperpairDataDisplay {
         }
 
         val itemData = FoundData(item = item)
-        found.getOrPut(FoundType.NORMAL) { mutableListOf(itemData) }.apply { if (!contains(itemData)) add(itemData) }
+        found.getOrPut(FoundType.NORMAL) { mutableListOf() }.add(itemData)
     }
 
     private fun drawDisplay() = buildList {
@@ -270,9 +268,7 @@ object SuperpairDataDisplay {
     private fun isReward(reward: String) =
         ExperimentationTableAPI.rewardPattern.matches(reward) || ExperimentationTableAPI.powerUpPattern.matches(reward)
 
-    // TODO use repo patterns instead
-    private fun isWaiting(itemName: String) =
-        listOf("Click any button!", "Click a second button!", "Next button is instantly rewarded!").contains(itemName)
+    private fun isWaiting(itemName: String) = waitingPattern.matches(itemName)
 
     private fun clicksSinceSeparator(list: MutableMap<Int, SuperpairItem>): Int {
         val lastIndex = list.entries.indexOfLast { it.value == emptySuperpairItem }

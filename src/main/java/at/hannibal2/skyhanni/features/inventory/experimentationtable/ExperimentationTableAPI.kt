@@ -140,6 +140,22 @@ object ExperimentationTableAPI {
     )
 
     /**
+     * REGEX-TEST: Instant Find
+     */
+    val instantFindPattern by patternGroup.pattern(
+        "instantfind",
+        "Instant Find"
+    )
+
+    /**
+     * REGEX-TEST: Click any button!
+     */
+    val waitingPattern by patternGroup.pattern(
+        "waiting",
+        "Click a(?:ny| second) button!|Next button is instantly rewarded!"
+    )
+
+    /**
      * REGEX-TEST: ☕ You renewed the experiment table! (1/3)
      */
     val experimentRenewPattern by patternGroup.pattern(
