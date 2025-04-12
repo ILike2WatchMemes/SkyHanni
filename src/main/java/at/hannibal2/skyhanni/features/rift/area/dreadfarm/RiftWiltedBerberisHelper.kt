@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -17,9 +16,11 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
@@ -80,7 +81,7 @@ object RiftWiltedBerberisHelper {
 
         hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftApi.farmingTool
 
-        if (Minecraft.getMinecraft().thePlayer.onGround) {
+        if (MinecraftCompat.localPlayer.onGround) {
             val block = LorenzVec.getBlockBelowPlayer().getBlockAt()
             val currentY = LocationUtils.playerLocation().y
             isOnFarmland = block == Blocks.farmland && (currentY % 1 == 0.0)
@@ -224,12 +225,12 @@ object RiftWiltedBerberisHelper {
 
                 val location = currentParticles.fixLocation(berberis)
                 if (!moving) {
-                    event.drawBox(location, highlightColor, 0.7f)
+                    event.drawFilledBoundingBox(axisAlignedBB(location), Color.YELLOW, 0.7f)
                     event.drawDynamicText(location.up(), "§eWilted Berberis", 1.5, ignoreBlocks = false)
                 } else {
-                    event.drawBox(location, Color.WHITE, 0.5f)
+                    event.drawFilledBoundingBox(axisAlignedBB(location), Color.WHITE, 0.5f)
                     previous?.fixLocation(berberis)?.let {
-                        event.drawBox(it, Color.LIGHT_GRAY, 0.2f)
+                        event.drawFilledBoundingBox(axisAlignedBB(it), Color.LIGHT_GRAY, 0.2f)
                         event.draw3DLine(it.add(0.5, 0.0, 0.5), location.add(0.5, 0.0, 0.5), Color.WHITE, 3, false)
                     }
                 }
@@ -278,7 +279,7 @@ object RiftWiltedBerberisHelper {
     private fun axisAlignedBB(loc: LorenzVec) = loc.add(0.1, -0.1, 0.1).boundingToOffset(0.8, 1.0, 0.8).expandBlock()
 
     private fun SkyHanniRenderWorldEvent.drawBox(location: LorenzVec, color: Color, alphaMultiplier: Float) {
-        drawFilledBoundingBoxNea(axisAlignedBB(location), color, alphaMultiplier)
+        drawFilledBoundingBox(axisAlignedBB(location), color, alphaMultiplier)
     }
 
     private fun isEnabled() = RiftApi.inRift() && RiftApi.inDreadfarm() && config.enabled
