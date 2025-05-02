@@ -35,7 +35,6 @@ object RenderBackground {
                 backgroundRenderable,
                 0,
                 config.roundedCornerSmoothness,
-                1,
                 outline.colorTop.toSpecialColor().rgb,
                 outline.colorBottom.toSpecialColor().rgb,
                 outline.thickness,
