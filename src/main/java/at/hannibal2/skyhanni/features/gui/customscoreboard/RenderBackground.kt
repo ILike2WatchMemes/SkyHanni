@@ -1,20 +1,27 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import GifLoader
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.BackgroundConfig
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import kotlin.time.Duration.Companion.milliseconds
 
 object RenderBackground {
 
     private val config get() = CustomScoreboard.config.background
-    private val textureLocation = createResourceLocation("skyhanni", "scoreboard.png")
+    private val imageTextureLocation by lazy { createResourceLocation("skyhanni", "scoreboard.png") }
+    private val gifTextureLocation by lazy { createResourceLocation("skyhanni", "scoreboard.gif") }
+    private val frames by lazy { GifLoader.loadGifFrames(gifTextureLocation) }
+    private var currentFrameIndex = 0
+    private var lastFrameTime = SimpleTimeMark.farPast()
 
     internal fun addBackground(renderable: Renderable): Renderable {
         with(config) {
@@ -41,15 +48,36 @@ object RenderBackground {
 
     private fun BackgroundConfig.createBackground(renderable: Renderable): Renderable =
         if (config.useCustomBackgroundImage) {
-            Renderable.drawInsideImage(
-                renderable,
-                textureLocation,
-                (config.customBackgroundImageOpacity * 255) / 100,
-                borderSize,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-                radius = config.roundedCornerSmoothness,
-            )
+            if (true) {
+                val currentFrame = frames[currentFrameIndex]
+
+                if (lastFrameTime.passedSince() >= currentFrame.delay.milliseconds) {
+                    lastFrameTime = SimpleTimeMark.now()
+                    currentFrameIndex++
+
+                    if (currentFrameIndex >= frames.size) currentFrameIndex = 0
+                }
+
+                Renderable.drawInsideImage(
+                    renderable,
+                    currentFrame.textureLocation,
+                    (config.customBackgroundImageOpacity * 255) / 100,
+                    borderSize,
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                    radius = config.roundedCornerSmoothness,
+                )
+            } else {
+                Renderable.drawInsideImage(
+                    renderable,
+                    imageTextureLocation,
+                    (config.customBackgroundImageOpacity * 255) / 100,
+                    borderSize,
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                    radius = config.roundedCornerSmoothness,
+                )
+            }
         } else {
             Renderable.drawInsideRoundedRect(
                 renderable,
