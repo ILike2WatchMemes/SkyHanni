@@ -80,6 +80,9 @@ object HubSelectorKeybinds {
                 .mapKeysNotNull {
                     val simpleServerId: String? = it.value.serverID
                     if (simpleServerId != null) return@mapKeysNotNull simpleServerId
+                    //Bingo Brewers sends the hub number instead of the serverid
+                    //:skull: Indigo mapps the hub numbers to severids in his 1.8.9 mod.
+                    //The cache is needed anyway though for serverid to hub number mapping for splash announcements
                     return@mapKeysNotNull hubIdToNumberCache.inverse()[it.value.hubSelectorData?.hubNumber]
 
                 }

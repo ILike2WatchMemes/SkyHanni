@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.bingo.bingobrewers
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Features
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import com.esotericsoftware.kryonet.Client
 import com.esotericsoftware.kryonet.Connection
@@ -20,18 +21,18 @@ object BingoBrewersClient {
     @Throws(IOException::class)
     private fun init() {
         client?.stop()
-        client = Client(16384, 16384)
+        val client = Client(16384, 16384)
         listener = getListener()
         BingoBrewersPackets.registerPackets(client)
-        client?.addListener(listener)
-        client?.start()
-        client?.connect(10000, "bingobrewers.com", 8282, 7070)
-
+        client.addListener(listener)
+        client.start()
+        client.connect(10000, "bingobrewers.com", 8282, 7070)
+        this.client = client
         val response = BingoBrewersPackets.ConnectionIgn()
         //IDK your server side indigo. I wanted to avoid issues on your side if I change anything since I dont have your code to look at. Otherwise I would have said sth like v0.3.7-compatible or sth.
         response.hello = "${PlayerUtils.getName()}|v0.3.7|Beta|${PlayerUtils.getUuid()}"
         println("Sending BingoBrewers Hello " + response.hello)
-        client?.sendTCP(response)
+        client.sendTCP(response)
     }
 
 
@@ -39,14 +40,14 @@ object BingoBrewersClient {
         return object : Listener() {
             override fun received(connection: Connection?, `object`: Any) {
                 SkyHanniMod.launchCoroutine {
-                    if (`object`.javaClass.`package`.name.contains("com.esotericsoftware.kryonet")) return@Runnable
+                    if (`object`.javaClass.`package`.name.contains("com.esotericsoftware.kryonet")) return@launchCoroutine
                     if (`object` is BingoBrewersPackets.BingoBrewersPacket<*>) {
                         if (SkyHanniMod.feature.event.bingo.bingoNetworks.showPacketTraffic) println("BN Bingobrewrs: ${gson.toJson(`object`)}")
                         try {
                             val packet = `object`
-                            packet.executeUnparsed(packet, client)
+                            packet.executeUnparsed(packet, client?:error("BingoBrewersClient client is null but received a packet!"))
                         } catch (e: Exception) {
-                            Chat.sendPrivateMessageToSelfError("Error handling a Packet from Bingo brewers. Please report this to BINGO NET")
+                            ChatUtils.chat("Error handling a Packet from Bingo Brewers. Please report this to BINGO NET")
                             e.printStackTrace()
                         }
                     }

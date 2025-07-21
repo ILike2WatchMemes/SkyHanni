@@ -200,7 +200,7 @@ object BingoBrewersPackets {
         var lastReceivedDayInfo: Long = Long.MAX_VALUE
 
         override fun execute(packet: receiveCHItems, client: Client) {
-            UpdateListenerManager.onChLobbyDataReceived(packet)
+            ChChestUpdateListener.onChLobbyDataReceived(packet)
         }
     }
 

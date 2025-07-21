@@ -18,7 +18,7 @@ class BingoConfig {
     val bingoCard: BingoCardConfig = BingoCardConfig()
 
     @Expose
-    @ConfigOption(name = "Bingo Net", desc = "")
+    @ConfigOption(name = "Third Party Bingo Networks", desc = "§cThe Bingo Networks are Third Party Services that are based on closed Source Servers above which Skyhanni has no control.")
     @Accordion
     val bingoNetworks: BingoNetworksConfig = BingoNetworksConfig()
 

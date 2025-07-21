@@ -20,6 +20,8 @@ import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.player.ClickAction
 import at.hannibal2.skyhanni.events.player.PlayerInteractionEvent
@@ -28,13 +30,16 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -47,6 +52,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -226,6 +232,24 @@ object MinionFeatures {
         lastClickedEntity = null
         minionInventoryOpen = true
         lastMinionOpened = 0
+    }
+
+    @HandleEvent
+    fun openMinionRecipeOnResource(event: KeyDownEvent) {
+        val key = config.openMinionRecipeForHeldResource
+        if (key != event.keyCode || !key.isKeyClicked()) return
+        //TODO change it so it gets the item that is currently hovered over
+        val currentItem = NeuItems.getInternalName(MinecraftCompat.localPlayer.heldItem)
+        for (entry in NeuItems.allItemsCache) {
+            if (!entry.value.asString().endsWith("GENERATOR_1")) continue
+            val recipes = NeuItems.getRecipes(entry.value)
+            if (recipes.size != 1) continue
+            recipes.first { it.isCraftingRecipe() }.ingredients.any {
+                it.internalName.asString() == currentItem
+            }
+            HypixelCommands.viewRecipe(entry.value)
+            return
+        }
     }
 
     @HandleEvent

@@ -1,12 +1,8 @@
 package de.hype.bingonet.environment.packetconfig
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.BNConnection
 import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.environment.packetconfig.BNGson
-import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.environment.packetconfig.BNPacketManager
 import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.environment.packetconfig.Packet
 import com.google.gson.Gson
-import de.hype.bingonet.shared.packets.base.ExpectReplyPacket
 
 object PacketUtils {
     val gson: Gson = BNGson.createNotPrettyPrinting()

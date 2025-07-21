@@ -48,7 +48,7 @@ object ChChestMessageAnalyser {
                 if (items.isNotEmpty()) {
                     val coords = BingoNet.temporaryConfig.lastGlobalChchestCoords
                     val chest = ChChestData(coords, items)
-                    val serverId = HypixelData.serverId
+                    val serverId = HypixelData.serverId?:return@launchCoroutine
                     val bnPacket = ChChestPacket(chest, serverId)
                     BNConnection.sendPacket(bnPacket)
                     if (SkyHanniMod.feature.event.bingo.bingoNetworks.chestWaypoints) {
@@ -65,7 +65,7 @@ object ChChestMessageAnalyser {
                             return@map bItem
                         }
                         packet.server = serverId
-                        packet.day = MinecraftCompat.localWorldOrNull?.worldTime
+                        packet.day = MinecraftCompat.worldDay
                         BingoBrewersClient.sendTCP(packet)
                     }
                 }
