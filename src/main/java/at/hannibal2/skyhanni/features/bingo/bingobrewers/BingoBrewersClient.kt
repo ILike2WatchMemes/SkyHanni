@@ -14,7 +14,7 @@ object BingoBrewersClient {
     private var listener: Listener? = null
 
     init {
-        if (SkyHanniMod.feature.event.bingo.bingoBrewers.useBB) init()
+        if (SkyHanniMod.feature.event.bingo.bingoNetworks.useBB) init()
     }
 
     @Throws(IOException::class)
@@ -41,7 +41,7 @@ object BingoBrewersClient {
                 SkyHanniMod.launchCoroutine {
                     if (`object`.javaClass.`package`.name.contains("com.esotericsoftware.kryonet")) return@Runnable
                     if (`object` is BingoBrewersPackets.BingoBrewersPacket<*>) {
-                        if (SkyHanniMod.feature.event.bingo.bingoBrewers.showPacketTraffic) println("BN Bingobrewrs: ${gson.toJson(`object`)}")
+                        if (SkyHanniMod.feature.event.bingo.bingoNetworks.showPacketTraffic) println("BN Bingobrewrs: ${gson.toJson(`object`)}")
                         try {
                             val packet = `object`
                             packet.executeUnparsed(packet, client)

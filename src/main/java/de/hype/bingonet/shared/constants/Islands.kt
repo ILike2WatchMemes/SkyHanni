@@ -30,6 +30,9 @@ enum class Islands(val internalName: String, private val displayName: String) {
     GLACITE_TUNNEL("mineshaft", "Mineshaft"),
     KUUDRA("kuudra", "Kuudra"),
     PRIVATE_ISLAND("dynamic", "Private Island", "home"),
+
+    //TODO validate internal name for garden
+    GARDEN("garden", "Garden", "garden"),
     SPIDERS_DEN("combat_1", "Spider's Den", "spider"),
     THE_END("combat_3", "The End", "end"),
     THE_FARMING_ISLANDS("farming_1", "The Farming Islands", "barn"),
@@ -38,6 +41,7 @@ enum class Islands(val internalName: String, private val displayName: String) {
     THE_PARK("foraging_1", "The Park", "park"),
     DARK_AUCTION("dark_auction", "Dark Auction"),
     BAYOU("fishing_1", "Backwater Bayou", "bayou"),
+    GALATEA("foraging_2", "Galatea", "galatea")
     ;
 
     constructor(internalName: String, displayName: String, warpArgument: String?) : this(internalName, displayName) {
@@ -52,6 +56,7 @@ enum class Islands(val internalName: String, private val displayName: String) {
     }
 
     companion object {
+
         @JvmStatic
         fun getIslandByMap(map: String): Islands? {
             for (island in entries) {

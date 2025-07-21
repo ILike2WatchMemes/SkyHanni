@@ -60,7 +60,7 @@ object BingoBrewersPackets {
         abstract fun execute(packet: T, client: Client)
 
         fun handleAsUnexpectedPacket() {
-            Chat.sendPrivateMessageToSelfDebug("Bingo Net: Received unexpected Bingo Brewers packet. Please Report this to BINGO NET! Packet Type: " + this.javaClass.getSimpleName())
+            ChatUtils.chat("Bingo Net: Received unexpected Bingo Brewers packet. Please Report this to BINGO NET! Packet Type: " + this.javaClass.getSimpleName(), prefix = false)
             println(com.google.gson.Gson().toJson(this))
         }
 
@@ -69,7 +69,7 @@ object BingoBrewersPackets {
         }
     }
 
-    val config = SkyHanniMod.feature.event.bingo.bingoBrewers
+    val config = SkyHanniMod.feature.event.bingo.bingoNetworks
 
     class SplashNotification : BingoBrewersPacket<SplashNotification>() {
         val message: String? = null
@@ -172,7 +172,7 @@ object BingoBrewersPackets {
     }
 
     class sendCHItems {
-        var items: MutableList<CHChestItem> = java.util.ArrayList<CHChestItem>()
+        var items: List<CHChestItem> = java.util.ArrayList<CHChestItem>()
         var x: Int = 0
         var y: Int = 0
         var z: Int = 0

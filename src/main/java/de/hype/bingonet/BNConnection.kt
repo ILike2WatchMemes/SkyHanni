@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.MojangUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -69,7 +70,7 @@ object BNConnection {
     //Viewing Packet Traffic can pose as a Unfair Advantage (Splashes).
     val roles = mutableSetOf<BNRole>(BNRole.DEBUG)
 
-    private val config get() = SkyHanniMod.feature.event.bingo.bingoNet
+    private val config get() = SkyHanniMod.feature.event.bingo.bingoNetworks
 
     val waypoints: MutableMap<Int, WaypointData> = HashMap()
 
@@ -172,7 +173,7 @@ object BNConnection {
                 return
             }
             if (handleIntercept(packet.second)) {
-                if (SkyHanniMod.feature.event.bingo.bingoNet.showPacketTraffic && roles.contains(BNRole.DEBUG)) {
+                if (SkyHanniMod.feature.event.bingo.bingoNetworks.showPacketTraffic && roles.contains(BNRole.DEBUG)) {
                     val json = message.split(Regex("\\."), 2)[1]
                     ChatUtils.clickableChat(
                         "§b[BN-REC]: $json",
@@ -497,7 +498,7 @@ object BNConnection {
         val serverId = clientRandom + packet.serverIdSuffix
 
         if (config.BNApiKey.isEmpty()) {
-            MojangUtils.authServer(serverId)
+            MojangUtils.joinServer(serverId)
             val connectPacket = RequestConnectPacket(
                 PlayerUtils.getRawUuid(),
                 clientRandom,
@@ -543,7 +544,7 @@ object BNConnection {
             reader = null
             socket = null
         } catch (e: Exception) {
-            if (e.message != null) Chat.sendPrivateMessageToSelfError(e.message)
+            if (e.message != null) ChatUtils.chat("§c"+e.message)
             e.printStackTrace()
         }
     }
