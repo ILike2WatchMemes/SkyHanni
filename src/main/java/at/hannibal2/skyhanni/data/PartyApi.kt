@@ -22,13 +22,17 @@ import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import de.hype.bingonet.shared.packets.function.RequestPartyStatePacket
 import de.hype.bingonet.shared.packets.function.RequestPartyStatePacket.PartyStatePacket
-import io.github.moulberry.notenoughupdates.util.TabListUtils
 import kotlin.random.Random
 
 @SkyHanniModule
 object PartyApi {
-
+    val hideConfig = SkyHanniMod.feature.misc.hidePartyMessagesConfig
     private val patternGroup = RepoPattern.group("data.party")
+
+    /**
+     * REGEX-TEST: §9-----------------------------------------------------
+     */
+    private val wrapper by patternGroup.pattern("wrapper", "§9-----------------------------------------------------")
 
     /**
      * REGEX-TEST: §eYou have joined §b[MVP§d+§b] Throwpo's §eparty!
@@ -38,6 +42,10 @@ object PartyApi {
         "§eYou have joined (?<name>.*)'s? §eparty!",
     )
 
+    private val otherDisconnect5MinTimePattern by patternGroup.pattern(
+        "others.disconnect.5min",
+        ".*has disconnected, they have 5 minutes to rejoin before they are removed from the party.",
+    )
     /**
      * REGEX-TEST: §b[MVP§d+§b] Throwpo §ejoined the party.
      */
@@ -195,6 +203,12 @@ object PartyApi {
     fun onChat(event: SkyHanniChatEvent) {
         val message = event.message.trimWhiteSpace().removeResets()
 
+        wrapper.matchMatcher(message){
+            if (hideConfig.hideWrapper) {
+                event.blockedReason = "Hide Party Messages: Hide Wrapper"
+            }
+        }
+
         // new member joined
         youJoinedPartyPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
@@ -207,6 +221,9 @@ object PartyApi {
                 partyLeader = PlayerUtils.getName()
             }
             addPlayer(name)
+            if (partyMembers.size >= hideConfig.hideJoinAndLeave) {
+                event.blockedReason = "Hide Party Messages: Hide Join/Leave"
+            }
         }
         othersInThePartyPattern.matchMatcher(message) {
             for (name in group("names").split(", ")) {
@@ -226,18 +243,35 @@ object PartyApi {
         otherLeftPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             removeWithLeader(name)
+            if (partyMembers.size >= hideConfig.hideJoinAndLeave) {
+                event.blockedReason = "Hide Party Messages: Hide Join/Leave"
+            }
         }
         otherKickedPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             removeWithLeader(name)
+            if (partyMembers.size >= hideConfig.hideKicks) {
+                event.blockedReason = "Hide Party Messages: Hide Kicks"
+            }
         }
         otherOfflineKickedPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             removeWithLeader(name)
+            if (partyMembers.size >= hideConfig.hideKicks) {
+                event.blockedReason = "Hide Party Messages: Hide Kicks"
+            }
         }
         otherDisconnectedPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
+            if (partyMembers.size >= hideConfig.hideDisconnects) {
+                event.blockedReason =  "Hide Party Messages: Hide Disconnects"
+            }
             partyMembers.remove(name)
+        }
+        otherDisconnect5MinTimePattern.matchMatcher(message) {
+            if (partyMembers.size>=hideConfig.hideDisconnects){
+                event.blockedReason = "Hide Party Messages: Hide Disconnects"
+            }
         }
         transferOnLeavePattern.matchMatcher(message.removeColor()) {
             val name = group("name").cleanPlayerName()
@@ -436,7 +470,7 @@ object PartyApi {
     }
 
     fun allPartyPlayersInLobby(): Boolean {
-        val playerList : Set<String> = EntityUtils.getPlayerList()
+        val playerList: Set<String> = EntityUtils.getPlayerList()
         return partyMembers.all { playerList.contains(it) }
     }
 
@@ -460,7 +494,7 @@ object PartyApi {
     fun partyChat(message: String, prefix: Boolean = false) {
         HypixelCommands.partyChat(
             message,
-            prefix
+            prefix,
         )
     }
     //TODO track party invites as part of player count since potential accepts.
