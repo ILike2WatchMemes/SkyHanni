@@ -24,6 +24,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.input.Keyboard
 
 class MiscConfig {
+
     @Expose
     @Category(name = "Pets", desc = "Pets Settings")
     val pets: PetConfig = PetConfig()
@@ -512,4 +513,7 @@ class MiscConfig {
     @FeatureToggle
     @OnlyModern
     var fixDoubleClicks: Boolean = true
+
+
+    val hidePartyMessagesConfig: HidePartyMessagesConfig = HidePartyMessagesConfig()
 }
