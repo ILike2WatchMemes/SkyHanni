@@ -42,10 +42,12 @@ object PartyApi {
         "§eYou have joined (?<name>.*)'s? §eparty!",
     )
 
+    //TODO
     private val otherDisconnect5MinTimePattern by patternGroup.pattern(
         "others.disconnect.5min",
         ".*has disconnected, they have 5 minutes to rejoin before they are removed from the party.",
     )
+
     /**
      * REGEX-TEST: §b[MVP§d+§b] Throwpo §ejoined the party.
      */
@@ -203,7 +205,7 @@ object PartyApi {
     fun onChat(event: SkyHanniChatEvent) {
         val message = event.message.trimWhiteSpace().removeResets()
 
-        wrapper.matchMatcher(message){
+        wrapper.matchMatcher(message) {
             if (hideConfig.hideWrapper) {
                 event.blockedReason = "Hide Party Messages: Hide Wrapper"
             }
@@ -264,12 +266,12 @@ object PartyApi {
         otherDisconnectedPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             if (partyMembers.size >= hideConfig.hideDisconnects) {
-                event.blockedReason =  "Hide Party Messages: Hide Disconnects"
+                event.blockedReason = "Hide Party Messages: Hide Disconnects"
             }
             partyMembers.remove(name)
         }
         otherDisconnect5MinTimePattern.matchMatcher(message) {
-            if (partyMembers.size>=hideConfig.hideDisconnects){
+            if (partyMembers.size >= hideConfig.hideDisconnects) {
                 event.blockedReason = "Hide Party Messages: Hide Disconnects"
             }
         }
