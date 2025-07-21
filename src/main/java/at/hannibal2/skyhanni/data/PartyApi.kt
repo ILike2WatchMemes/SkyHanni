@@ -438,7 +438,7 @@ object PartyApi {
     }
 
     fun onRequestPartyStatePacket(requestPartyStatePacket: RequestPartyStatePacket) {
-        val general = SkyHanniMod.feature.event.bingo.bingoNet.allow_bn_server_party
+        val general = SkyHanniMod.feature.event.bingo.bingoNetworks.allow_bn_server_party
         val count = if (general) partyMembers.size else 0
         val response = PartyStatePacket(
             general,

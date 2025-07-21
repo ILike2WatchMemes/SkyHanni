@@ -20,9 +20,7 @@ class BingoConfig {
     @Expose
     @ConfigOption(name = "Bingo Net", desc = "")
     @Accordion
-    val bingoNet: BingoNetConfig = BingoNetConfig()
-
-    val bingoBrewers: BingoBrewersConfig = BingoBrewersConfig()
+    val bingoNetworks: BingoNetworksConfig = BingoNetworksConfig()
 
     @Expose
     @ConfigOption(name = "Compact Chat Messages", desc = "")
@@ -60,25 +58,4 @@ class BingoConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var boopParty: Boolean = false
-
-    @Expose
-    @FeatureToggle
-    @ConfigOption(
-        name = "Splasher Overlay",
-        desc = "Show Data that is useful for a Splasher in an Overlay after you announced a Splash."
-    )
-    val useSplasherOverlay: Boolean = true
-
-    @FeatureToggle
-    @Expose
-    @ConfigOption(
-        name = "Show Splash Status Updates",
-        desc = "Will inform you about Splash Status Updates in the Chat."
-    )
-    val showSplashStatusUpdates: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Bingo Multipurpose", desc = "Used for various Features in regards to Bingo such as Warp to Hub Selector (Splash) or Minion crafting.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_R)
-    val bingoKeybind: Property<Int> = Property.of(Keyboard.KEY_R)
 }
