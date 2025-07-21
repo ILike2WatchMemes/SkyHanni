@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
@@ -21,6 +22,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import de.hype.bingonet.shared.packets.function.RequestPartyStatePacket
 import de.hype.bingonet.shared.packets.function.RequestPartyStatePacket.PartyStatePacket
+import io.github.moulberry.notenoughupdates.util.TabListUtils
 import kotlin.random.Random
 
 @SkyHanniModule
@@ -434,11 +436,12 @@ object PartyApi {
     }
 
     fun allPartyPlayersInLobby(): Boolean {
-        return partyMembers.all { PlayerUtils.isPlayerInLobby(it) }
+        val playerList : Set<String> = EntityUtils.getPlayerList()
+        return partyMembers.all { playerList.contains(it) }
     }
 
     fun onRequestPartyStatePacket(requestPartyStatePacket: RequestPartyStatePacket) {
-        val general = SkyHanniMod.feature.event.bingo.bingoNetworks.allow_bn_server_party
+        val general = SkyHanniMod.feature.event.bingo.bingoNetworks.allowBNServerPartyManagement
         val count = if (general) partyMembers.size else 0
         val response = PartyStatePacket(
             general,

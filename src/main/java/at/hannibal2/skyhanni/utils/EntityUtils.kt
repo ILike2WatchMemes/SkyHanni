@@ -61,6 +61,10 @@ object EntityUtils {
         return list
     }
 
+    fun getPlayerList(): Set<String> {
+        return getPlayerEntities().map { it.name }.toHashSet()
+    }
+
     @Deprecated("Use Mob Detection Instead")
     fun EntityLivingBase.getAllNameTagsInRadiusWith(
         contains: String,

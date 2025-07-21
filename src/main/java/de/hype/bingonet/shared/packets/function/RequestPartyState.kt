@@ -5,7 +5,7 @@ import de.hype.bingonet.shared.packets.base.ExpectReplyPacket
 /**
  * Used by the Server to find the best person to send out an invite.
  */
-class RequestPartyStatePacket : ExpectReplyPacket<RequestPartyStatePacket.PartyStatePacket>(1, 1) {
+class RequestPartyStatePacket : ExpectReplyPacket<RequestPartyStatePacket.PartyStatePacket>() {
     data class PartyStatePacket(
         val allowServerPartyInvite: Boolean,
         val isInParty: Boolean,

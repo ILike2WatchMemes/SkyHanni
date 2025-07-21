@@ -22,7 +22,7 @@ class RequestUserInfoPacket : AbstractPacket {
         bingoPoints: Int?,
         displayPrefix: String?,
         roles: MutableList<String>
-    ) : super(1, 1) {
+    ) {
         this.requestUpToDateData = requestUpToDateData
         this.bbUserId = bbUserId
         this.mcUsername = mcUsername
@@ -39,7 +39,7 @@ class RequestUserInfoPacket : AbstractPacket {
         mcUsername: String?,
         dcUserId: Long?,
         roles: MutableList<String>
-    ) : super(1, 1) {
+    ) {
         this.requestUpToDateData = requestUpToDateData
         this.bbUserId = bbUserId
         this.mcUsername = mcUsername

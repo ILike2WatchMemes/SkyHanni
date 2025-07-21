@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.environment.packetconfig
+package de.hype.bingonet.environment.packetconfig
 
 import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.BNConnection
+import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.environment.packetconfig.Packet
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.features.bingo.bingonet.SplashManager
-import de.hype.bingonet.environment.packetconfig.AbstractPacket
 import de.hype.bingonet.shared.packets.function.CommandChatPromptPacket
 import de.hype.bingonet.shared.packets.function.GetWaypointsPacket
 import de.hype.bingonet.shared.packets.function.MinionDataResponse
@@ -95,12 +95,6 @@ object BNPacketManager{
         packets.add(Packet<WaypointPacket>(WaypointPacket::class.java, BNConnection::onWaypointPacket))
         packets.add(Packet<CompletedGoalPacket>(CompletedGoalPacket::class.java, BNConnection::onCompletedGoalPacket))
         packets.add(Packet<WantedSearchPacket>(WantedSearchPacket::class.java, BNConnection::onWantedSearchPacket))
-        packets.add(
-            Packet<CommandChatPromptPacket>(
-                CommandChatPromptPacket::class.java,
-                BNConnection::onCommandChatPromptPacket,
-            ),
-        )
         packets.add(
             Packet<PacketChatPromptPacket>(
                 PacketChatPromptPacket::class.java,

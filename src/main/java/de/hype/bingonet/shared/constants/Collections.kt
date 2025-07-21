@@ -1,9 +1,8 @@
 package de.hype.bingonet.shared.constants
 
-import de.hype.bingonet.shared.compilation.sbenums.NeuRepoManager
-import de.hype.bingonet.shared.compilation.sbenums.minions.MinionRepoManager
-import de.hype.bingonet.shared.compilation.sbenums.minions.MinionType
-import io.github.moulberry.repo.data.NEUItem
+
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
+import at.hannibal2.skyhanni.utils.NeuItems
 import kotlin.math.min
 
 @Suppress("unused", "EnumEntryName")
@@ -265,14 +264,5 @@ interface Collections {
         }
 
         val values: MutableSet<Collections> = values()
-    }
-
-    fun asNEUItem(): NEUItem {
-        return NeuRepoManager.items.get(id.replace(":", "-"))!!
-    }
-
-    fun getMinionType(): MinionType? {
-        val minionId = minionID ?: return null
-        return MinionRepoManager.minionTypes[minionId]
     }
 }

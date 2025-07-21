@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.bingo.bingonet.SplashManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -19,6 +20,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.createSound
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import de.hype.bingonet.environment.packetconfig.AbstractPacket
@@ -31,6 +33,7 @@ import de.hype.bingonet.shared.packets.function.*
 import de.hype.bingonet.shared.packets.function.MinionDataResponse.RequestMinionDataPacket
 import de.hype.bingonet.shared.packets.network.*
 import de.hype.bingonet.shared.packets.network.WantedSearchPacket.WantedSearchPacketReply
+import net.minecraft.potion.Potion
 import tv.twitch.chat.Chat
 import java.io.*
 import java.lang.String
@@ -99,7 +102,7 @@ object BNConnection {
         }
     }
 
-    fun connect(serverIP: kotlin.String, serverPort: Int) {
+    fun connect(serverIP: kotlin.String = "hackthetime.de", serverPort: Int) {
         try {
             val sslContext = createSSLContext()
             val sslSocketFactory = sslContext.socketFactory
@@ -302,10 +305,15 @@ object BNConnection {
             if (retry <= 0) {
                 ChatUtils.chat("§cBN: Failed to send packet $packetName. Not connected to Bingo Net Server.")
             } else {
-                BNConnection.reconnectToBNserver()
+                BNConnection.reconnectToBNServer()
                 sendPacket(packet, blockLog, retry - 1)
             }
         }
+    }
+
+    fun BNConnection.reconnectToBNServer(ignoreIfConnected: Boolean = true){
+        connect(serverPort = 5000)
+        TODO("fix the port. just random from memory")
     }
 
     fun onBroadcastMessagePacket(packet: BroadcastMessagePacket) {
@@ -320,11 +328,16 @@ object BNConnection {
         } else {
             SplashManager.addSplash(packet.splash, SplashManager.SplashSource.BN)
             if (packet.splash.lessWaste) {
-                waitTime = min(((EnvironmentCore.utils.getPotTime() * 1000) / 80), 25 * 1000)
+                val potion = MinecraftCompat.localPlayer.getActivePotionEffect(Potion.damageBoost)
+                val remainingDuration =
+                if ((potion?.amplifier ?: 0) >= 7) {
+                    potion.duration/20
+                }else 0
+                waitTime = min((remainingDuration / 80), 25)
             } else {
                 waitTime = 0
             }
-            DelayedRun.runDelayed(waitTime.milliseconds) {
+            DelayedRun.runDelayed(waitTime.seconds) {
                 SplashManager.display(packet.splash.splashId, SplashManager.SplashSource.BN)
             }
         }
@@ -360,9 +373,9 @@ object BNConnection {
                 (packet.waitBeforeReconnect[i] + (Math.random() * packet.randomExtraDelay)).seconds,
                 {
                     if (finalI == 0) {
-                        connectToBBserver()
+                        reconnectToBNServer(false)
                     } else {
-                        conditionalReconnectToBBserver()
+                        reconnectToBNServer(true)
                     }
                 },
             )
@@ -384,7 +397,7 @@ object BNConnection {
                 DelayedRun.runDelayed(
                     i.seconds,
                     {
-                        conditionalReconnectToBBserver()
+                        reconnectToBNServer(true)
                     },
                 )
             }
@@ -583,7 +596,7 @@ object BNConnection {
         if (packet.serverId != null && !(HypixelData.serverId?.matches(Regex(packet.serverId)) ?: false)
         ) return
         if (packet.mega != null && packet.mega != HypixelData.isInMega()) return
-        val players: List<kotlin.String> = HypixelData.getPlayersOnCurrentServer()
+        val players: Set<kotlin.String> = EntityUtils.getPlayerList()
         if (packet.maximumPlayerCount != null && packet.maximumPlayerCount <= players.size) return
         if (packet.minimumPlayerCount != null && packet.minimumPlayerCount >= players.size) return
         if (packet.username != null && !players.contains(packet.username)) return
@@ -625,7 +638,7 @@ object BNConnection {
             },
             10,
         )
-        Chat.sendPrivateMessageToSelfText(packet.printMessage)
+        ChatUtils.chat(packet.message)
         BingoNet.temporaryConfig.lastChatPromptAnswer = prompt
     }
 

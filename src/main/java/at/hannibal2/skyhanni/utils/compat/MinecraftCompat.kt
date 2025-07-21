@@ -28,7 +28,5 @@ object MinecraftCompat {
     //$$ val showDebugHud get(): Boolean = MinecraftClient.getInstance().debugHud.shouldShowDebugHud()
     //#endif
 
-    val worldDay get() : Int? = {
-        localWorldOrNull?.worldTime
-    }
+    val worldDay get() : Int = { localWorldOrNull?.worldTime }
 }

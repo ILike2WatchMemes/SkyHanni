@@ -24,7 +24,7 @@ class WantedSearchPacket : ExpectReplyPacket<WantedSearchPacket.WantedSearchPack
         mega: Boolean? = null,
         minimumPlayerCount: Int? = null,
         maximumPlayerCount: Int? = null,
-    ) : super(1, 1) {
+    ) : super() {
         this.username = mcUsername
         this.serverId = serverId
         this.mega = mega
@@ -35,7 +35,7 @@ class WantedSearchPacket : ExpectReplyPacket<WantedSearchPacket.WantedSearchPack
 
     class WantedSearchPacketReply(
         @JvmField var finder: String,
-        @JvmField var usernames: List<String>,
+        @JvmField var usernames: Set<String>,
         var megaServer: Boolean,
         @JvmField var serverId: String,
     ) : ExpectReplyPacket.ReplyPacket() {

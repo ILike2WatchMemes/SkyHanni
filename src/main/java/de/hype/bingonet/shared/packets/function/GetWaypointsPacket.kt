@@ -1,7 +1,6 @@
 package de.hype.bingonet.shared.packets.function
 
 import de.hype.bingonet.environment.packetconfig.AbstractPacket
-import de.hype.bingonet.shared.objects.ClientWaypointData
 import de.hype.bingonet.shared.objects.WaypointData
 
 /**

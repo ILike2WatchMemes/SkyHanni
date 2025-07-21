@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.environment.packetconfig
+package de.hype.bingonet.environment.packetconfig
 
 object TradeTypeEnvironmentRegistry {
     val CATACOMBS_FLOOR_2_300_SCORE: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()

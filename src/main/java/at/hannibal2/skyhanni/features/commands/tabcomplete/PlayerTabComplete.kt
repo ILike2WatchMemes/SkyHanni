@@ -23,7 +23,7 @@ object PlayerTabComplete {
     private val partyMembersEntry = lazyEntry { PartyApi.partyMembers }
     private val guildMembersEntry = lazyEntry { GuildApi.getAllMembers() }
     private val vipVisitsEntry = lazyEntry { vipVisits }
-    private val islandPlayersEntry = lazyEntry { EntityUtils.getPlayerEntities().map { it.name } }
+    private val islandPlayersEntry = lazyEntry { EntityUtils.getPlayerList() }
 
     private val suggestions = SuggestionProvider.build {
         parent("f", "friend") {
@@ -88,7 +88,7 @@ object PlayerTabComplete {
             addAll(FriendApi.getAllFriends().filter { it.bestFriend || !config.onlyBestFriends }.map { it.name })
         }
         if (config.islandPlayers && PlayerCategory.ISLAND_PLAYERS !in categories) {
-            addAll(EntityUtils.getPlayerEntities().map { it.name })
+            addAll(EntityUtils.getPlayerList())
         }
         if (config.party && PlayerCategory.PARTY !in categories) {
             addAll(PartyApi.partyMembers)
@@ -98,7 +98,7 @@ object PlayerTabComplete {
         }
     }
 
-    private fun lazyEntry(getter: () -> List<String>) = LazySuggestionEntry { addAll(getter()) }
+    private fun lazyEntry(getter: () -> Collection<String>) = LazySuggestionEntry { addAll(getter()) }
 
     fun handleTabComplete(command: String): List<String>? = suggestions.getSuggestions(command).takeIf {
         it.isNotEmpty()

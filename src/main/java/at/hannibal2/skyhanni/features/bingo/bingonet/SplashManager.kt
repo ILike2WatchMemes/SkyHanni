@@ -44,7 +44,7 @@ object SplashManager {
         if (splash != null) {
             splash.status = packet.status
             if (splash.alreadyDisplayed) {
-                if (SkyHanniMod.feature.event.bingo.showSplashStatusUpdates && splash.hubSelectorData != null) {
+                if (SkyHanniMod.feature.event.bingo.bingoNetworks.showSplashStatusUpdates && splash.hubSelectorData != null) {
                     ChatUtils.chat("§6The Splash in ${splash.hubSelectorData.hubType.getDisplayName()} §a#${splash.hubSelectorData?.hubNumber ?: splash.serverID}§6 is now §d${packet.status.displayName}§r.")
                 }
             }

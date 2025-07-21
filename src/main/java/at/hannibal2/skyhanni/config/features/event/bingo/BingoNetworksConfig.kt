@@ -9,13 +9,19 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.input.Keyboard
 
 class BingoNetworksConfig {
-    val useBB: Boolean
 
     @Expose
-    @ConfigOption(name = "Enable Bingo Net", desc = "Bingo Net is based on a closed Source Project by Hype_the_Time")
+    @ConfigOption(name = "Enable Bingo Net (§c⚠ Closed Source Server!§r)", desc = "§c§lBingo Net is based on a closed Source Project by Hype_the_Time. SkyHanni has no insight nor control over the Servers.")
     @ConfigEditorBoolean
     @FeatureToggle
     var useBN: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Enable Bingo Brewers (§c⚠ Closed Source Server§r)", desc = "§c§lThe Bingo Brewers Network is a closed Source Project by indigo_polecat. SkyHanni has no insight nor control over the Servers.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var useBB: Boolean = false
+
 
     //TODO requires restart rn still so fix somehow?
 
@@ -44,10 +50,10 @@ class BingoNetworksConfig {
     @ConfigEditorBoolean
     var BNApiKey: String = ""
 
-    val showGoalCompletions: Boolean = false
-    val showCardCompletions: Boolean = false
+    var showGoalCompletions: Boolean = false
+    var showCardCompletions: Boolean = false
 
-    val showPacketTraffic = false
+    var showPacketTraffic = false
 
 
     //TODO hide unless you have splasher perm?
@@ -57,7 +63,7 @@ class BingoNetworksConfig {
         name = "Splasher Overlay",
         desc = "Show Data that is useful for a Splasher in an Overlay after you announced a Splash."
     )
-    val useSplasherOverlay: Boolean = true
+    var useSplasherOverlay: Boolean = true
 
     @FeatureToggle
     @Expose
@@ -65,10 +71,26 @@ class BingoNetworksConfig {
         name = "Show Splash Status Updates",
         desc = "Will inform you about Splash Status Updates in the Chat."
     )
-    val showSplashStatusUpdates: Boolean = true
+    var showSplashStatusUpdates: Boolean = true
 
     @Expose
     @ConfigOption(name = "Splash Multipurpose Keybind", desc = "Used to trigger Server Warp and if in Hub Selector to warp to the right splash automatically.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_R)
-    val splashHubWarp: Property<Int?> = Property.of(Keyboard.KEY_R)
+    var splashHubWarp: Property<Int?> = Property.of(Keyboard.KEY_R)
+
+    @Expose
+    @FeatureToggle
+    @ConfigOption(
+        name = "Show Private Splashes",
+        desc = "Show Splashes that require you to join a party to be warped in."
+    )
+    var showPrivateSplashes: Boolean = true
+
+    @Expose
+    @FeatureToggle
+    @ConfigOption(
+        name = "Auto Splash Status Updates",
+        desc = "Will automatically change the Status of YOUR Splashes to match the current State."
+    )
+    var autoSplashStatusUpdates: Boolean = true
 }
