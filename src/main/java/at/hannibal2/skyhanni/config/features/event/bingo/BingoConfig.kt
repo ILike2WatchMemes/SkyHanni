@@ -58,4 +58,23 @@ class BingoConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var boopParty: Boolean = false
+
+
+    @Expose
+    @ConfigOption(
+        name = "Party Broadcast Cata Level UP",
+        desc = "Send a Short Cata Level UP message with the new level into the Party so the Carrier knows whether they can go next Floor."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var sendCataLevelUP: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Party Broadcast Important Cata Milestones",
+        desc = "Send a Short Cata Milestone message into the Party when you reach Cata Milestone 2 and 3."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var sendImportantCataMilestones: Boolean = false
 }
