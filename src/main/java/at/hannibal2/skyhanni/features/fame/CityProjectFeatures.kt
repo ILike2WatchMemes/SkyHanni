@@ -39,6 +39,8 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -177,7 +179,7 @@ object CityProjectFeatures {
         val name = internalName.repoItemName
         val price = internalName.getPrice() * amount
 
-        return Renderable.line {
+        return Renderable.horizontal {
             addString(" §7- ")
             addItemStack(stack)
             add(materialLink(name, amount))
@@ -239,7 +241,7 @@ object CityProjectFeatures {
             if (lore.isEmpty()) continue
             val last = lore.last()
             if (last == "§eClick to contribute!") {
-                slot.highlight(event.context, LorenzColor.YELLOW)
+                slot.highlight(LorenzColor.YELLOW)
             }
         }
     }
