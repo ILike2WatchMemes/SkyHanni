@@ -1,6 +1,7 @@
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -60,6 +61,8 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
     private JButton buttonInstall = null;
     private JButton buttonOpenFolder = null;
     private JButton buttonClose = null;
+    private JLabel thirdPartyLabel = null;
+    private JCheckBox thirdPartyCheckbox = null;
     private int x = 0;
     private int y = 0;
 
@@ -152,11 +155,45 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
                 panelCenter.add(getLabelFolder(), getLabelFolder().getName());
                 panelCenter.add(getFieldFolder(), getFieldFolder().getName());
                 panelCenter.add(getButtonFolder(), getButtonFolder().getName());
+                panelBottom.add(getThirdPartyLabel(), getThirdPartyLabel().getName());
+                panelBottom.add(getThirdPartyCheckbox(), getThirdPartyCheckbox().getName());
             } catch (Throwable ivjExc) {
                 showErrorPopup(ivjExc);
             }
         }
         return panelCenter;
+    }
+
+    private JLabel getThirdPartyLabel() {
+        if (thirdPartyLabel == null) {
+            try {
+                thirdPartyLabel = new JLabel();
+                thirdPartyLabel.setName("Third Party Server");
+                thirdPartyLabel.setText("Do you want to enable closed source third party services? (Bingo Net, Bingo Brewers, etc.)");
+                thirdPartyLabel.setFont(new Font(Font.DIALOG, Font.PLAIN, 12));
+                thirdPartyLabel.setHorizontalAlignment(SwingConstants.LEFT);
+            } catch (Throwable ivjExc) {
+                showErrorPopup(ivjExc);
+            }
+        }
+        return thirdPartyLabel;
+    }
+
+    private JCheckBox getThirdPartyCheckbox() {
+        //todo fully implement the actual execution since the use bb and use bn setting has to be enabled.
+        if (thirdPartyCheckbox == null) {
+            try {
+                thirdPartyCheckbox = new JCheckBox();
+                thirdPartyCheckbox.setName("Use Third Party Servers");
+                thirdPartyCheckbox.setSelected(false);
+                thirdPartyCheckbox.setHorizontalAlignment(SwingConstants.LEFT);
+                thirdPartyCheckbox.setFont(new Font(Font.DIALOG, Font.PLAIN, 12));
+                thirdPartyCheckbox.setText("⚠Do you want to enable closed source third party services? (Bingo Net, Bingo Brewers, etc.). THESE ARE OUTSIDE OF SKYHANNI'S CONTROL!⚠");
+            } catch (Throwable ivjExc) {
+                showErrorPopup(ivjExc);
+            }
+        }
+        return thirdPartyCheckbox;
     }
 
     private JLabel getPictureLabel() {
