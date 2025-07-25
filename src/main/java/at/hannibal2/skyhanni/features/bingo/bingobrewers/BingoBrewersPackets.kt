@@ -182,10 +182,10 @@ object BingoBrewersPackets {
     }
 
     class CHChestItem {
-        var name: String? = null
-        var count: String? = null
-        var numberColor: Int? = null
-        var itemColor: Int? = null
+        var name: String = "Missing"
+        var count: String = "0"
+        var numberColor: Int = 0
+        var itemColor: Int = 0
     }
 
     class SubscribeToCHServer {
@@ -195,8 +195,8 @@ object BingoBrewersPackets {
     }
 
     class receiveCHItems : BingoBrewersPacket<receiveCHItems>() {
-        var chestMap: java.util.ArrayList<ChestInfo>? = null
-        var server: String? = null // used to confirm that the server is correct
+        var chestMap: java.util.ArrayList<ChestInfo> = java.util.ArrayList<ChestInfo>()
+        var server: String = "" // used to confirm that the server is correct
         var day: Int = 0 // server's last known day
         var lastReceivedDayInfo: Long = Long.MAX_VALUE
 

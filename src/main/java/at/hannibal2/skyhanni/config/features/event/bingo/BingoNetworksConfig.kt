@@ -3,12 +3,11 @@ package at.hannibal2.skyhanni.config.features.event.bingo
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.KeyBind
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class BingoNetworksConfig {
-
-
     @Expose
     @ConfigOption(
         name = "Enable Bingo Net (§c⚠ Closed Source Server!§r)",
@@ -17,11 +16,19 @@ class BingoNetworksConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var useBN: Boolean = false
-
+    @Expose
+    @ConfigOption(
+        name = "Bingo Net API/Legacy Key - Optional",
+        desc = "API/Legacy Key can be used instead of Mojang Auth. This prevents the possible restart your client message when the Mojang Tokens expired. Leave empty to use Mojang Auth.",
+    )
+    @ConfigEditorBoolean
+    var BNApiKey: String = ""
     @Expose
     @ConfigOption(
         name = "Enable Bingo Brewers (§c⚠ Closed Source Server§r)",
-        desc = "§c§lThe Bingo Brewers Network is a closed Source Project by indigo_polecat. SkyHanni has no insight nor control over the Servers.",
+        desc = "§c§lThe Bingo Brewers Network is a closed Source Project by indigo_polecat. " +
+            "SkyHanni has no insight nor control over the Servers. " +
+            "Bingo Brewers does not support all Features and some only partially."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -52,14 +59,6 @@ class BingoNetworksConfig {
     @ConfigOption(name = "Show Bingo Chat", desc = "Bingo Chat is a Chat every Bingo Net ")
     @ConfigEditorBoolean
     var showBingoChat: Boolean = true
-
-    @Expose
-    @ConfigOption(
-        name = "Bingo Net API/Legacy Key",
-        desc = "API/Legacy Key can be used instead of Mojang Auth. This prevents the possible restart your client message when the Mojang Tokens expired. Leave empty to use Mojang Auth.",
-    )
-    @ConfigEditorBoolean
-    var BNApiKey: String = ""
 
     var showGoalCompletions: Boolean = false
     var showCardCompletions: Boolean = false
@@ -113,4 +112,10 @@ class BingoNetworksConfig {
         desc = "Will automatically change the Status of YOUR Splashes to match the current State.",
     )
     var autoSplashStatusUpdates: Boolean = true
+
+
+    @Expose
+    @ConfigOption(name = "Ch Chest Items Config", desc = "Configure the Chat Prompt Key and which items your are interested in.")
+    @Accordion
+    val chChestConfig: ChChestConfig = ChChestConfig()
 }

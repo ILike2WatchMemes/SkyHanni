@@ -697,6 +697,9 @@ class ProfileSpecificStorage(
     }
 
     class MiningStorage {
+        //TODO add the code for this
+        val hotmLevel: Int = 0
+
         @Expose
         var kingsTalkedTo: MutableList<String> = mutableListOf()
 

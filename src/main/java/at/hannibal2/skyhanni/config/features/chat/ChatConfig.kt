@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.chat
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.KeyBind
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -223,4 +224,12 @@ class ChatConfig {
         desc = "A Multiplier for the duration for which a Chat Prompt is valid for.",
     )
     val chatPromptExpirationMultiplier: Double = 1.0
+
+    @Expose
+    @ConfigOption(
+        name = "Answer Suggested NPC Response Chat Prompts",
+        desc = "Some NPCs have dialogue that you need to answer (stuff like §a[Yes]§r)",
+    )
+    val npcResponseSuggestion : KeyBind = KeyBind()
+
 }
