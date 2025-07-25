@@ -1,23 +1,28 @@
 package at.hannibal2.skyhanni.config.features.event.bingo
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.KeyBind
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import io.github.notenoughupdates.moulconfig.observer.Property
-import org.lwjgl.input.Keyboard
 
 class BingoNetworksConfig {
 
+
     @Expose
-    @ConfigOption(name = "Enable Bingo Net (§c⚠ Closed Source Server!§r)", desc = "§c§lBingo Net is based on a closed Source Project by Hype_the_Time. SkyHanni has no insight nor control over the Servers.")
+    @ConfigOption(
+        name = "Enable Bingo Net (§c⚠ Closed Source Server!§r)",
+        desc = "§c§lBingo Net is based on a closed Source Project by Hype_the_Time. SkyHanni has no insight nor control over the Servers.",
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     var useBN: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Enable Bingo Brewers (§c⚠ Closed Source Server§r)", desc = "§c§lThe Bingo Brewers Network is a closed Source Project by indigo_polecat. SkyHanni has no insight nor control over the Servers.")
+    @ConfigOption(
+        name = "Enable Bingo Brewers (§c⚠ Closed Source Server§r)",
+        desc = "§c§lThe Bingo Brewers Network is a closed Source Project by indigo_polecat. SkyHanni has no insight nor control over the Servers.",
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     var useBB: Boolean = false
@@ -36,7 +41,10 @@ class BingoNetworksConfig {
     var chestWaypoints: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Allow Server Invite", desc = "Allows the BingoNet Server to Manage your parties. This is required for some Features.")
+    @ConfigOption(
+        name = "Allow Server Invite",
+        desc = "Allows the BingoNet Server to Manage your parties. This is required for some Features.",
+    )
     @ConfigEditorBoolean
     var allowBNServerPartyManagement: Boolean = true
 
@@ -46,7 +54,10 @@ class BingoNetworksConfig {
     var showBingoChat: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Bingo Net API/Legacy Key", desc = "API/Legacy Key can be used instead of Mojang Auth. This prevents the possible restart your client message when the Mojang Tokens expired. Leave empty to use Mojang Auth.")
+    @ConfigOption(
+        name = "Bingo Net API/Legacy Key",
+        desc = "API/Legacy Key can be used instead of Mojang Auth. This prevents the possible restart your client message when the Mojang Tokens expired. Leave empty to use Mojang Auth.",
+    )
     @ConfigEditorBoolean
     var BNApiKey: String = ""
 
@@ -61,7 +72,7 @@ class BingoNetworksConfig {
     @FeatureToggle
     @ConfigOption(
         name = "Splasher Overlay",
-        desc = "Show Data that is useful for a Splasher in an Overlay after you announced a Splash."
+        desc = "Show Data that is useful for a Splasher in an Overlay after you announced a Splash.",
     )
     var useSplasherOverlay: Boolean = true
 
@@ -69,28 +80,37 @@ class BingoNetworksConfig {
     @Expose
     @ConfigOption(
         name = "Show Splash Status Updates",
-        desc = "Will inform you about Splash Status Updates in the Chat."
+        desc = "Will inform you about Splash Status Updates in the Chat.",
     )
     var showSplashStatusUpdates: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Splash Multipurpose Keybind", desc = "Used to trigger Server Warp and if in Hub Selector to warp to the right splash automatically.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_R)
-    var splashHubWarp: Property<Int?> = Property.of(Keyboard.KEY_R)
+    @ConfigOption(
+        name = "Splash Multipurpose Keybind",
+        desc = "Used to trigger Server Warp and if in Hub Selector to warp to the right splash automatically.",
+    )
+    var splashHubWarp: KeyBind = KeyBind()
 
     @Expose
     @FeatureToggle
     @ConfigOption(
         name = "Show Private Splashes",
-        desc = "Show Splashes that require you to join a party to be warped in."
+        desc = "Show Splashes that require you to join a party to be warped in.",
     )
     var showPrivateSplashes: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Server Action Chat Prompt Key",
+        desc = "Shown when a Bingo Network server wants to receive an acknowledgement. NOT USED FOR PARTY COMMANDS",
+    )
+    val serverActionChatPrompt = KeyBind()
 
     @Expose
     @FeatureToggle
     @ConfigOption(
         name = "Auto Splash Status Updates",
-        desc = "Will automatically change the Status of YOUR Splashes to match the current State."
+        desc = "Will automatically change the Status of YOUR Splashes to match the current State.",
     )
     var autoSplashStatusUpdates: Boolean = true
 }

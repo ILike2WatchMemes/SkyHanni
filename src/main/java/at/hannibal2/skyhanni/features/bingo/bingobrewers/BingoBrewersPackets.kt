@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.bingo.bingobrewers
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.features.bingo.bingonet.SplashManager
+import at.hannibal2.skyhanni.features.mining.crystalhollows.ChChestUpdateListener
 import at.hannibal2.skyhanni.utils.ChatUtils
 import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryonet.Client

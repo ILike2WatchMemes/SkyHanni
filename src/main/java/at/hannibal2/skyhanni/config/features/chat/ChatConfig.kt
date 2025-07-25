@@ -14,6 +14,8 @@ import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import org.lwjgl.input.Keyboard
 
 class ChatConfig {
+
+
     @Expose
     @ConfigOption(name = "Peek Chat", desc = "Hold this key to keep the chat open.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_Z)
@@ -130,7 +132,7 @@ class ChatConfig {
     @Expose
     @ConfigOption(
         name = "Compact Jacob Claim",
-        desc = "Compact the Jacob Claim message, only showing full information when hovering."
+        desc = "Compact the Jacob Claim message, only showing full information when hovering.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -205,4 +207,20 @@ class ChatConfig {
     @SearchTag("format")
     @FeatureToggle
     var shortenCoinAmounts: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Default Chat Prompt Keybind",
+        desc = "Some clickable messages have a Keybind you can use to execute their Code instead of having to click. " +
+            "All other Keybind can be configured to be different," +
+            " but this one will be the default if no custom one is set for the related feature.",
+    )
+    val defaultChatPrompt: Int = Keyboard.KEY_R
+
+    @Expose
+    @ConfigOption(
+        name = "Chat Prompt Expiration Multiplier",
+        desc = "A Multiplier for the duration for which a Chat Prompt is valid for.",
+    )
+    val chatPromptExpirationMultiplier: Double = 1.0
 }

@@ -63,7 +63,7 @@ object HubSelectorKeybinds {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onKeyPress(event: GuiKeyPressEvent) {
-        val key = config.splashHubWarp.get() ?: return
+        val key = config.splashHubWarp.getEffectiveKey()
         if (!mainInventory.isInside()) return
 
         val chest = event.guiContainer as? GuiChest ?: return
@@ -108,17 +108,6 @@ object HubSelectorKeybinds {
         val spots = data.maxPlayerCount - data.playerCount
         if (spots <= 3 || time > 45) return null
         return time.toInt() - spots
-    }
-
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (config.splashHubWarp.get() == null) return
-        if (!mainInventory.isInside()) return
-
-        // needed to not send duplicate clicks via keybind feature
-        if (event.clickType == GuiContainerEvent.ClickType.HOTBAR) {
-            event.cancel()
-        }
     }
 
     private fun ItemStack.parseToHubSelectorData(): HubData? {
