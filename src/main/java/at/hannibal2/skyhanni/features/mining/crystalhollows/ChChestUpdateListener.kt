@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.features.bingo.bingobrewers.BingoBrewersClient
 import at.hannibal2.skyhanni.features.bingo.bingobrewers.BingoBrewersPackets
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import de.hype.bingonet.BNConnection
 import de.hype.bingonet.shared.constants.ChChestItem
@@ -114,17 +115,14 @@ object ChChestUpdateListener {
         if (!config.chestWaypoints) return
         SkyHanniMod.launchCoroutine {
             if (event.oldIsland == IslandType.CRYSTAL_HOLLOWS) {
-                val unsubpacket = UnSubscribeToChServer(event.oldServerId, EnvironmentCore.utils.getPlayers().toSet())
+                val unsubpacket = UnSubscribeToChServer(event.oldServerId, EntityUtils.getPlayerList())
+                //TODO the player list is outdated due to the swap
                 if (config.useBN) BNConnection.sendPacket(unsubpacket)
                 if (config.useBB) {
                     val bbsub = BingoBrewersPackets.SubscribeToCHServer()
                     bbsub.server = event.oldServerId
                     bbsub.day = MinecraftCompat.worldDay //TODO change so this is the old world day
                     bbsub.unsubscribe = true
-                    //I'm not updating the day since I fear that my server leave task would send bad data since the
-                    // day is world based and my leave procs on new server join due too it being the only fabric
-                    // event. The Tablist Data gets updated slower, and so it is for the Hypixel API Location Packet.
-                    // Also the reason why i even removed the closing time field from my unsubscribe packet.
                     BingoBrewersClient.sendTCP(bbsub)
                 }
                 reset()

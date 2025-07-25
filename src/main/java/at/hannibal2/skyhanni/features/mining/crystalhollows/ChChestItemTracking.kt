@@ -42,7 +42,7 @@ object ChChestMessageAnalyser {
             if (isInMessage && wrapper.matches(message)) {
                 isInMessage = false
                 if (items.isNotEmpty()) {
-                    val coords = BingoNet.temporaryConfig.lastGlobalChchestCoords
+                    val coords = ChChestUpdateListener.lastGlobalChchestCoords
                     val chest = ChChestData(coords, items)
                     val serverId = HypixelData.serverId?:return@launchCoroutine
                     val bnPacket = ChChestPacket(chest, serverId)

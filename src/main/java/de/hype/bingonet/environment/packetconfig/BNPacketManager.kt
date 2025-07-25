@@ -4,6 +4,7 @@ import de.hype.bingonet.BNConnection
 import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.environment.packetconfig.Packet
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.features.bingo.bingonet.SplashManager
+import at.hannibal2.skyhanni.features.mining.crystalhollows.ChChestUpdateListener
 import de.hype.bingonet.shared.packets.function.GetWaypointsPacket
 import de.hype.bingonet.shared.packets.function.MinionDataResponse
 import de.hype.bingonet.shared.packets.function.PacketChatPromptPacket
@@ -116,13 +117,13 @@ object BNPacketManager{
         packets.add(
             Packet<ChChestPacket>(
                 ChChestPacket::class.java,
-                UpdateListenerManager::onChChestDataReceived,
+                ChChestUpdateListener::onChChestDataReceived,
             ),
         )
         packets.add(
             Packet<ChestLobbyUpdatePacket>(
                 ChestLobbyUpdatePacket::class.java,
-                (UpdateListenerManager::onChLobbyDataReceived),
+                (ChChestUpdateListener::onChLobbyDataReceived),
             ),
         )
     }

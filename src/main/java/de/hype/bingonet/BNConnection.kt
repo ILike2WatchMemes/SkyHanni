@@ -632,16 +632,11 @@ object BNConnection {
     }
 
     fun onPacketChatPromptPacket(packet: PacketChatPromptPacket) {
-        val prompt = ChatPrompt(
-            Runnable {
-                for (p in packet.packets) {
-                    sendPacket(p)
-                }
-            },
-            10,
-        )
-        ChatUtils.chat(packet.message)
-        BingoNet.temporaryConfig.lastChatPromptAnswer = prompt
+        ChatUtils.chatPrompt("§e[Sh-Bingo Net Server]${packet.message}",config.serverActionChatPrompt,{
+            for (p in packet.packets) {
+                sendPacket(p)
+            }
+        }, prefix = false)
     }
 
     @HandleEvent

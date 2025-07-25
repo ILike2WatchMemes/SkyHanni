@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.core.config.KeyBind
+import at.hannibal2.skyhanni.config.features.chat.ChatPromptUtils
 import at.hannibal2.skyhanni.data.ChatManager.deleteChatLine
 import at.hannibal2.skyhanni.data.ChatManager.editChatLine
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
@@ -9,8 +11,10 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.mixins.hooks.ChatLineData
 //#if MC < 1.21
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
-//#endif
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+//#endifimport at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils.CHAT_PREFIX
+import at.hannibal2.skyhanni.utils.ChatUtils.DEBUG_PREFIX
+import at.hannibal2.skyhanni.utils.ChatUtils.USER_ERROR_PREFIX
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
@@ -173,6 +177,31 @@ object ChatUtils {
         } else {
             chat(text)
         }
+    }
+
+    /**
+     * Sends a message to the user that they can click the message or use the given [keyBind] to run the [code] block.
+     *
+     * [message] supports the %KEY% placeholder which will be replaced with the effective key string of the [keyBind].
+     */
+    fun chatPrompt(
+        message: String,
+        keyBind: KeyBind,
+        code: () -> Unit,
+        hover: String = "§eThis Message is a Chat Prompt and can be clicked!",
+        prefix: Boolean = true,
+        prefixColor: String = "§e",
+    ) {
+        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
+
+        //TODO isnt the permanent click action essentially a small memory leak that bunches up over time?
+        val rawText = msgPrefix + message.replace("%KEY%", keyBind.getEffectiveKeyString())
+        val text = TextHelper.text(rawText) {
+            this.onClick(SimpleTimeMark.now().plus(keyBind.getEffectiveExpirationDuration()), true, code)
+            this.hover = hover.asComponent()
+        }
+        ChatPromptUtils.setActivePrompt(keyBind,code)
+        chat(text)
     }
 
     /**
