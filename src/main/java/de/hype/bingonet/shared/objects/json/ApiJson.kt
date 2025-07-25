@@ -166,7 +166,7 @@ class ApiJson {
             try {
                 val obj: JsonObject? = this.jSONObjectSafe
                 if (obj == null) return HashMap<String, ApiJson>()
-                val keys = obj.keySet().toMutableList()
+                val keys = obj.entrySet().map { it.key }
                 val subs: MutableMap<String, ApiJson> = HashMap()
                 for (key in keys) {
                     subs.put(key, ApiJson(obj.getAsJsonObject(key)))

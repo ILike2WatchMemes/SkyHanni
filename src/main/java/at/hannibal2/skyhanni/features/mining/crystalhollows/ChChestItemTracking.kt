@@ -2,22 +2,18 @@ package at.hannibal2.skyhanni.features.mining.crystalhollows
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.BNConnection
+import de.hype.bingonet.BNConnection
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.bingo.bingobrewers.BingoBrewersClient
 import at.hannibal2.skyhanni.features.bingo.bingobrewers.BingoBrewersPackets
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import com.esotericsoftware.kryonet.Server
 import de.hype.bingonet.shared.constants.ChChestItem
 import de.hype.bingonet.shared.objects.ChChestData
 import de.hype.bingonet.shared.packets.mining.ChChestPacket
-import kotlin.time.Duration.Companion.days
 
 @SkyHanniModule
 object ChChestMessageAnalyser {

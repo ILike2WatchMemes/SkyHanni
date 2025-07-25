@@ -1,26 +1,27 @@
 package de.hype.bingonet.environment.packetconfig
 
-object TradeTypeEnvironmentRegistry {
-    val CATACOMBS_FLOOR_2_300_SCORE: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
-    val CATACOMBS_FLOOR_2_250_SCORE: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
-    val AUTO_SLAYER_UNLOCK: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
-    val CARRY_ENTRANCE_TO_F3_COMPLETION: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
-    val KABOOM_ASSISTANCE: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
-    val OPEN_VIKING: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
-    val ENCHANT_ITEMS: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
-    val CATACOMBS_FLOOR_1_230_SCORE: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
-    val CATACOMBS_FLOOR_1_270_SCORE: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
-    val CARRY_LILY_PAD_GOAL: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
-    val DAILY_MAX_ENCHANTING: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
-    val CARRY_CHALLENGING_ROD: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
-    val CRIMSON_ISLE_BARBARIAN_FACTION: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
-    val SPIDER_ESSENCE_COM_GOAL: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
-    val MINING_COMMISSIONS: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
-    val SLAYER_TIER_4: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
-    val SLAYER_TIER_5: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
-    val SPAWN_SCATHA: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
-    val GIFTS: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
-    val CARRY_INK_SACKS: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
-    val CRIMSON_ISLE_MAGE_FACTION: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
-    val CHUM_BUCKET: TradeTypeEnvironmentRegistry = TradeTypeEnvironmentRegistry()
+enum class TradeTypeEnvironmentRegistry {
+    CATACOMBS_FLOOR_2_300_SCORE,
+    CATACOMBS_FLOOR_2_250_SCORE,
+    AUTO_SLAYER_UNLOCK,
+    CARRY_ENTRANCE_TO_F3_COMPLETION,
+    KABOOM_ASSISTANCE,
+    OPEN_VIKING,
+    ENCHANT_ITEMS,
+    CATACOMBS_FLOOR_1_230_SCORE,
+    CATACOMBS_FLOOR_1_270_SCORE,
+    CARRY_LILY_PAD_GOAL,
+    DAILY_MAX_ENCHANTING,
+    CARRY_CHALLENGING_ROD,
+    CRIMSON_ISLE_BARBARIAN_FACTION,
+    SPIDER_ESSENCE_COM_GOAL,
+    MINING_COMMISSIONS,
+    SLAYER_TIER_4,
+    SLAYER_TIER_5,
+    SPAWN_SCATHA,
+    GIFTS,
+    CARRY_INK_SACKS,
+    CRIMSON_ISLE_MAGE_FACTION,
+    CHUM_BUCKET,
+    ;
 }

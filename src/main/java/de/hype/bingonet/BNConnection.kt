@@ -1,10 +1,11 @@
-package at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network
+package de.hype.bingonet
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.environment.packetconfig.Packet
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PartyApi
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.bingo.bingonet.SplashManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -20,9 +21,12 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.createSound
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.renderBeaconBeam
 import de.hype.bingonet.environment.packetconfig.AbstractPacket
 import de.hype.bingonet.environment.packetconfig.InterceptPacketInfo
 import de.hype.bingonet.environment.packetconfig.PacketUtils
@@ -34,7 +38,6 @@ import de.hype.bingonet.shared.packets.function.MinionDataResponse.RequestMinion
 import de.hype.bingonet.shared.packets.network.*
 import de.hype.bingonet.shared.packets.network.WantedSearchPacket.WantedSearchPacketReply
 import net.minecraft.potion.Potion
-import tv.twitch.chat.Chat
 import java.io.*
 import java.lang.String
 import java.math.BigInteger
@@ -52,7 +55,6 @@ import java.util.function.Consumer
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
 import kotlin.math.min
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toKotlinDuration
 
@@ -311,7 +313,7 @@ object BNConnection {
         }
     }
 
-    fun BNConnection.reconnectToBNServer(ignoreIfConnected: Boolean = true){
+    fun BNConnection.reconnectToBNServer(ignoreIfConnected: Boolean = true) {
         connect(serverPort = 5000)
         TODO("fix the port. just random from memory")
     }
@@ -330,9 +332,9 @@ object BNConnection {
             if (packet.splash.lessWaste) {
                 val potion = MinecraftCompat.localPlayer.getActivePotionEffect(Potion.damageBoost)
                 val remainingDuration =
-                if ((potion?.amplifier ?: 0) >= 7) {
-                    potion.duration/20
-                }else 0
+                    if ((potion?.amplifier ?: 0) >= 7) {
+                        potion.duration / 20
+                    } else 0
                 waitTime = min((remainingDuration / 80), 25)
             } else {
                 waitTime = 0
@@ -557,7 +559,7 @@ object BNConnection {
             reader = null
             socket = null
         } catch (e: Exception) {
-            if (e.message != null) ChatUtils.chat("§c"+e.message)
+            if (e.message != null) ChatUtils.chat("§c" + e.message)
             e.printStackTrace()
         }
     }
@@ -656,7 +658,18 @@ object BNConnection {
                 beacon = data.renderBeacon,
             )
             event.drawDynamicText(position, "§6[BN]-${data.text}", 1.0)
+            if (data.doTracer) event.drawLineToEye(
+                position, data.color,
+                3,
+                true,
+            )
+            if (data.renderBeacon) event.renderBeaconBeam(position, data.color.rgb)
         }
+    }
+
+    @HandleEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        waypoints.removeIf { it.value.deleteOnServerSwap }
     }
 }
 
