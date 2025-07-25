@@ -61,7 +61,7 @@ object ChChestMessageAnalyser {
                             return@map bItem
                         }
                         packet.server = serverId
-                        packet.day = MinecraftCompat.worldDay
+                        packet.day = MinecraftCompat.worldDay?:error("World is null?")
                         BingoBrewersClient.sendTCP(packet)
                     }
                 }
