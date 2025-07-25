@@ -1,10 +1,9 @@
 package de.hype.bingonet.environment.packetconfig
 
-import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.BNConnection
+import de.hype.bingonet.BNConnection
 import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.environment.packetconfig.Packet
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.features.bingo.bingonet.SplashManager
-import de.hype.bingonet.shared.packets.function.CommandChatPromptPacket
 import de.hype.bingonet.shared.packets.function.GetWaypointsPacket
 import de.hype.bingonet.shared.packets.function.MinionDataResponse
 import de.hype.bingonet.shared.packets.function.PacketChatPromptPacket
@@ -16,7 +15,6 @@ import de.hype.bingonet.shared.packets.function.SplashUpdatePacket
 import de.hype.bingonet.shared.packets.function.WaypointPacket
 import de.hype.bingonet.shared.packets.mining.ChChestPacket
 import de.hype.bingonet.shared.packets.mining.ChestLobbyUpdatePacket
-import de.hype.bingonet.shared.packets.mining.MiningEventPacket
 import de.hype.bingonet.shared.packets.network.BingoChatMessagePacket
 import de.hype.bingonet.shared.packets.network.BroadcastMessagePacket
 import de.hype.bingonet.shared.packets.network.CompletedGoalPacket
@@ -73,7 +71,6 @@ object BNPacketManager{
                 BNConnection::onInvalidCommandFeedbackPacket,
             ),
         )
-        packets.add(Packet<MiningEventPacket>(MiningEventPacket::class.java, BNConnection::onMiningEventPacket))
         packets.add(Packet<PartyPacket>(PartyPacket::class.java, BNConnection::onPartyPacket))
         //        packets.add(new Packet<>(RequestConnectPacket.class, BNConnection::dummy));
         packets.add(Packet<SplashNotifyPacket>(SplashNotifyPacket::class.java, BNConnection::onSplashNotifyPacket))

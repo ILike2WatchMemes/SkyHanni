@@ -2,17 +2,15 @@ package at.hannibal2.skyhanni.features.bingo.bingonet
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.BNConnection
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import de.hype.bingonet.BNConnection
 import de.hype.bingonet.shared.constants.StatusConstants
 import de.hype.bingonet.shared.objects.SplashData
 import de.hype.bingonet.shared.packets.function.SplashUpdatePacket
@@ -34,7 +32,7 @@ object SplashStatusUpdateListener {
     private val selfSplashPattern by repoPatterns.pattern("selfSplash", "§aBUFF! You splashed yourself with")
 
     @HandleEvent
-    public fun onHypixelJoin(event: HypixelJoinEvent) {
+    public fun onHypixelJoin(event: IslandChangeEvent) {
         val username = PlayerUtils.getName()
         data = SplashManager.splashPool.values.firstOrNull {
             it.serverID == HypixelData.serverId && it.announcer == username
