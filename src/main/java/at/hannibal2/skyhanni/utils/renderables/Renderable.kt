@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.utils.renderables
 
+//#if TODO
+//#endif
+//#if MC < 1.21
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
 import at.hannibal2.skyhanni.data.GuiData
@@ -7,6 +10,9 @@ import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.data.model.TextInput
+import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
+import at.hannibal2.skyhanni.features.chroma.ChromaType
+import at.hannibal2.skyhanni.features.misc.DarkenShader
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
@@ -26,18 +32,23 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.guide.GuideGui
 import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.shouldAllowLink
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.table.SearchableScrollTable.Companion.searchableScrollTable
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.inventory.GuiEditSign
+import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
@@ -45,14 +56,7 @@ import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import kotlin.math.max
-//#if TODO
-import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
-import at.hannibal2.skyhanni.features.chroma.ChromaType
-import at.hannibal2.skyhanni.features.misc.DarkenShader
-import at.hannibal2.skyhanni.utils.shader.ShaderManager
-//#endif
-//#if MC < 1.21
-import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
+
 //#else
 //$$ import net.minecraft.client.gui.screen.ingame.InventoryScreen.drawEntity
 //$$ import at.hannibal2.skyhanni.utils.compat.RenderCompat
@@ -626,7 +630,7 @@ interface Renderable {
                     //#if MC < 1.21
                     GuiRenderUtils.drawTexturedRect(
                         mouseOffsetX, mouseOffsetY, width, height, uMin, uMax, vMin, vMax, createResourceLocation(texture.path),
-                        alpha = 1f, filter = GL11.GL_NEAREST
+                        alpha = 1f, filter = GL11.GL_NEAREST,
                     )
                     //#else
                     //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
@@ -645,7 +649,7 @@ interface Renderable {
                         GuiRenderUtils.drawTexturedRect(
                             mouseOffsetX, mouseOffsetY, progress, height, uMin, uMin + (progress * scale),
                             vMin + (height * scale), vMin + (2 * height * scale), createResourceLocation(texture.path),
-                            alpha = 1f, filter = GL11.GL_NEAREST
+                            alpha = 1f, filter = GL11.GL_NEAREST,
                         )
                         //#else
                         //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
@@ -662,7 +666,7 @@ interface Renderable {
                         GuiRenderUtils.drawTexturedRect(
                             mouseOffsetX, mouseOffsetY, progress, height, uMin, uMin + (progress * scale),
                             vMin + (height * scale), vMin + (2 * height * scale), createResourceLocation(texture.path),
-                            alpha = 1f, filter = GL11.GL_NEAREST
+                            alpha = 1f, filter = GL11.GL_NEAREST,
                         )
                         //#else
                         //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
@@ -1306,6 +1310,38 @@ interface Renderable {
                 //$$ DrawContextUtils.translate(35f, 125f, 0f)
                 //#endif
                 DrawContextUtils.translate(0f, 0f, -100f)
+            }
+        }
+
+        fun textBox(
+            prefix: String,
+            input: TextInput,
+            /**
+             * Does not limit the input, just where it visuals breaks
+             */
+            maxWidth: Int,
+            scale: Double = 1.0,
+            color: Color = Color.WHITE,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true },
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : StringRenderable(prefix, scale, color, horizontalAlign, verticalAlign) {
+            override val text get() = prefix + input.textBox
+
+            override val width = maxWidth
+
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                if (isHovered(mouseOffsetX, mouseOffsetY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                    input.makeActive()
+                    input.handle()
+                    if (RIGHT_MOUSE.isKeyClicked()) {
+                        input.clear()
+                    } else {
+                        input.disable()
+                    }
+                    super.render(mouseOffsetX, mouseOffsetY)
+                }
             }
         }
     }

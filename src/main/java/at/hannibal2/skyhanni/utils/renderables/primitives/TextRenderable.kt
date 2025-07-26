@@ -27,8 +27,8 @@ fun Renderable.Companion.text(
     verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
 ) = TextRenderable(text, scale, color, horizontalAlign, verticalAlign)
 
-class StringRenderable internal constructor(
-    val text: String,
+open class StringRenderable internal constructor(
+    open val text: String,
     val scale: Double = 1.0,
     val color: Color = Color.WHITE,
     override val horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,

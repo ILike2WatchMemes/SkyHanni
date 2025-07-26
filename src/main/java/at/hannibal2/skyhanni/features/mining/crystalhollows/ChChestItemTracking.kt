@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import de.hype.bingonet.shared.constants.ChChestItem
 import de.hype.bingonet.shared.objects.ChChestData
 import de.hype.bingonet.shared.packets.mining.ChChestPacket
+import java.awt.Color
 
 @SkyHanniModule
 object ChChestMessageAnalyser {
@@ -56,8 +57,8 @@ object ChChestMessageAnalyser {
                             val bItem = BingoBrewersPackets.CHChestItem()
                             bItem.name = item.displayName
                             bItem.count = count.toString()
-                            bItem.itemColor = item.itemFormatting.color?.rgb
-                            bItem.numberColor = item.countFormatting.color?.rgb
+                            bItem.itemColor = item.itemFormatting.color?.rgb?: Color.WHITE.rgb
+                            bItem.numberColor = item.countFormatting.color?.rgb?:Color.WHITE.rgb
                             return@map bItem
                         }
                         packet.server = serverId
