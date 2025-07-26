@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.bingo.bingonet.RegistrationScreen
 import at.hannibal2.skyhanni.features.bingo.bingonet.SplashManager
+import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -27,6 +29,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.renderBeaconBeam
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import de.hype.bingonet.environment.packetconfig.AbstractPacket
 import de.hype.bingonet.environment.packetconfig.InterceptPacketInfo
 import de.hype.bingonet.environment.packetconfig.PacketUtils
@@ -40,7 +43,6 @@ import de.hype.bingonet.shared.packets.network.WantedSearchPacket.WantedSearchPa
 import net.minecraft.potion.Potion
 import java.io.*
 import java.lang.String
-import java.math.BigInteger
 import java.net.Socket
 import java.security.KeyStore
 import java.security.NoSuchAlgorithmException
@@ -385,10 +387,29 @@ object BNConnection {
 
         val reason = packet.internalReason
         if (reason == InternalReasonConstants.NOT_REGISTERED) {
-            ChatUtils.clickableLinkChat(
-                "§cBN: You are not registered in the Bingo Net Network. Click here to view more Info.",
-                "https://hackthetime.de/mod-not-registered",
-            )
+            val dcUserId = DiscordRPCManager.getDiscordUserId()
+            val dcUsername = DiscordRPCManager.getDiscordUsername()
+            val hasDiscordAvailable = dcUserId != null && dcUsername != null
+            if (hasDiscordAvailable) {
+                ChatUtils.clickableChat(
+                    "§cYou are not registered in the Bingo Net Network. Click here to open the Registration Screen",
+                    {
+                        SkyHanniMod.screenToOpen = RegistrationScreen(
+                            dcUserId,
+                            dcUsername,
+                        )
+                    },
+                )
+            } else {
+                ChatUtils.clickableChat(
+                    "§cYou are not registered in the Bingo Net Network." +
+                        " Click here to open the Discord Invite and follow the Bot DM instructions " +
+                        "(Will lead you to the correct place IN THE SERVER!)",
+                    {
+                        OSUtils.openBrowser("https://hackthetime.de/discord")
+                    },
+                )
+            }
         } else if (reason == InternalReasonConstants.BANNED) {
             ChatUtils.chat("§cIt appears that you have been banned from the Bingo Net Network. Due to this the Bingo Net Integration deactivated itself!")
             config.useBN = false
@@ -406,8 +427,9 @@ object BNConnection {
         }
     }
 
+    //TODO error report to BN Server via packet? Optionally via Config option automatically?
     fun onInvalidCommandFeedbackPacket(packet: InvalidCommandFeedbackPacket) {
-        //TODO upgrade via sth like run command packet interface and then reply just copmmand failed maybe error too or sth and then fail command execution and show user exact command or sth? maybe clickable for slighly changeable?
+        //TODO upgrade via sth like run command packet interface and then reply just command failed maybe error too or sth and then fail command execution and show user exact command or sth? maybe clickable for slighly changeable?
         ChatUtils.chat("§cBN: ${packet.displayMessage}")
     }
 
@@ -503,12 +525,7 @@ object BNConnection {
         } catch (e: InterruptedException) {
             throw RuntimeException(e)
         }
-        val r1 = Random()
-        val r2 = Random(System.identityHashCode(Any()).toLong())
-        val random1Bi = BigInteger(64, r1)
-        val random2Bi = BigInteger(64, r2)
-        val serverBi = random1Bi.xor(random2Bi)
-        val clientRandom = serverBi.toString(16)
+        val clientRandom = MojangUtils.generateClientRandom()
 
         val serverId = clientRandom + packet.serverIdSuffix
 
@@ -517,9 +534,9 @@ object BNConnection {
             val connectPacket = RequestConnectPacket(
                 PlayerUtils.getRawUuid(),
                 clientRandom,
-                EnvironmentCore.utils.getGameVersion(),
-                EnvironmentCore.utils.getModVersion(),
-                "SkyHanni",
+                PlatformUtils.MC_VERSION,
+                SkyHanniMod.modVersion.asString,
+                SkyHanniMod.MODID,
                 AuthenticationConstants.MOJANG,
             )
             sendPacket(connectPacket)
@@ -528,9 +545,9 @@ object BNConnection {
                 RequestConnectPacket(
                     PlayerUtils.getRawUuid(),
                     config.BNApiKey,
-                    EnvironmentCore.utils.getGameVersion(),
-                    EnvironmentCore.utils.getModVersion(),
-                    "SkyHanni",
+                    PlatformUtils.MC_VERSION,
+                    SkyHanniMod.modVersion.asString,
+                    SkyHanniMod.MODID,
                     AuthenticationConstants.DATABASE,
                 ),
             )
@@ -632,11 +649,15 @@ object BNConnection {
     }
 
     fun onPacketChatPromptPacket(packet: PacketChatPromptPacket) {
-        ChatUtils.chatPrompt("§e[Sh-Bingo Net Server]${packet.message}",config.serverActionChatPrompt,{
-            for (p in packet.packets) {
-                sendPacket(p)
-            }
-        }, prefix = false)
+        ChatUtils.chatPrompt(
+            "§e[Sh-Bingo Net Server]${packet.message}", config.serverActionChatPrompt,
+            {
+                for (p in packet.packets) {
+                    sendPacket(p)
+                }
+            },
+            prefix = false,
+        )
     }
 
     @HandleEvent

@@ -115,8 +115,8 @@ object DiscordRPCManager {
             buttons.add(
                 Activity.Button(
                     label = "Open EliteBot",
-                    url = "https://elitebot.dev/@${PlayerUtils.getName()}/${HypixelData.profileName}"
-                )
+                    url = "https://elitebot.dev/@${PlayerUtils.getName()}/${HypixelData.profileName}",
+                ),
             )
         }
 
@@ -124,8 +124,8 @@ object DiscordRPCManager {
             buttons.add(
                 Activity.Button(
                     label = "Open SkyCrypt",
-                    url = "https://sky.shiiyu.moe/stats/${PlayerUtils.getName()}/${HypixelData.profileName}"
-                )
+                    url = "https://sky.shiiyu.moe/stats/${PlayerUtils.getName()}/${HypixelData.profileName}",
+                ),
             )
         }
 
@@ -135,14 +135,14 @@ object DiscordRPCManager {
                 state = getStatusByConfigId(config.secondLine.get()).getDisplayString(),
                 timestamps = Activity.Timestamps(
                     start = startTimestamp.toMillis(),
-                    end = null
+                    end = null,
                 ),
                 assets = Activity.Assets(
                     largeImage = discordIconKey,
-                    largeText = location
+                    largeText = location,
                 ),
-                buttons = buttons.ifEmpty { null }
-            )
+                buttons = buttons.ifEmpty { null },
+            ),
         )
     }
 
@@ -269,5 +269,14 @@ object DiscordRPCManager {
             category = CommandCategory.USERS_ACTIVE
             callback { startCommand() }
         }
+    }
+
+
+    fun getDiscordUserId(): String? {
+        return client?.userManager?.currentUser?.id
+    }
+
+    fun getDiscordUsername(): String? {
+        return client?.userManager?.currentUser?.username
     }
 }

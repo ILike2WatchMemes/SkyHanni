@@ -5,6 +5,8 @@ import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils
+import java.math.BigInteger
+import java.util.Random
 
 object MojangUtils {
     /**
@@ -76,5 +78,14 @@ object MojangUtils {
             e.printStackTrace()
             return false // An error occurred
         }
+    }
+
+    fun generateClientRandom(): String {
+        val r1 = Random()
+        val r2 = Random(System.identityHashCode(Any()).toLong())
+        val random1Bi = BigInteger(64, r1)
+        val random2Bi = BigInteger(64, r2)
+        val serverBi = random1Bi.xor(random2Bi)
+        return serverBi.toString(16)
     }
 }
