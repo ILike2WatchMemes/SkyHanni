@@ -22,7 +22,7 @@ RepoRules:
     SkullTexturesUseRepo:
         active: true
     RepoPatternRegexTestMissing:
-        active: false
+        active: true
     RepoPatternRegexTestFailed:
         active: true
     RepoPatternUnnamedGroup:
@@ -82,7 +82,6 @@ style:
         maxDestructuringEntries: 5
 
 formatting:
-    active: false
     MaximumLineLength: # ktlint - handled by detekt
         active: false
     MultiLineIfElse:
