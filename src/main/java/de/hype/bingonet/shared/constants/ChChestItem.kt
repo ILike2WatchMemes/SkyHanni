@@ -17,8 +17,8 @@ class ChChestItem(
         return Formatting.Companion.covertToDiscordAnsi(displayName)
     }
 
-    fun getAsValueableItem(count: IntRange): ValueableChChestItem? {
-        return ValueableChChestItem.get(displayName, count)
+    fun getAsValueableItem(count: IntRange): ValuableChChestItem? {
+        return ValuableChChestItem.get(displayName, count)
     }
 
     companion object {

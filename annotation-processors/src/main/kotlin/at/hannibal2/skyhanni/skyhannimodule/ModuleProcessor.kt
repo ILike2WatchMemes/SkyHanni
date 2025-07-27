@@ -121,7 +121,7 @@ class ModuleProcessor(
         return symbol
     }
 
-    //TODO remove when KMixins added as it contains KSP annotation helpers.
+    // TODO remove when KMixins added as it contains KSP annotation helpers.
     private fun isDevAnnotation(klass: KSClassDeclaration): Boolean {
         val annotation = klass.annotations.find { it.shortName.asString() == "SkyHanniModule" } ?: return false
         return annotation.arguments.find { it.name?.asString() == "devOnly" }?.value as? Boolean ?: false

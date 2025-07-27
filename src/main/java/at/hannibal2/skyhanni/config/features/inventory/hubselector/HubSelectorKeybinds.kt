@@ -32,7 +32,7 @@ object HubSelectorKeybinds {
     private val patternGroup = RepoPattern.group("inventory.hubselector")
     val hubIdToNumberCache: BiMap<String, Int> = HashBiMap.create()
 
-    //TODO Dungeon Hub implementation
+    // TODO Dungeon Hub implementation
     private val hubSelectorGuiNamePattern by patternGroup.pattern(
         "guiName",
         ".*Hub Selector.*",
@@ -71,7 +71,7 @@ object HubSelectorKeybinds {
         if (!key.isKeyClicked()) return
         lastClick = SimpleTimeMark.now()
         event.cancel()
-        //First Score | Second Index
+        // First Score | Second Index
         var bestClick: Pair<Int, Int>? = null
         val island = HypixelData.skyBlockIsland.toBNIsland()
         val splashPool: Map<String, SplashManager.DisplaySplash> =
@@ -80,9 +80,9 @@ object HubSelectorKeybinds {
                 .mapKeysNotNull {
                     val simpleServerId: String? = it.value.serverID
                     if (simpleServerId != null) return@mapKeysNotNull simpleServerId
-                    //Bingo Brewers sends the hub number instead of the serverid
-                    //:skull: Indigo mapps the hub numbers to severids in his 1.8.9 mod.
-                    //The cache is needed anyway though for serverid to hub number mapping for splash announcements
+                    // Bingo Brewers sends the hub number instead of the serverid
+                    // :skull: Indigo mapps the hub numbers to severids in his 1.8.9 mod.
+                    // The cache is needed anyway though for serverid to hub number mapping for splash announcements
                     return@mapKeysNotNull hubIdToNumberCache.inverse()[it.value.hubSelectorData?.hubNumber]
 
                 }

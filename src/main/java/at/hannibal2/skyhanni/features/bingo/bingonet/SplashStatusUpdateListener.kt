@@ -28,7 +28,7 @@ object SplashStatusUpdateListener {
 
     private val repoPatterns = RepoPattern.group("feature.event.bingo.bingoNetworks.splashes")
 
-    //TODO fix this pattern
+    // TODO fix this pattern
     private val selfSplashPattern by repoPatterns.pattern("selfSplash", "§aBUFF! You splashed yourself with")
 
     @HandleEvent

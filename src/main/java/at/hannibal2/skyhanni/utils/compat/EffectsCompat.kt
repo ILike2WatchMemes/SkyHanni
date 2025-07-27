@@ -31,6 +31,13 @@ enum class EffectsCompat(
         //$$ MobEffects.BLINDNESS
         //#endif
     ),
+    STRENGTH(
+        //#if MC < 1.16
+        Potion.damageBoost
+        //#else
+        //$$ MobEffects.STRENGTH
+        //#endif
+    ),
     ;
 
     companion object {
@@ -40,6 +47,10 @@ enum class EffectsCompat(
 
         fun EntityLivingBase.activePotionEffect(effect: EffectsCompat): PotionEffect? {
             return this.getActivePotionEffect(effect.potion)
+        }
+
+        fun getPlayerEffect(effect: EffectsCompat): PotionEffect? {
+            return MinecraftCompat.localPlayer.activePotionEffect(effect)
         }
     }
 }

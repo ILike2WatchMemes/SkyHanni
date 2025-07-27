@@ -29,7 +29,7 @@ object BingoBrewersClient {
         client.connect(10000, "bingobrewers.com", 8282, 7070)
         this.client = client
         val response = BingoBrewersPackets.ConnectionIgn()
-        //IDK your server side indigo. I wanted to avoid issues on your side if I change anything since I dont have your code to look at. Otherwise I would have said sth like v0.3.7-compatible or sth.
+        // IDK your server side indigo. I wanted to avoid issues on your side if I change anything since I dont have your code to look at. Otherwise I would have said sth like v0.3.7-compatible or sth.
         response.hello = "${PlayerUtils.getName()}|v0.3.7|Beta|${PlayerUtils.getUuid()}"
         println("Sending BingoBrewers Hello " + response.hello)
         client.sendTCP(response)

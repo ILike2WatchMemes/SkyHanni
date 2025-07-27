@@ -8,7 +8,7 @@ import kotlin.time.Duration.Companion.seconds
 
 data class KeyBind(
     private var expirationTime: Duration = 10.seconds,
-    private var key: Int? = null, //Null means for default Chat Prompt Key → changeable all at once globally with overrides
+    private var key: Int? = null, // Null means for default Chat Prompt Key → changeable all at once globally with overrides
 ) {
     fun getEffectiveKey(): Int {
         return key ?: SkyHanniMod.feature.chat.defaultChatPrompt

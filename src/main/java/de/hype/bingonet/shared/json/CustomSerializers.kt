@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.shared.json
+package de.hype.bingonet.shared.json
 
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer

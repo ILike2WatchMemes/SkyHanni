@@ -86,7 +86,7 @@ object BingoBrewersPackets {
             val message: String = packet.message ?: return
             if ((message == "0") && partyHost != null && (partyHost != "No Party")) {
                 if (!config.showPrivateSplashes) return
-                //TODO Insert chat prompt key
+                // TODO Insert chat prompt key
                 ChatUtils.clickableChat(
                     "§d$splasher§r is splashing in a §6Private Server§r. Press TODO to join their Party.",
                     {

@@ -1,17 +1,17 @@
 package de.hype.bingonet.environment.packetconfig
 
 import de.hype.bingonet.BNConnection
-import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.environment.packetconfig.Packet
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.features.bingo.bingonet.SplashManager
 import at.hannibal2.skyhanni.features.mining.crystalhollows.ChChestUpdateListener
 import de.hype.bingonet.shared.packets.function.GetWaypointsPacket
-import de.hype.bingonet.shared.packets.function.MinionDataResponse
+// import de.hype.bingonet.shared.packets.function.MinionDataResponse
 import de.hype.bingonet.shared.packets.function.PacketChatPromptPacket
 import de.hype.bingonet.shared.packets.function.PartyPacket
 import de.hype.bingonet.shared.packets.function.PlaySoundPacket
 import de.hype.bingonet.shared.packets.function.RequestPartyStatePacket
 import de.hype.bingonet.shared.packets.function.SplashNotifyPacket
+import de.hype.bingonet.shared.packets.function.SplashTimeRequestPacket
 import de.hype.bingonet.shared.packets.function.SplashUpdatePacket
 import de.hype.bingonet.shared.packets.function.WaypointPacket
 import de.hype.bingonet.shared.packets.mining.ChChestPacket
@@ -20,7 +20,6 @@ import de.hype.bingonet.shared.packets.network.BingoChatMessagePacket
 import de.hype.bingonet.shared.packets.network.BroadcastMessagePacket
 import de.hype.bingonet.shared.packets.network.CompletedGoalPacket
 import de.hype.bingonet.shared.packets.network.DisconnectPacket
-import de.hype.bingonet.shared.packets.network.InternalCommandPacket
 import de.hype.bingonet.shared.packets.network.InvalidCommandFeedbackPacket
 import de.hype.bingonet.shared.packets.network.PunishedPacket
 import de.hype.bingonet.shared.packets.network.RequestAuthentication
@@ -34,10 +33,6 @@ object BNPacketManager{
     // Method to initialize packet actions
     init {
         initializePacketActions()
-    }
-
-    fun getPackets(): MutableList<Packet<out AbstractPacket>> {
-        return packets
     }
 
     // Method to handle a received packet
@@ -61,9 +56,9 @@ object BNPacketManager{
             ),
         )
         packets.add(
-            Packet<InternalCommandPacket>(
-                InternalCommandPacket::class.java,
-                BNConnection::onInternalCommandPacket,
+            Packet<SplashTimeRequestPacket>(
+                SplashTimeRequestPacket::class.java,
+                BNConnection::onSplashDurationRequestPacket,
             ),
         )
         packets.add(
@@ -101,13 +96,13 @@ object BNPacketManager{
         )
         packets.add(Packet<PunishedPacket>(PunishedPacket::class.java, BNConnection::onPunishedPacket))
         packets.add(Packet<PlaySoundPacket>(PlaySoundPacket::class.java, BNConnection::onPlaySoundPacket))
-        packets.add(
-            Packet<MinionDataResponse.RequestMinionDataPacket>(
-                MinionDataResponse.RequestMinionDataPacket::class.java,
-                BNConnection::onRequestMinionDataPacket,
-            ),
-        )
-        packets.add(Packet<MinionDataResponse>(MinionDataResponse::class.java, BNConnection::dummy))
+//         packets.add(
+//             Packet<MinionDataResponse.RequestMinionDataPacket>(
+//                 MinionDataResponse.RequestMinionDataPacket::class.java,
+//                 BNConnection::onRequestMinionDataPacket,
+//             ),
+//         )
+//         packets.add(Packet<MinionDataResponse>(MinionDataResponse::class.java, BNConnection::dummy))
         packets.add(
             Packet<RequestPartyStatePacket>(
                 RequestPartyStatePacket::class.java,

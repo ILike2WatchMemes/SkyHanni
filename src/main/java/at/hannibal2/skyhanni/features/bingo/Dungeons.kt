@@ -24,8 +24,8 @@ object Dungeons {
         if (config.sendCataLevelUP) skillLVLUPPattern.matchMatcher(event.message) {
             HypixelCommands.partyChat("Dungeon Skill Level Up: ${group("newLevel")}")
         }
-        if (config.sendImportantCataMilestones){
-
+        if (config.sendImportantCataMilestones) {
+        //TODO add the cata milestone pattern check and post
         }
     }
 }

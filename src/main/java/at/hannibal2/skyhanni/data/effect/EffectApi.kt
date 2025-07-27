@@ -21,11 +21,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -314,5 +316,9 @@ object EffectApi {
                 EffectDurationChangeEvent(effect, EffectDurationChangeType.SET, duration).post()
             }
         }
+    }
+
+    fun getGodSplashDuration(): Duration {
+        return ((EffectsCompat.getPlayerEffect(EffectsCompat.STRENGTH)?.duration ?: 0) / 20).seconds
     }
 }

@@ -194,7 +194,7 @@ object ChatUtils {
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
 
-        //TODO isnt the permanent click action essentially a small memory leak that bunches up over time?
+        // TODO isnt the permanent click action essentially a small memory leak that bunches up over time?
         val rawText = msgPrefix + message.replace("%KEY%", keyBind.getEffectiveKeyString())
         val text = TextHelper.text(rawText) {
             this.onClick(SimpleTimeMark.now().plus(keyBind.getEffectiveExpirationDuration()), true, code)

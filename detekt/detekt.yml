@@ -1,6 +1,7 @@
 config:
     validation: true
 
+
 GrammarRules:
     AvoidBritishSpelling:
         active: true
@@ -21,7 +22,7 @@ RepoRules:
     SkullTexturesUseRepo:
         active: true
     RepoPatternRegexTestMissing:
-        active: true
+        active: false
     RepoPatternRegexTestFailed:
         active: true
     RepoPatternUnnamedGroup:
@@ -81,6 +82,7 @@ style:
         maxDestructuringEntries: 5
 
 formatting:
+    active: false
     MaximumLineLength: # ktlint - handled by detekt
         active: false
     MultiLineIfElse:

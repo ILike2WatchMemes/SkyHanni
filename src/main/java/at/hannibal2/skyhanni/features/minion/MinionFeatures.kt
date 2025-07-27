@@ -238,7 +238,7 @@ object MinionFeatures {
     fun openMinionRecipeOnResource(event: KeyDownEvent) {
         val key = config.openMinionRecipeForHeldResource
         if (key != event.keyCode || !key.isKeyClicked()) return
-        //TODO change it so it gets the item that is currently hovered over
+        // TODO change it so it gets the item that is currently hovered over
         val currentItem = NeuItems.getInternalName(MinecraftCompat.localPlayer.heldItem)
         for (entry in NeuItems.allItemsCache) {
             if (!entry.value.asString().endsWith("GENERATOR_1")) continue

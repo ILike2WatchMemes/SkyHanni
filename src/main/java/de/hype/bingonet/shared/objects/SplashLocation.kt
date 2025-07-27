@@ -24,9 +24,6 @@ class SplashLocation {
         return !(name == null || name.isEmpty())
     }
 
-    val splashLocation: SplashLocation
-        get() = this
-
     val displayString: String
         get() {
             if (name.equals("bea", ignoreCase = true)) return "bea"

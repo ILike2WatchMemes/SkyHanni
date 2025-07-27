@@ -2,24 +2,30 @@ package at.hannibal2.skyhanni.features.mining.crystalhollows
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage
+import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldLeaveEvent
 import at.hannibal2.skyhanni.features.bingo.bingobrewers.BingoBrewersClient
 import at.hannibal2.skyhanni.features.bingo.bingobrewers.BingoBrewersPackets
-import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.BlockUtils.getTileEntity
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.localWorld
+import at.hannibal2.skyhanni.utils.compat.WorldCompat
 import de.hype.bingonet.BNConnection
 import de.hype.bingonet.shared.constants.ChChestItem
 import de.hype.bingonet.shared.constants.Formatting
-import de.hype.bingonet.shared.constants.ValueableChChestItem
+import de.hype.bingonet.shared.constants.ValuableChChestItem
 import de.hype.bingonet.shared.objects.ChChestData
 import de.hype.bingonet.shared.objects.Position
 import de.hype.bingonet.shared.objects.RenderInformation
@@ -28,6 +34,11 @@ import de.hype.bingonet.shared.packets.function.RequestServerWarpPacket
 import de.hype.bingonet.shared.packets.mining.ChChestPacket
 import de.hype.bingonet.shared.packets.mining.SubscribeToChServer
 import de.hype.bingonet.shared.packets.mining.UnSubscribeToChServer
+import net.minecraft.init.Blocks
+import net.minecraft.tileentity.TileEntityChest
+import java.time.Instant
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ChChestUpdateListener {
@@ -50,7 +61,7 @@ object ChChestUpdateListener {
                 waypoint.value.visible = shouldDisplay
                 continue
             }
-            val valuable: List<ValueableChChestItem> =
+            val valuable: List<ValuableChChestItem> =
                 chest.value.items.mapNotNull { it.key.getAsValueableItem(it.value) }
             val renderInformationList: MutableList<RenderInformation> = ArrayList()
             valuable.forEach {
@@ -132,7 +143,7 @@ object ChChestUpdateListener {
         if (config.useBB) {
             val bbsub = BingoBrewersPackets.SubscribeToCHServer()
             bbsub.server = HypixelData.serverId
-            bbsub.day = MinecraftCompat.worldDay ?: error("World appears to be null, cannot get day")
+            bbsub.day = WorldCompat.worldDay ?: error("World appears to be null, cannot get day")
             bbsub.unsubscribe = true
             BingoBrewersClient.sendTCP(bbsub)
         }
@@ -151,7 +162,7 @@ object ChChestUpdateListener {
                     val bbsub = BingoBrewersPackets.SubscribeToCHServer()
                     bbsub.unsubscribe = false
                     bbsub.server = serverId
-                    bbsub.day = MinecraftCompat.worldDay ?: error("World appears to be null, cannot get day")
+                    bbsub.day = WorldCompat.worldDay ?: error("World appears to be null, cannot get day")
                     BingoBrewersClient.sendTCP(bbsub)
                     BingoBrewersClient.sendTCP(bbsub)
                 }
@@ -161,20 +172,20 @@ object ChChestUpdateListener {
 
     fun showChChest(items: Map<ChChestItem, IntRange>): Boolean {
         if (SkyBlockUtils.isBingoProfile) return false
-        if (ProfileStorageData.profileSpecific?.mining?.hotmLevel?:0 < 4) return false
+        if ((ProfileStorageData.profileSpecific?.mining?.hotmLevel ?: 0) < 4) return false
         if (chChestConfig.allChChestItem) return true
         for (baseItem in items.entries) {
             val item = baseItem.key.getAsValueableItem(baseItem.value) ?: continue
             if (chChestConfig.allRoboPart && item.isRoboPart) return true
-            if (chChestConfig.prehistoricEgg && item == ValueableChChestItem.PrehistoricEgg) return true
-            if (chChestConfig.pickonimbus2000 && item == ValueableChChestItem.Pickonimbus2000) return true
-            if (chChestConfig.controlSwitch && item == ValueableChChestItem.ControlSwitch) return true
-            if (chChestConfig.electronTransmitter && item == ValueableChChestItem.ElectronTransmitter) return true
-            if (chChestConfig.ftx3070 && item == ValueableChChestItem.FTX3070) return true
-            if (chChestConfig.robotronReflector && item == ValueableChChestItem.RobotronReflector) return true
-            if (chChestConfig.superliteMotor && item == ValueableChChestItem.SuperliteMotor) return true
-            if (chChestConfig.syntheticHeart && item == ValueableChChestItem.SyntheticHeart) return true
-            if (chChestConfig.flawlessGemstone && item == ValueableChChestItem.FlawlessGemstone) return true
+            if (chChestConfig.prehistoricEgg && item == ValuableChChestItem.PrehistoricEgg) return true
+            if (chChestConfig.pickonimbus2000 && item == ValuableChChestItem.Pickonimbus2000) return true
+            if (chChestConfig.controlSwitch && item == ValuableChChestItem.ControlSwitch) return true
+            if (chChestConfig.electronTransmitter && item == ValuableChChestItem.ElectronTransmitter) return true
+            if (chChestConfig.ftx3070 && item == ValuableChChestItem.FTX3070) return true
+            if (chChestConfig.robotronReflector && item == ValuableChChestItem.RobotronReflector) return true
+            if (chChestConfig.superliteMotor && item == ValuableChChestItem.SuperliteMotor) return true
+            if (chChestConfig.syntheticHeart && item == ValuableChChestItem.SyntheticHeart) return true
+            if (chChestConfig.flawlessGemstone && item == ValuableChChestItem.FlawlessGemstone) return true
         }
         return false
     }
@@ -189,7 +200,8 @@ object ChChestUpdateListener {
                     "${it.key.itemFormatting}${it.key.displayName} ${it.key.countFormatting}${it.value.toGoodString()}"
                 }
                 ChatUtils.chatPrompt(
-                    "§e[SH-BN] A CH Chest with the following valuable items was found:\n $items\n Press §a%KEY%§r to request a party invite for a warp.",
+                    "§e[SH-BN] A CH Chest with the following valuable items was found:\n" +
+                        " $items\n Press §a%KEY%§r to request a party invite for a warp.",
                     chChestConfig.chChestChatPromp,
                     {
                         BNConnection.sendPacket(RequestServerWarpPacket(packet.server))
@@ -206,7 +218,7 @@ object ChChestUpdateListener {
 
     fun onChLobbyDataReceived(packet: BingoBrewersPackets.receiveCHItems) {
         if (HypixelData.serverId == packet.server) {
-            packet.chestMap.forEach { it ->
+            packet.chestMap.forEach {
                 val items = HashMap<ChChestItem, IntRange>()
                 it.items.forEach {
                     val countSplit = it.count.split("-")
@@ -221,5 +233,34 @@ object ChChestUpdateListener {
                 addChestAndUpdate(Position(it.x, it.y, it.z), items)
             }
         }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
+    fun onBlockClick(event: BlockClickEvent) {
+        if (event.clickType != ClickType.RIGHT_CLICK) return
+        if (event.getChestOpenState() != false) return
+        DelayedRun.runDelayed(500.milliseconds) {
+            if (event.getChestOpenState() != true) return@runDelayed
+            lastGlobalChchestCoords = event.position
+            DelayedRun.runDelayed(20.seconds) {
+                if (lastGlobalChchestCoords == event.position) {
+                    lastGlobalChchestCoords = null
+                }
+            }
+        }
+    }
+
+    var lastGlobalChchestCoords: LorenzVec? = null
+
+    fun BlockClickEvent.getChestOpenState(): Boolean? {
+        if (position.getBlockAt() != Blocks.chest) return null
+        val test = position.getTileEntity() as TileEntityChest
+        return test.numPlayersUsing > 0f
+    }
+
+    fun getLobbyClosingTime(): Instant {
+        val ticks = WorldCompat.worldTime ?: error("World is null, cannot get time")
+        val diffTime: Long = 20400 - (ticks / 20)
+        return Instant.now().plusSeconds(diffTime)
     }
 }

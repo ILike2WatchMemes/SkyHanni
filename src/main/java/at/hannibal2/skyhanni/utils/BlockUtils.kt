@@ -7,6 +7,7 @@ import net.minecraft.block.Block
 import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
+import net.minecraft.tileentity.TileEntity
 import net.minecraft.tileentity.TileEntitySkull
 import net.minecraft.util.BlockPos
 import net.minecraft.util.MovingObjectPosition
@@ -22,6 +23,8 @@ object BlockUtils {
     fun LorenzVec.getBlockAt(): Block = getBlockStateAt().block
 
     fun LorenzVec.getBlockStateAt(): IBlockState = world.getBlockState(toBlockPos())
+
+    fun LorenzVec.getTileEntity(): TileEntity = world.getTileEntity(toBlockPos());
 
     //#if MC < 1.21
     fun LorenzVec.isInLoadedChunk(): Boolean = world.isBlockLoaded(toBlockPos(), false)

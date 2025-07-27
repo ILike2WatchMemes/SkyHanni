@@ -5,6 +5,9 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.Entity
+import net.minecraft.potion.Potion
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 object MinecraftCompat {
 
@@ -27,9 +30,5 @@ object MinecraftCompat {
     //#else
     //$$ val showDebugHud get(): Boolean = MinecraftClient.getInstance().debugHud.shouldShowDebugHud()
     //#endif
-    //TODO maybe make it so if absurd high number we use spooky new day every x ticks and use that to include in the calculation?
-    val worldDay get() : Int? {
-        val ticks = localWorldOrNull?.worldTime?:return null
-        return (ticks / (20*60*20)).toInt() // 20 ticks per second, 60 seconds per minute, 20 minutes per day
-    }
+
 }

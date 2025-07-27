@@ -35,7 +35,7 @@ class BingoNetworksConfig {
     var useBB: Boolean = false
 
 
-    //TODO requires restart rn still so fix somehow?
+    // TODO requires restart rn still so fix somehow?
 
     @Expose
     @ConfigOption(name = "Bingo Net Splashes", desc = "Show Splashes announced via the Bingo Net Server.")
@@ -66,7 +66,7 @@ class BingoNetworksConfig {
     var showPacketTraffic = false
 
 
-    //TODO hide unless you have splasher perm?
+    // TODO hide unless you have splasher perm?
     @Expose
     @FeatureToggle
     @ConfigOption(
@@ -118,4 +118,6 @@ class BingoNetworksConfig {
     @ConfigOption(name = "Ch Chest Items Config", desc = "Configure the Chat Prompt Key and which items your are interested in.")
     @Accordion
     val chChestConfig: ChChestConfig = ChChestConfig()
+
+    var chChestOverlay : Boolean = true
 }
