@@ -14,7 +14,7 @@ object Dungeons {
     val config = SkyHanniMod.feature.event.bingo
     val patternGroup = RepoPattern.group("feature.event.bingo.dungeons")
     val skillLVLUPPattern by patternGroup.pattern(
-        "skillLevelUp",
+        "skill-level-up",
         "DUNGEON LEVEL UP The Catacombs",
     )
 

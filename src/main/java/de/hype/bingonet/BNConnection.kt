@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.bingo.bingonet.RegistrationScreen
 import at.hannibal2.skyhanni.features.bingo.bingonet.SplashManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -61,7 +62,7 @@ import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toKotlinDuration
 
-@Suppress("SkyHanniModuleInspection")
+@SkyHanniModule
 object BNConnection {
     var messageReceiverThread: Thread? = null
     var messageSenderThread: Thread? = null
@@ -79,6 +80,7 @@ object BNConnection {
     val roles = mutableSetOf<BNRole>(BNRole.DEBUG)
 
     private val config get() = SkyHanniMod.feature.event.bingo.bingoNetworks
+    private val bnConfig get() = SkyHanniMod.feature.event.bingo.bingoNetworks.bingoNet
 
     val waypoints: MutableMap<Int, WaypointData> = HashMap()
 
@@ -104,6 +106,12 @@ object BNConnection {
         // Create the SSLContext using the trust managers from our certificate
         return SSLContext.getInstance("TLS").apply {
             init(null, trustManagerFactory.trustManagers, SecureRandom())
+        }
+    }
+
+    init {
+        if(bnConfig.useBN){
+            reconnectToBNServer()
         }
     }
 
@@ -411,7 +419,7 @@ object BNConnection {
             }
         } else if (reason == InternalReasonConstants.BANNED) {
             ChatUtils.chat("§cIt appears that you have been banned from the Bingo Net Network. Due to this the Bingo Net Integration deactivated itself!")
-            config.useBN = false
+            bnConfig.useBN = false
         } else if (packet.waitBeforeReconnect?.isEmpty() ?: true) {
             ChatUtils.chat("§cBN: You have been disconnected from the Bingo Net Network.")
         } else {
@@ -528,7 +536,7 @@ object BNConnection {
 
         val serverId = clientRandom + packet.serverIdSuffix
 
-        if (config.BNApiKey.isEmpty()) {
+        if (bnConfig.BNApiKey.isEmpty()) {
             MojangUtils.joinServer(serverId)
             val connectPacket = RequestConnectPacket(
                 PlayerUtils.getRawUuid(),
@@ -543,7 +551,7 @@ object BNConnection {
             sendPacket(
                 RequestConnectPacket(
                     PlayerUtils.getRawUuid(),
-                    config.BNApiKey,
+                    bnConfig.BNApiKey,
                     PlatformUtils.MC_VERSION,
                     SkyHanniMod.modVersion.asString,
                     SkyHanniMod.MODID,
@@ -631,7 +639,7 @@ object BNConnection {
     }
 
     fun onPunishedPacket(data: PunishedPacket) {
-        if (!data.canUseNetwork) config.useBN = false
+        if (!data.canUseNetwork) bnConfig.useBN = false
         ChatUtils.chat(
             "§c[Bingo Net] You currently have a Punishment Active. Type: ${data.punishmentType}. Expiration Time: ${
                 (Duration.between(

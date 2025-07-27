@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
@@ -216,6 +217,7 @@ class ChatConfig {
             "All other Keybind can be configured to be different," +
             " but this one will be the default if no custom one is set for the related feature.",
     )
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_R)
     val defaultChatPrompt: Int = Keyboard.KEY_R
 
     @Expose
@@ -223,6 +225,7 @@ class ChatConfig {
         name = "Chat Prompt Expiration Multiplier",
         desc = "A Multiplier for the duration for which a Chat Prompt is valid for.",
     )
+    @ConfigEditorSlider(minValue = 0.5f, maxValue = 10f, minStep = 0.1f)
     val chatPromptExpirationMultiplier: Double = 1.0
 
     @Expose
@@ -230,6 +233,7 @@ class ChatConfig {
         name = "Answer Suggested NPC Response Chat Prompts",
         desc = "Some NPCs have dialogue that you need to answer (stuff like §a[Yes]§r)",
     )
+    @Accordion
     val npcResponseSuggestion : KeyBind = KeyBind()
 
 }

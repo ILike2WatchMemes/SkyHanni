@@ -26,10 +26,10 @@ object MojangUtils {
         )
         //#else
         //$$    MinecraftClient.getInstance().getSessionService().joinServer(
-        //             MinecraftClient.getInstance().getGameProfile().getId(),
-        //             MinecraftClient.getInstance().getSession().getAccessToken(),
-        //             server,
-        //         )
+        //$$             MinecraftClient.getInstance().getGameProfile().getId(),
+        //$$             MinecraftClient.getInstance().getSession().getAccessToken(),
+        //$$             server,
+        //$$         )
         //#endif
     }
 

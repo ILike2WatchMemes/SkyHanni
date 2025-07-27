@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.data.FriendApi
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -36,7 +37,8 @@ enum class PermissionLevel(val displayName: String) {
 
 class PartyCommandsConfig {
     @Expose
-    @ConfigOption(name = "Users", desc = "Configure permissions for specific user")
+//     @ConfigOption(name = "Users", desc = "Configure permissions for specific user")
+    @NoConfigLink
     val users: MutableMap<String, TrustUserConfig> = mutableMapOf()
 
     // Global default thresholds for permissions: first = Instant threshold, second = Ask threshold
@@ -127,12 +129,12 @@ class PartyCommandsConfig {
     var defaultStreamOpenAsk: FriendLevel = FriendLevel.FRIENDS
 
     @Expose
-    @ConfigEditorBoolean
+    @ConfigEditorDropdown
     @ConfigOption(name = "Warp - Instant Threshold", desc = "Minimum trust level to warp the party without asking")
     var warpInstant: FriendLevel = FriendLevel.BEST_FRIENDS
 
     @Expose
-    @ConfigEditorBoolean
+    @ConfigEditorDropdown
     @ConfigOption(name = "Warp - Ask Threshold", desc = "Minimum trust level to ask to warp the party")
     var warpAsk: FriendLevel = FriendLevel.FRIENDS
 

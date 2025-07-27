@@ -5,24 +5,19 @@ import at.hannibal2.skyhanni.config.core.config.KeyBind
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class BingoNetworksConfig {
     @Expose
     @ConfigOption(
-        name = "Enable Bingo Net (§c⚠ Closed Source Server!§r)",
+        name = "Bingo Net (§c⚠ Closed Source Server!§r)",
         desc = "§c§lBingo Net is based on a closed Source Project by Hype_the_Time. SkyHanni has no insight nor control over the Servers.",
     )
     @ConfigEditorBoolean
-    @FeatureToggle
-    var useBN: Boolean = false
-    @Expose
-    @ConfigOption(
-        name = "Bingo Net API/Legacy Key - Optional",
-        desc = "API/Legacy Key can be used instead of Mojang Auth. This prevents the possible restart your client message when the Mojang Tokens expired. Leave empty to use Mojang Auth.",
-    )
-    @ConfigEditorBoolean
-    var BNApiKey: String = ""
+    @Accordion
+    val bingoNet: BingoNetConfig = BingoNetConfig()
+    val useBN get() = bingoNet.useBN
     @Expose
     @ConfigOption(
         name = "Enable Bingo Brewers (§c⚠ Closed Source Server§r)",
@@ -73,6 +68,7 @@ class BingoNetworksConfig {
         name = "Splasher Overlay",
         desc = "Show Data that is useful for a Splasher in an Overlay after you announced a Splash.",
     )
+    @ConfigEditorBoolean
     var useSplasherOverlay: Boolean = true
 
     @FeatureToggle
@@ -81,6 +77,7 @@ class BingoNetworksConfig {
         name = "Show Splash Status Updates",
         desc = "Will inform you about Splash Status Updates in the Chat.",
     )
+    @ConfigEditorBoolean
     var showSplashStatusUpdates: Boolean = true
 
     @Expose
@@ -88,6 +85,7 @@ class BingoNetworksConfig {
         name = "Splash Multipurpose Keybind",
         desc = "Used to trigger Server Warp and if in Hub Selector to warp to the right splash automatically.",
     )
+    @Accordion
     var splashHubWarp: KeyBind = KeyBind()
 
     @Expose
@@ -96,6 +94,7 @@ class BingoNetworksConfig {
         name = "Show Private Splashes",
         desc = "Show Splashes that require you to join a party to be warped in.",
     )
+    @ConfigEditorBoolean
     var showPrivateSplashes: Boolean = true
 
     @Expose
@@ -103,6 +102,7 @@ class BingoNetworksConfig {
         name = "Server Action Chat Prompt Key",
         desc = "Shown when a Bingo Network server wants to receive an acknowledgement. NOT USED FOR PARTY COMMANDS",
     )
+    @Accordion
     val serverActionChatPrompt = KeyBind()
 
     @Expose
@@ -111,6 +111,7 @@ class BingoNetworksConfig {
         name = "Auto Splash Status Updates",
         desc = "Will automatically change the Status of YOUR Splashes to match the current State.",
     )
+    @ConfigEditorBoolean
     var autoSplashStatusUpdates: Boolean = true
 
 
@@ -119,5 +120,8 @@ class BingoNetworksConfig {
     @Accordion
     val chChestConfig: ChChestConfig = ChChestConfig()
 
+    @Expose
+    @ConfigOption(name = "Ch Chest Overlay", desc = "Show an Overlay with the Ch Chest Items in the Lobby.")
+    @ConfigEditorBoolean
     var chChestOverlay : Boolean = true
 }
