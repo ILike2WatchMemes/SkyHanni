@@ -24,7 +24,7 @@ object BlockUtils {
 
     fun LorenzVec.getBlockStateAt(): IBlockState = world.getBlockState(toBlockPos())
 
-    fun LorenzVec.getTileEntity(): TileEntity = world.getTileEntity(toBlockPos());
+    fun LorenzVec.getTileEntity(): TileEntity? = world.getTileEntity(toBlockPos());
 
     //#if MC < 1.21
     fun LorenzVec.isInLoadedChunk(): Boolean = world.isBlockLoaded(toBlockPos(), false)

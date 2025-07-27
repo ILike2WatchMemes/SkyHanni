@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.bingo.bingobrewers
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Features
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import com.esotericsoftware.kryonet.Client
@@ -9,7 +10,7 @@ import com.esotericsoftware.kryonet.Connection
 import com.esotericsoftware.kryonet.Listener
 import de.hype.bingonet.environment.packetconfig.PacketUtils.gson
 import java.io.IOException
-
+@SkyHanniModule
 object BingoBrewersClient {
     private var client: Client? = null
     private var listener: Listener? = null

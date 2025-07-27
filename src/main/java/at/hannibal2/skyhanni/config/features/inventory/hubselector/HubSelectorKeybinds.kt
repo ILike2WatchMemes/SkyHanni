@@ -34,21 +34,21 @@ object HubSelectorKeybinds {
 
     // TODO Dungeon Hub implementation
     private val hubSelectorGuiNamePattern by patternGroup.pattern(
-        "guiName",
-        ".*Hub Selector.*",
+        "gui-name",
+        ".*hub selector.*",
     )
 
     private val itemNamePattern by patternGroup.pattern(
-        "itemName",
+        "item-name",
         "SkyBlock Hub #(?<hubNumber>\\d+)",
     )
 
     private val playersPattern by patternGroup.pattern(
-        "itemName",
+        "player-count",
         "Players: (?<current>\\d+)/(?<max>\\d+)",
     )
     private val serverIdPattern by patternGroup.pattern(
-        "itemName",
+        "server-id",
         "Server: (?<max>.*)",
     )
     private var mainInventory = InventoryDetector(

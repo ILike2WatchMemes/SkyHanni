@@ -13,12 +13,13 @@ import at.hannibal2.skyhanni.features.bingo.bingobrewers.BingoBrewersClient
 import at.hannibal2.skyhanni.features.bingo.bingobrewers.BingoBrewersPackets
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.BlockUtils.getTileEntity
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.BlockCompat
+import at.hannibal2.skyhanni.utils.compat.BlockCompat.isChestOpened
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.localWorld
 import at.hannibal2.skyhanni.utils.compat.WorldCompat
@@ -35,7 +36,6 @@ import de.hype.bingonet.shared.packets.mining.ChChestPacket
 import de.hype.bingonet.shared.packets.mining.SubscribeToChServer
 import de.hype.bingonet.shared.packets.mining.UnSubscribeToChServer
 import net.minecraft.init.Blocks
-import net.minecraft.tileentity.TileEntityChest
 import java.time.Instant
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -254,8 +254,7 @@ object ChChestUpdateListener {
 
     fun BlockClickEvent.getChestOpenState(): Boolean? {
         if (position.getBlockAt() != Blocks.chest) return null
-        val test = position.getTileEntity() as TileEntityChest
-        return test.numPlayersUsing > 0f
+        return position.isChestOpened()
     }
 
     fun getLobbyClosingTime(): Instant {
