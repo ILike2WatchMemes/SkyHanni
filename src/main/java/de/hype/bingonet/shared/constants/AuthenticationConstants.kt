@@ -1,7 +1,7 @@
 package de.hype.bingonet.shared.constants
 
 enum class AuthenticationConstants {
-    //Authentication Types
+    // Authentication Types
     MOJANG,
     DATABASE,
     REGISTER

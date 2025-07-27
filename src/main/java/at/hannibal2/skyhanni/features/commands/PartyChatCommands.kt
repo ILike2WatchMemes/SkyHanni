@@ -148,7 +148,7 @@ object PartyChatCommands {
         } else if (level == PermissionLevel.INSTANT) {
             command.executable.invoke(event)
         }else if (level == PermissionLevel.ASK){
-            //TODO ChatPrompt
+            // TODO ChatPrompt
         }
     }
 
@@ -262,5 +262,5 @@ object PartyChatCommands {
         event.move(95, "misc.partyCommands.defaultRequiredTrustLevel", "misc.partyCommands.requiredTrustLevel")
     }
 
-    //TODO msg commands.
+    // TODO msg commands.
 }

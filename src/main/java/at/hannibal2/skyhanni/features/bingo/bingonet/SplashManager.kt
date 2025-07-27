@@ -18,8 +18,8 @@ import de.hype.bingonet.shared.packets.function.SplashUpdatePacket
 import java.time.Instant
 import kotlin.time.Duration.Companion.minutes
 
+// Not needed since the SH Message Event is asked for by the Player. Not needed to be a module.
 @Suppress("SkyHanniModuleInspection")
-//Not needed since the SH Message Event is asked for by the Player. Not needed to be a module.
 object SplashManager {
     var splashPool: MutableMap<Int, DisplaySplash> = HashMap<Int, DisplaySplash>()
 
@@ -67,7 +67,7 @@ object SplashManager {
                     joinParty(splash, source)
                 },
             )
-            //TODO add keybind activation too
+            // TODO add keybind activation too
         } else {
             var islandType: String
             if (splash.hubSelectorData.hubType == Islands.DUNGEON_HUB) {
@@ -82,7 +82,7 @@ object SplashManager {
                     prepareHubWarp(splash, source)
                 },
             )
-            //TODO add keybind activation too
+            // TODO add keybind activation too
         }
     }
 
@@ -103,7 +103,7 @@ object SplashManager {
                     currentIsland == IslandType.SPIDER_DEN ||
                     currentIsland == IslandType.GOLD_MINES
                 ) {
-                    //Double warp needed
+                    // Double warp needed
                     HypixelCommands.warp(Islands.HUB.name)
                 }
                 HypixelCommands.warp(Islands.HUB.name)

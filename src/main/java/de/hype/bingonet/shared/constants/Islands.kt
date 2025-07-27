@@ -31,7 +31,7 @@ enum class Islands(val internalName: String, private val displayName: String) {
     KUUDRA("kuudra", "Kuudra"),
     PRIVATE_ISLAND("dynamic", "Private Island", "home"),
 
-    //TODO validate internal name for garden
+    // TODO validate internal name for garden
     GARDEN("garden", "Garden", "garden"),
     SPIDERS_DEN("combat_1", "Spider's Den", "spider"),
     THE_END("combat_3", "The End", "end"),

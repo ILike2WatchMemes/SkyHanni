@@ -179,7 +179,7 @@ object DungeonLividFinder {
         }
     }
 
-    private fun isCurrentlyBlind() = (MinecraftCompat.localPlayerOrNull?.activePotionEffect(EffectsCompat.BLINDNESS)?.duration ?: 0) > 10
+    private fun isCurrentlyBlind() = (EffectsCompat.getPlayerEffect(EffectsCompat.BLINDNESS)?.duration ?: 0) > 10
 
     private fun EntityOtherPlayerMP.isLividColor(color: LorenzColor): Boolean {
         val chatColor = color.getChatColor()

@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.environment.packetconfig
+package de.hype.bingonet.environment.packetconfig
 
-import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.shared.json.ColorSerializer
-import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.shared.json.DurationSerializer
-import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.shared.json.InstantSerializer
+import de.hype.bingonet.shared.json.ColorSerializer
+import de.hype.bingonet.shared.json.DurationSerializer
+import de.hype.bingonet.shared.json.InstantSerializer
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import java.awt.Color

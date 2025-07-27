@@ -4,16 +4,19 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import de.hype.bingonet.BNConnection
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.bingo.bingobrewers.BingoBrewersClient
 import at.hannibal2.skyhanni.features.bingo.bingobrewers.BingoBrewersPackets
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.WorldCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import de.hype.bingonet.shared.constants.ChChestItem
 import de.hype.bingonet.shared.objects.ChChestData
 import de.hype.bingonet.shared.packets.mining.ChChestPacket
+import de.hype.bingonet.toBN
 import java.awt.Color
 
 @SkyHanniModule
@@ -33,7 +36,7 @@ object ChChestMessageAnalyser {
         ".*LOOT CHEST COLLECTED.*",
     )
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onChatMessage(event: SkyHanniChatEvent) {
         SkyHanniMod.launchCoroutine {
             val message = event.message
@@ -43,7 +46,7 @@ object ChChestMessageAnalyser {
             if (isInMessage && wrapper.matches(message)) {
                 isInMessage = false
                 if (items.isNotEmpty()) {
-                    val coords = ChChestUpdateListener.lastGlobalChchestCoords
+                    val coords = ChChestUpdateListener.lastGlobalChchestCoords?.toBN()?:error("No global chest coords")
                     val chest = ChChestData(coords, items)
                     val serverId = HypixelData.serverId?:return@launchCoroutine
                     val bnPacket = ChChestPacket(chest, serverId)
@@ -62,7 +65,7 @@ object ChChestMessageAnalyser {
                             return@map bItem
                         }
                         packet.server = serverId
-                        packet.day = MinecraftCompat.worldDay?:error("World is null?")
+                        packet.day = WorldCompat.worldDay?:error("World is null?")
                         BingoBrewersClient.sendTCP(packet)
                     }
                 }
@@ -70,7 +73,7 @@ object ChChestMessageAnalyser {
             }
         }
         if (isInMessage) {
-            //I thought about using the PowderChestReward Pattern for this but its lacking the item color which indigo uses and BN needs a shared data enum anyway.
+            // I thought about using the PowderChestReward Pattern for this but its lacking the item color which indigo uses and BN needs a shared data enum anyway.
             val item = ChChestItem.parse(event.message) ?: return
             val before = items.get(item.first) ?: IntRange(0, 0)
             items[item.first] = before.plus(item.second)

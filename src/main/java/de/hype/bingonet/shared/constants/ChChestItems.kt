@@ -25,7 +25,7 @@ package de.hype.bingonet.shared.constants
  * Make sure too use the EXACT display name!
 </pre> *
  */
-enum class ValueableChChestItem(val displayName: String, val iconPath: String) {
+enum class ValuableChChestItem(val displayName: String, val iconPath: String) {
     PrehistoricEgg("Prehistoric Egg", "prehistoric_egg"),
 
     Pickonimbus2000("Pickonimbus 2000", "pickonimbus"),
@@ -47,7 +47,7 @@ enum class ValueableChChestItem(val displayName: String, val iconPath: String) {
     MITHRIL_POWDER("Mithril Powder", "legendary_mithril_powder");
 
     companion object {
-        fun get(displayName: String, count: IntRange): ValueableChChestItem? {
+        fun get(displayName: String, count: IntRange): ValuableChChestItem? {
             if (displayName.startsWith("Flawless") && displayName.endsWith("Gemstone")) {
                 return FlawlessGemstone
             }
@@ -64,23 +64,23 @@ enum class ValueableChChestItem(val displayName: String, val iconPath: String) {
     }
 
     val isFlawlessGemstone: Boolean
-        get() = this == ValueableChChestItem.FlawlessGemstone
+        get() = this == ValuableChChestItem.FlawlessGemstone
 
     val isRoboPart: Boolean
         get() {
             this in listOf(
-                ValueableChChestItem.ControlSwitch,
-                ValueableChChestItem.ElectronTransmitter,
-                ValueableChChestItem.FTX3070,
-                ValueableChChestItem.RobotronReflector,
-                ValueableChChestItem.SuperliteMotor,
-                ValueableChChestItem.SyntheticHeart
+                ValuableChChestItem.ControlSwitch,
+                ValuableChChestItem.ElectronTransmitter,
+                ValuableChChestItem.FTX3070,
+                ValuableChChestItem.RobotronReflector,
+                ValuableChChestItem.SuperliteMotor,
+                ValuableChChestItem.SyntheticHeart
             )
             return false
         }
 
     val isPowder: Boolean
-        get() = this == ValueableChChestItem.GEMSTONE_POWDER ||
-                this == ValueableChChestItem.MITHRIL_POWDER
+        get() = this == ValuableChChestItem.GEMSTONE_POWDER ||
+                this == ValuableChChestItem.MITHRIL_POWDER
 
 }

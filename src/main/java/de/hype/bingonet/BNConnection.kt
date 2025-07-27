@@ -2,9 +2,10 @@ package de.hype.bingonet
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.event.bingo.bingonet.network.environment.packetconfig.Packet
+import de.hype.bingonet.environment.packetconfig.Packet
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PartyApi
+import at.hannibal2.skyhanni.data.effect.EffectApi
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.bingo.bingonet.RegistrationScreen
@@ -24,6 +25,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils.createSound
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
+import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
@@ -37,10 +39,9 @@ import de.hype.bingonet.shared.constants.*
 import de.hype.bingonet.shared.objects.*
 import de.hype.bingonet.shared.packets.base.ExpectReplyPacket
 import de.hype.bingonet.shared.packets.function.*
-import de.hype.bingonet.shared.packets.function.MinionDataResponse.RequestMinionDataPacket
+// import de.hype.bingonet.shared.packets.function.MinionDataResponse.RequestMinionDataPacket
 import de.hype.bingonet.shared.packets.network.*
 import de.hype.bingonet.shared.packets.network.WantedSearchPacket.WantedSearchPacketReply
-import net.minecraft.potion.Potion
 import java.io.*
 import java.lang.String
 import java.net.Socket
@@ -74,7 +75,7 @@ object BNConnection {
     var authenticated: Boolean? = null
         private set
 
-    //Viewing Packet Traffic can pose as a Unfair Advantage (Splashes).
+    // Viewing Packet Traffic can pose as a Unfair Advantage (Splashes).
     val roles = mutableSetOf<BNRole>(BNRole.DEBUG)
 
     private val config get() = SkyHanniMod.feature.event.bingo.bingoNetworks
@@ -194,7 +195,7 @@ object BNConnection {
                 consumer.accept(packet.second)
             }
         } catch (e: Throwable) {
-            //This should prevent any Issues from Bingo Net from causing an actual Issue. The Set Filter should prevent Error Spam.
+            // This should prevent any Issues from Bingo Net from causing an actual Issue. The Set Filter should prevent Error Spam.
             val key = "${e::class.java.name}:${e.message}"
             if (reportedErrors.add(key)) {
                 val errorReport = buildString {
@@ -209,7 +210,9 @@ object BNConnection {
                         if (current != null) appendLine("Caused by:")
                     }
                 }
-                ChatUtils.clickToClipboard("§cBN: Error processing message: ${e.localizedMessage}", errorReport.split("\n"))
+                ChatUtils.clickToClipboard(
+                    "§cBN: Error processing message: ${e.localizedMessage}", errorReport.split("\n"),
+                )
                 e.printStackTrace()
             }
         }
@@ -288,7 +291,7 @@ object BNConnection {
     }
 
     fun <T : AbstractPacket> dummy(o: T?) {
-        //this does absolutely nothing. dummy for packet in packt manager
+        // this does absolutely nothing. dummy for packet in packt manager
     }
 
     fun <E : AbstractPacket> sendPacket(packet: E, blockLog: Boolean = false, retry: Int = 1) {
@@ -325,19 +328,15 @@ object BNConnection {
     }
 
     fun onSplashNotifyPacket(packet: SplashNotifyPacket) {
-        //influencing the delay in any way is disallowed!
+        // influencing the delay in any way is disallowed!
         val waitTime: Int
         if (packet.splash.announcer == PlayerUtils.getName() && config.autoSplashStatusUpdates) {
             ChatUtils.chat("The Splash Update Statuses will be updatet automatically for you. If you need to do something manually go into Discord Splash Dashboard")
         } else {
             SplashManager.addSplash(packet.splash, SplashManager.SplashSource.BN)
             if (packet.splash.lessWaste) {
-                val potion = MinecraftCompat.localPlayer.getActivePotionEffect(Potion.damageBoost)
-                val remainingDuration =
-                    if ((potion?.amplifier ?: 0) >= 7) {
-                        potion.duration / 20
-                    } else 0
-                waitTime = min((remainingDuration / 80), 25)
+                val remainingDuration = EffectApi.getGodSplashDuration()
+                waitTime = min((remainingDuration.inWholeSeconds.toInt() / 80), 25)
             } else {
                 waitTime = 0
             }
@@ -427,15 +426,15 @@ object BNConnection {
         }
     }
 
-    //TODO error report to BN Server via packet? Optionally via Config option automatically?
+    // TODO error report to BN Server via packet? Optionally via Config option automatically?
     fun onInvalidCommandFeedbackPacket(packet: InvalidCommandFeedbackPacket) {
-        //TODO upgrade via sth like run command packet interface and then reply just command failed maybe error too or sth and then fail command execution and show user exact command or sth? maybe clickable for slighly changeable?
+        // TODO upgrade via sth like run command packet interface and then reply just command failed maybe error too or sth and then fail command execution and show user exact command or sth? maybe clickable for slighly changeable?
         ChatUtils.chat("§cBN: ${packet.displayMessage}")
     }
 
     fun onPartyPacket(packet: PartyPacket) {
-        //This allows Deactivating the Remote Party Control HOWEVER
-        //It is needed for a LOT of Features which can both cause Issues and will block some Features that depend on it to not work.
+        // This allows Deactivating the Remote Party Control HOWEVER
+        // It is needed for a LOT of Features which can both cause Issues and will block some Features that depend on it to not work.
         if (config.allowBNServerPartyManagement) {
             val isInParty = PartyApi.isInParty()
             if (!isInParty && !(packet.type == PartyConstants.JOIN || packet.type == PartyConstants.ACCEPT || packet.type == PartyConstants.INVITE)) return
@@ -644,9 +643,9 @@ object BNConnection {
         )
     }
 
-    fun onRequestMinionDataPacket(packet: RequestMinionDataPacket) {
-        sendPacket(packet.preparePacketToReplyToThis(EnvironmentCore.utils.getMiniondata()))
-    }
+//     fun onRequestMinionDataPacket(packet: RequestMinionDataPacket) {
+//         sendPacket(packet.preparePacketToReplyToThis(EnvironmentCore.utils.getMiniondata()))
+//     }
 
     fun onPacketChatPromptPacket(packet: PacketChatPromptPacket) {
         ChatUtils.chatPrompt(
@@ -683,16 +682,30 @@ object BNConnection {
         }
     }
 
+    fun onSplashDurationRequestPacket(packet: SplashTimeRequestPacket) {
+        val response = SplashTimeRequestPacket.SplashReportResponse(EffectApi.getGodSplashDuration())
+        sendPacket(packet.preparePacketToReplyToThis(response))
+    }
+
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         waypoints.removeIf { it.value.deleteOnServerSwap }
     }
 }
 
-private fun Position.toLorenz(): LorenzVec {
+fun Position.toLorenz(): LorenzVec {
     return LorenzVec(
         x.toDouble(),
         y.toDouble(),
         z.toDouble(),
     )
 }
+
+fun LorenzVec.toBN(): Position {
+    return Position(
+        x.toInt(),
+        y.toInt(),
+        z.toInt(),
+    )
+}
+

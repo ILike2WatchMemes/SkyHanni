@@ -63,9 +63,7 @@ class RegistrationScreen(
             if (clicked == null) {
                 openTerms()
                 clickedTos = SimpleTimeMark.now().plus(3.minutes)
-                //TODO
-                // Uh somehow show the user that they have a cooldown of 3 minutes to read them now.
-                // I want them to read it! And they aren't long nor written in a way thats impossible to understand.
+                feedbackMessage = "§c You did not read the Terms of Service. You have a minimum of 3 Minutes to get an overview."
                 return@darkRectButton
             } else if (clicked.isInPast()) {
                 registerNow()

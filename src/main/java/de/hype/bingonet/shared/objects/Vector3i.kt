@@ -49,7 +49,7 @@ open class Vector3i : Comparable<Vector3i> {
         return Vector3i(
             this.y * vec.z - this.z * vec.y,
             this.z * vec.x - this.x * vec.z,
-            this.x * vec.y - this.y * vec.x
+            this.x * vec.y - this.y * vec.x,
         )
     }
 
@@ -101,8 +101,7 @@ open class Vector3i : Comparable<Vector3i> {
         } else if (other !is Vector3i) {
             return false
         } else {
-            val Vectorc = other
-            return this.x == Vectorc.x && this.y == Vectorc.y && this.z == Vectorc.z
+            return this.x == other.x && this.y == other.y && this.z == other.z
         }
     }
 
@@ -116,17 +115,18 @@ open class Vector3i : Comparable<Vector3i> {
 
     override fun compareTo(other: Vector3i): Int {
         return if (this.y == other.y)
-            (if (this.z == other.z)
-                (this.x - other.x)
-            else
-                (this.z - other.z))
+            (
+                if (this.z == other.z)
+                    (this.x - other.x)
+                else
+                    (this.z - other.z))
         else
             (this.y - other.y)
     }
 
     fun signumEquals(other: Vector3i): Boolean {
         return sign(x.toFloat()) == sign(other.x.toFloat()) && sign(y.toFloat()) == sign(other.y.toFloat()) && sign(z.toFloat()) == sign(
-            other.z.toFloat()
+            other.z.toFloat(),
         )
     }
 
@@ -168,7 +168,7 @@ open class Vector3i : Comparable<Vector3i> {
             11,
             5,
             10,
-            9
+            9,
         )
         private val SIZE_BITS_X: Int = 1 + floorLog2(smallestEncompassingPowerOfTwo(30000000))
         private val SIZE_BITS_Z: Int = SIZE_BITS_X

@@ -180,7 +180,7 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
     }
 
     private JCheckBox getThirdPartyCheckbox() {
-        //todo fully implement the actual execution since the use bb and use bn setting has to be enabled.
+        // todo fully implement the actual execution since the use bb and use bn setting has to be enabled.
         if (thirdPartyCheckbox == null) {
             try {
                 thirdPartyCheckbox = new JCheckBox();

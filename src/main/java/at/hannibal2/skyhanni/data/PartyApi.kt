@@ -42,7 +42,7 @@ object PartyApi {
         "§eYou have joined (?<name>.*)'s? §eparty!",
     )
 
-    //TODO
+    // TODO
     private val otherDisconnect5MinTimePattern by patternGroup.pattern(
         "others.disconnect.5min",
         ".*has disconnected, they have 5 minutes to rejoin before they are removed from the party.",
@@ -56,7 +56,7 @@ object PartyApi {
         "(?<name>.*) §ejoined the party\\.",
     )
 
-    //TODO the invited you to their party was created based on what i had in mind. has to be tested still!
+    // TODO the invited you to their party was created based on what i had in mind. has to be tested still!
     /**
      * REGEX-TEST: §b[MVP§d+§b] Throwpo §einvited you to join their Party.
      */
@@ -433,7 +433,7 @@ object PartyApi {
         send("party invite $username")
         return true
     }
-    //TODO add something that slows down invites if a lot people are supposed to be invited.
+    // TODO add something that slows down invites if a lot people are supposed to be invited.
 
     fun invite(usernames: List<String>): Boolean {
         if (!canInvite()) return false
@@ -448,9 +448,10 @@ object PartyApi {
     }
 
     fun isModerator(): Boolean {
-        //TODO add moderator tracking
-        //TODO add allinvite tracking
-        //WARNING if you add moderator tracking but not allinvite this blocks commands due to expecting not being able to invite.
+        // TODO add moderator tracking
+        // TODO add allinvite tracking
+        // WARNING if you add moderator tracking but not allinvite this blocks commands
+        // due to expecting not being able to invite.
         return true
     }
 
@@ -499,5 +500,5 @@ object PartyApi {
             prefix,
         )
     }
-    //TODO track party invites as part of player count since potential accepts.
+    // TODO track party invites as part of player count since potential accepts.
 }
