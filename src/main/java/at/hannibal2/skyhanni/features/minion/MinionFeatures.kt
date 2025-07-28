@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -35,6 +36,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -52,7 +54,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -235,20 +239,22 @@ object MinionFeatures {
     }
 
     @HandleEvent
-    fun openMinionRecipeOnResource(event: KeyDownEvent) {
+    fun openMinionRecipeOnResource(event: GuiKeyPressEvent) {
         val key = config.openMinionRecipeForHeldResource
-        if (key != event.keyCode || !key.isKeyClicked()) return
-        // TODO change it so it gets the item that is currently hovered over
-        val currentItem = NeuItems.getInternalName(MinecraftCompat.localPlayer.heldItem)
-        for (entry in NeuItems.allItemsCache) {
-            if (!entry.value.asString().endsWith("GENERATOR_1")) continue
-            val recipes = NeuItems.getRecipes(entry.value)
-            if (recipes.size != 1) continue
-            recipes.first { it.isCraftingRecipe() }.ingredients.any {
-                it.internalName.asString() == currentItem
+        if (!key.isKeyHeld()) return
+        val stack = stackUnderCursor() ?: return
+        SkyHanniMod.launchCoroutine {
+            val currentItem = NeuItems.getInternalName(stack)
+            for (entry in NeuItems.allItemsCache) {
+                if (!entry.value.asString().endsWith("GENERATOR_1")) continue
+                val recipes = NeuItems.getRecipes(entry.value)
+                if (recipes.size != 1) continue
+                if (recipes.first { it.isCraftingRecipe() }.ingredients.any {
+                        it.internalName.asString() == currentItem
+                    })
+                    HypixelCommands.viewRecipe(entry.value)
+                return@launchCoroutine
             }
-            HypixelCommands.viewRecipe(entry.value)
-            return
         }
     }
 

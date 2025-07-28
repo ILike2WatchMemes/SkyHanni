@@ -1,26 +1,19 @@
 package de.hype.bingonet
 
+// import de.hype.bingonet.shared.packets.function.MinionDataResponse.RequestMinionDataPacket
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.features.event.bingo.BingoNetConfig
-import de.hype.bingonet.environment.packetconfig.Packet
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.effect.EffectApi
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.bingo.bingonet.RegistrationScreen
 import at.hannibal2.skyhanni.features.bingo.bingonet.SplashManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
-import at.hannibal2.skyhanni.features.misc.update.ChangelogViewer.CommandContext
-import at.hannibal2.skyhanni.utils.CommandContextAwareObject
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CommandArgument
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -34,8 +27,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils.createSound
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
-import at.hannibal2.skyhanni.utils.compat.EffectsCompat
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -43,16 +34,40 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.renderBeaconBeam
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import de.hype.bingonet.environment.packetconfig.AbstractPacket
 import de.hype.bingonet.environment.packetconfig.InterceptPacketInfo
+import de.hype.bingonet.environment.packetconfig.Packet
 import de.hype.bingonet.environment.packetconfig.PacketUtils
-import de.hype.bingonet.shared.constants.*
-import de.hype.bingonet.shared.objects.*
+import de.hype.bingonet.shared.constants.AuthenticationConstants
+import de.hype.bingonet.shared.constants.InternalReasonConstants
+import de.hype.bingonet.shared.constants.PartyConstants
+import de.hype.bingonet.shared.objects.BNRole
+import de.hype.bingonet.shared.objects.Position
+import de.hype.bingonet.shared.objects.WaypointData
 import de.hype.bingonet.shared.packets.base.ExpectReplyPacket
-import de.hype.bingonet.shared.packets.function.*
-// import de.hype.bingonet.shared.packets.function.MinionDataResponse.RequestMinionDataPacket
-import de.hype.bingonet.shared.packets.network.*
+import de.hype.bingonet.shared.packets.function.GetWaypointsPacket
+import de.hype.bingonet.shared.packets.function.PacketChatPromptPacket
+import de.hype.bingonet.shared.packets.function.PartyPacket
+import de.hype.bingonet.shared.packets.function.PlaySoundPacket
+import de.hype.bingonet.shared.packets.function.SplashNotifyPacket
+import de.hype.bingonet.shared.packets.function.SplashTimeRequestPacket
+import de.hype.bingonet.shared.packets.function.WaypointPacket
+import de.hype.bingonet.shared.packets.network.BingoChatMessagePacket
+import de.hype.bingonet.shared.packets.network.BroadcastMessagePacket
+import de.hype.bingonet.shared.packets.network.CompletedGoalPacket
+import de.hype.bingonet.shared.packets.network.DisconnectPacket
+import de.hype.bingonet.shared.packets.network.InvalidCommandFeedbackPacket
+import de.hype.bingonet.shared.packets.network.PunishedPacket
+import de.hype.bingonet.shared.packets.network.RequestAuthentication
+import de.hype.bingonet.shared.packets.network.RequestConnectPacket
+import de.hype.bingonet.shared.packets.network.SystemMessagePacket
+import de.hype.bingonet.shared.packets.network.WantedSearchPacket
 import de.hype.bingonet.shared.packets.network.WantedSearchPacket.WantedSearchPacketReply
-import tv.twitch.chat.Chat
-import java.io.*
+import de.hype.bingonet.shared.packets.network.WelcomeClientPacket
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
+import java.io.PrintWriter
 import java.lang.String
 import java.net.Socket
 import java.security.KeyStore
@@ -61,7 +76,6 @@ import java.security.SecureRandom
 import java.security.cert.CertificateFactory
 import java.time.Duration
 import java.time.Instant
-import java.util.*
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
@@ -81,7 +95,7 @@ object BNConnection {
     private var socket: Socket? = null
     private var reader: BufferedReader? = null
     private var writer: PrintWriter? = null
-    private lateinit var messageQueue: LinkedBlockingQueue<String>
+    private var messageQueue: LinkedBlockingQueue<String>? = null
     var authenticated: Boolean? = null
         private set
 
@@ -120,7 +134,9 @@ object BNConnection {
 
     init {
         if (bnConfig.useBN) {
-            reconnectToBNServer()
+            SkyHanniMod.launchCoroutine {
+                reconnectToBNServer()
+            }
         }
     }
 
@@ -173,7 +189,7 @@ object BNConnection {
             {
                 try {
                     while (!Thread.currentThread().isInterrupted && isConnected) {
-                        messageQueue.poll(100, TimeUnit.MILLISECONDS)?.let { message ->
+                        messageQueue?.poll(100, TimeUnit.MILLISECONDS)?.let { message ->
                             writer?.println(message)
                             writer?.flush()
                         }
@@ -329,21 +345,30 @@ object BNConnection {
             if (retry <= 0) {
                 ChatUtils.chat("§cBN: Failed to send packet $packetName. Not connected to Bingo Net Server.")
             } else {
-                BNConnection.reconnectToBNServer()
-                sendPacket(packet, blockLog, retry - 1)
+                SkyHanniMod.launchCoroutine {
+                    BNConnection.reconnectToBNServer()
+                    sendPacket(packet, blockLog, retry - 1)
+                }
             }
         }
     }
 
-    fun BNConnection.reconnectToBNServer(ignoreIfConnected: Boolean = true, system: BingoNetConfig.BingoNetSystem = bnConfig.system, packetIntercepts : List<InterceptPacketInfo<*>> = emptyList()) {
+    suspend fun BNConnection.reconnectToBNServer(
+        ignoreIfConnected: Boolean = true,
+        system: BingoNetConfig.BingoNetSystem = bnConfig.system,
+        packetIntercepts: List<InterceptPacketInfo<*>> = emptyList(),
+    ) {
+        disconnect()
         if (bnConfig.useBN) {
             connect("hackthetime.de", system.port)
         } else {
             ChatUtils.clickableChat(
                 "Bingo Net is currently disabled. (Click to enable). §cKeep in mind that Hype_the_Time controls the Server and NOT the Sky Hanni Team!",
                 {
-                    bnConfig.useBN = true
-                    reconnectToBNServer(ignoreIfConnected, system, packetIntercepts)
+                    SkyHanniMod.launchCoroutine {
+                        bnConfig.useBN = true
+                        reconnectToBNServer(ignoreIfConnected, system, packetIntercepts)
+                    }
                 },
             )
         }
@@ -375,9 +400,12 @@ object BNConnection {
     fun onBingoChatMessagePacket(packet: BingoChatMessagePacket) {
         if (config.showBingoChat) {
             val prefix = if (packet.prefix == null) "" else "[${packet.prefix}§r]"
-            ChatUtils.hoverableChat(
+            ChatUtils.clickableChat(
                 "§6BC > §r$prefix ${packet.username}: ${packet.message}",
-                listOf("Bingo Cards: ${packet.bingo_cards}"),
+                {
+                  ChatUtils.suggestInChat("/bc @${packet.username} ")
+                },
+                "Bingo Cards: ${packet.bingo_cards}",
                 prefix = false,
             )
         }
@@ -401,10 +429,12 @@ object BNConnection {
             DelayedRun.runDelayed(
                 (packet.waitBeforeReconnect[i] + (Math.random() * packet.randomExtraDelay)).seconds,
                 {
-                    if (finalI == 0) {
-                        reconnectToBNServer(false)
-                    } else {
-                        reconnectToBNServer(true)
+                    SkyHanniMod.launchCoroutine {
+                        if (finalI == 0) {
+                            reconnectToBNServer(false)
+                        } else {
+                            reconnectToBNServer(true)
+                        }
                     }
                 },
             )
@@ -445,7 +475,9 @@ object BNConnection {
                 DelayedRun.runDelayed(
                     i.seconds,
                     {
-                        reconnectToBNServer(true)
+                        SkyHanniMod.launchNoScopeCoroutine {
+                            reconnectToBNServer(true)
+                        }
                     },
                 )
             }
@@ -722,7 +754,7 @@ object BNConnection {
         socket?.close()
         reader = null
         writer = null
-        messageQueue.clear()
+        messageQueue?.clear()
         messageReceiverThread?.interrupt()
         messageSenderThread?.interrupt()
         messageReceiverThread = null
