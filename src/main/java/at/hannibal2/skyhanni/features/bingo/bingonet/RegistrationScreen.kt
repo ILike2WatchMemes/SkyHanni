@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.bingo.bingonet
 
+import at.hannibal2.skyhanni.config.features.event.bingo.BingoNetConfig
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.features.misc.update.ChangelogViewer
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
@@ -25,7 +26,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class RegistrationScreen(
     val discordUserId: String,
-    val discordUserName: String
+    val discordUserName: String,
 ) : SkyhanniBaseScreen() {
     private val title = Renderable.text("Bingo Net Registration", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
     private val description = Renderable.text(
@@ -34,10 +35,13 @@ class RegistrationScreen(
     )
     private val repeatLabel = Renderable.text("Please repeat the following Text in the Box below: ${RequestRegisterPacket.PHRASE}")
     val textInput = TextInput()
-    private val textBox = Renderable.textBox("", TextInput(), width/3)
-    private val correctAccount = Renderable.clickable("We auto detected your running Discord. Do you want to register with your §6$discordUserName§r Account? The Mc and DC connection can not be changed anymore afterwards! If this is not the desired Account swap over to it and follow the Bots DM instructions", {
-        OSUtils.openBrowser("https://hackthetime.de/discord")
-    })
+    private val textBox = Renderable.textBox("", TextInput(), width / 3)
+    private val correctAccount = Renderable.clickable(
+        "We auto detected your running Discord. Do you want to register with your §6$discordUserName§r Account? The Mc and DC connection can not be changed anymore afterwards! If this is not the desired Account swap over to it and follow the Bots DM instructions",
+        {
+            OSUtils.openBrowser("https://hackthetime.de/discord")
+        },
+    )
     private val discordLabel = Renderable.text(
         "Due too how Bingo Net works you break parts of the Functionality for you, BUT ALSO FOR OTHERS if you are not on the Discord." +
             " During Registration you HAVE to be in the Discord!",
@@ -69,7 +73,7 @@ class RegistrationScreen(
                 registerNow()
             } else openTerms()
         },
-        horizontalAlign =  RenderUtils.HorizontalAlignment.CENTER
+        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
     )
 
     // Feedback message to show to the user
@@ -176,20 +180,22 @@ class RegistrationScreen(
                 val stringResponse = when (packet.response) {
                     RequestRegisterPacket.MCRegistrationResponsePacket.ResponseType.AWAITING_DC_USER_CONFIRMATION ->
                         "§aYou should have received a DM on Discord to confirm your Account."
+
                     RequestRegisterPacket.MCRegistrationResponsePacket.ResponseType.NOT_ON_DISCORD ->
                         "§cYou are not on the Bingo Net Discord Server. You need to join for this to work."
+
                     RequestRegisterPacket.MCRegistrationResponsePacket.ResponseType.ALREADY_REGISTERED ->
                         "§cEither your MC Account or Discord Account is already registered."
+
                     RequestRegisterPacket.MCRegistrationResponsePacket.ResponseType.BAD_REQUEST ->
                         "§cThe request was malformed. Please open a Bug Report on the Bingo Net Discord Server."
+
                     RequestRegisterPacket.MCRegistrationResponsePacket.ResponseType.ERROR ->
                         "§cThere was an error on our side (Bingo Net)."
                 }
                 feedbackMessage = stringResponse
             }
         }
-        BNConnection.packetIntercepts.add(intercept)
-        BNConnection.packetIntercepts.add(reponseIntercept)
-        BNConnection.reconnectToBNServer(false)
+        BNConnection.reconnectToBNServer(false, BingoNetConfig.BingoNetSystem.MAIN, listOf(intercept, reponseIntercept))
     }
 }

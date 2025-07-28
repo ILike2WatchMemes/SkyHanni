@@ -35,7 +35,7 @@ object BNCommands {
                 arg(
                     "server",
                     BrigadierArguments.word(),
-                    BingoNetConfig.BingoNetSystem.entries.map { it.name },
+                    BingoNetConfig.BingoNetSystem.entries.map { it.name }+"disconnect",
                 ) {
                     callback {
                         connectServerCommand(getArg(it))
@@ -125,11 +125,11 @@ object BNCommands {
     }
 
     fun connectServerCommand(arg: String? = null) {
-        if (arg == null) {
-            BNConnection.reconnectToBNServer(false, bnConfig.system)
+        val system = BingoNetConfig.BingoNetSystem.entries.find { it.name==arg }
+        if (system == null) {
+            BNConnection.disconnect()
             return
         }
-        val system = BingoNetConfig.BingoNetSystem.valueOf(arg)
         BNConnection.reconnectToBNServer(false, system)
     }
 
