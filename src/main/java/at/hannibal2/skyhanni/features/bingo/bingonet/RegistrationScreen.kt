@@ -14,7 +14,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import de.hype.bingonet.BNConnection
 import de.hype.bingonet.BNConnection.reconnectToBNServer
@@ -79,11 +81,11 @@ class RegistrationScreen(
     private var feedbackMessage: String? = null
 
     override fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        // Calculate the main area (1/2 width, centered, 1/2 height, centered)
-        val contentWidth = this.width / 2
+        // Calculate the main area similar to ChangeLogViewerScreen
+        val contentWidth = 4 * this.width / 5
         val contentHeight = 4 * this.height / 5
-        val xTranslate = this.width / 4
-        val yTranslate = (this.height - contentHeight) / 2
+        val xTranslate = this.width / 10
+        val yTranslate = this.height / 10
 
         drawDefaultBackground(mouseX, mouseY, partialTicks)
         DrawContextUtils.translate(xTranslate - 2.0, yTranslate - 2.0, 0.0)
@@ -92,51 +94,71 @@ class RegistrationScreen(
 
         DrawContextUtils.translate(xTranslate.toFloat(), yTranslate.toFloat() + 5, 0f)
         Renderable.withMousePosition(mouseX - xTranslate, mouseY - yTranslate) {
-            var y = 0
+            // Text width should be smaller than content width for proper wrapping
+            val textWidth = contentWidth - 40
 
-            // Title (centered)
-            title.renderXAligned(0, y, contentWidth)
-            y += title.height + 10
-
-            // Description
-            description.renderXAligned(0, y, contentWidth)
-            y += description.height + 10
-
-            // correctAccount
-            correctAccount.renderXAligned(0, y, contentWidth)
-            y += correctAccount.height + 10
-
-            // discord label
-            discordLabel.renderXAligned(0, y, contentWidth)
-            y += discordLabel.height + 5
-
-            // discord link (optional, can be commented out if not needed)
-            discordLink.renderXAligned(0, y, contentWidth)
-            y += discordLink.height + 5
-
-            // repeat label
-            repeatLabel.renderXAligned(0, y, contentWidth)
-            y += repeatLabel.height + 10
-
-            // textbox
-            textBox.renderXAligned(0, y, contentWidth)
-            y += 30
-
-            // openTerms
-            openTerms.renderXAligned(0, y, contentWidth)
-            y += openTerms.height + 15
-
-            // confirmButton (centered)
-            confirmButton.renderXAligned(0, y, contentWidth)
-            y += confirmButton.height + 10
-
-            // Feedback message (if any), centered
+            // Create a list of all UI elements
+            val elements = mutableListOf<Renderable>()
+            elements.add(Renderable.text("§l§9Bingo Net Registration", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER))
+            elements.add(Renderable.wrappedText(
+                "§c⚠ Warning ⚠: The Bingo Net Server is a closed source Project by Hype_the_Time. " +
+                "We as the Sky Hanni Team DO NOT HAVE ACCESS to the Server nor its Code.",
+                textWidth
+            ))
+            elements.add(Renderable.wrappedText(
+                "We auto detected your running Discord. Do you want to register with your §6$discordUserName§r Account? " +
+                "The Mc and DC connection can not be changed anymore afterwards! If this is not the desired Account " +
+                "swap over to it and follow the Bots DM instructions",
+                textWidth
+            ))
+            elements.add(Renderable.wrappedText(
+                "Due too how Bingo Net works you break parts of the Functionality for you, BUT ALSO FOR OTHERS " +
+                "if you are not on the Discord. During Registration you HAVE to be in the Discord!",
+                textWidth
+            ))
+            elements.add(discordLink)
+            elements.add(Renderable.wrappedText(
+                "Please repeat the following Text in the Box below: ${RequestRegisterPacket.PHRASE}",
+                textWidth
+            ))
+            elements.add(Renderable.textBox("", textInput, textWidth / 2))
+            elements.add(Renderable.clickable(
+                text="§e(Click to open Terms of Service, Privacy Policy and Rules)§r",
+                onLeftClick= {
+                    clickedTos = SimpleTimeMark.now()
+                    openTerms()
+                },
+            ))
+            elements.add(Renderable.darkRectButton(
+                Renderable.wrappedText(
+                    "I accept the Terms of Service, Privacy Policy and Rules (click to register)",
+                    textWidth / 2
+                ),
+                onClick = {
+                    val clicked = clickedTos
+                    if (clicked == null) {
+                        openTerms()
+                        clickedTos = SimpleTimeMark.now().plus(3.minutes)
+                        feedbackMessage = "§c You did not read the Terms of Service. You have a minimum of 3 Minutes to get an overview."
+                        return@darkRectButton
+                    } else if (clicked.isInPast()) {
+                        registerNow()
+                    } else openTerms()
+                },
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            ))
             feedbackMessage?.let { msg ->
-                Renderable.text(msg, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
-                    .renderXAligned(0, y, contentWidth)
+                elements.add(Renderable.wrappedText(msg, textWidth))
             }
+
+            // Create a vertical list that centers itself
+            Renderable.vertical(
+                elements,
+                spacing = 10,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER
+            ).renderXYAligned(0, 0, contentWidth, contentHeight)
         }
-        DrawContextUtils.translate(-xTranslate.toFloat(), -yTranslate.toFloat(), 0f)
+        DrawContextUtils.translate(-xTranslate.toFloat(), -yTranslate.toFloat() - 5, 0f)
     }
 
     fun openTerms() {
