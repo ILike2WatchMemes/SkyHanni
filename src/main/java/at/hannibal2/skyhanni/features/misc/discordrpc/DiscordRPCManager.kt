@@ -31,6 +31,7 @@ import dev.cbyrne.kdiscordipc.core.event.impl.ErrorEvent
 import dev.cbyrne.kdiscordipc.core.event.impl.ReadyEvent
 import dev.cbyrne.kdiscordipc.data.activity.Activity
 import dev.cbyrne.kdiscordipc.data.user.User
+import java.lang.Thread.sleep
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -276,10 +277,16 @@ object DiscordRPCManager {
 
     suspend fun getSelfUser(): User? {
         val manager = client?.userManager ?: return null
-        if (manager.currentUser==null){
+        if (manager.currentUser == null) {
             manager.subscribeToUserUpdates()
         }
-        return manager.currentUser
+        var max = 50
+        while (max > 0) {
+            max--
+            manager.currentUser?.let { return it }
+            sleep(100)
+        }
+        return null
     }
 
 

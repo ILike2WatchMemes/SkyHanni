@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.effect.EffectApi
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.bingo.bingonet.RegistrationScreen
 import at.hannibal2.skyhanni.features.bingo.bingonet.SplashManager
@@ -442,29 +443,7 @@ object BNConnection {
 
         val reason = packet.internalReason
         if (reason == InternalReasonConstants.NOT_REGISTERED) {
-            val dcUserId = DiscordRPCManager.getDiscordUserId()
-            val dcUsername = DiscordRPCManager.getDiscordUsername()
-            val hasDiscordAvailable = dcUserId != null && dcUsername != null
-            if (hasDiscordAvailable) {
-                ChatUtils.clickableChat(
-                    "§cYou are not registered in the Bingo Net Network. Click here to open the Registration Screen",
-                    {
-                        SkyHanniMod.screenToOpen = RegistrationScreen(
-                            dcUserId,
-                            dcUsername,
-                        )
-                    },
-                )
-            } else {
-                ChatUtils.clickableChat(
-                    "§cYou are not registered in the Bingo Net Network." +
-                        " Click here to open the Discord Invite and follow the Bot DM instructions " +
-                        "(Will lead you to the correct place IN THE SERVER!)",
-                    {
-                        OSUtils.openBrowser("https://hackthetime.de/discord")
-                    },
-                )
-            }
+            RegistrationScreen.openHelper()
         } else if (reason == InternalReasonConstants.BANNED) {
             ChatUtils.chat("§cIt appears that you have been banned from the Bingo Net Network. Due to this the Bingo Net Integration deactivated itself!")
             bnConfig.useBN = false
@@ -482,6 +461,7 @@ object BNConnection {
                 )
             }
         }
+        disconnect()
     }
 
     // TODO error report to BN Server via packet? Optionally via Config option automatically?
@@ -764,6 +744,14 @@ object BNConnection {
         packetIntercepts.clear()
         waypoints.clear()
         ChatUtils.chat("Disconnected from Bingo Net Server")
+    }
+
+    fun isEnabled(): Boolean {
+        return bnConfig.useBN
+    }
+
+    fun autoInit(event: HypixelJoinEvent){
+        //do nothing but init this file
     }
 }
 
