@@ -54,6 +54,7 @@ import at.hannibal2.skyhanni.utils.shader.ShaderManager
 //#endif
 //#if MC < 1.21
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
+
 //#else
 //$$ import net.minecraft.client.gui.screen.ingame.InventoryScreen.drawEntity
 //$$ import at.hannibal2.skyhanni.utils.compat.RenderCompat
@@ -1324,21 +1325,47 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : StringRenderable(prefix, scale, color, horizontalAlign, verticalAlign) {
-            override val text get() = prefix + input.textBox
+            override val text get() = prefix + input.editText()
 
             override val width = maxWidth
+            override val height = (9 * scale).toInt() + 6  // Add padding for the box
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                // Draw dark background box
+                val boxColor = if (isHovered(mouseOffsetX, mouseOffsetY)) {
+                    0xFF404040.toInt() // Lighter when hovered
+                } else {
+                    0xFF202020.toInt() // Dark background
+                }
+                GuiRenderUtils.drawRect(0, 0, width, height, boxColor)
+
+                // Draw border
+                val borderColor = if (input.isActive) {
+                    0xFF00AAFF.toInt() // Blue when active
+                } else if (isHovered(mouseOffsetX, mouseOffsetY)) {
+                    0xFF888888.toInt() // Light gray when hovered
+                } else {
+                    0xFF555555.toInt() // Dark gray normally
+                }
+                GuiRenderUtils.drawRect(0, 0, width, 1, borderColor) // Top
+                GuiRenderUtils.drawRect(0, height - 1, width, height, borderColor) // Bottom
+                GuiRenderUtils.drawRect(0, 0, 1, height, borderColor) // Left
+                GuiRenderUtils.drawRect(width - 1, 0, width, height, borderColor) // Right
+
                 if (isHovered(mouseOffsetX, mouseOffsetY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     input.makeActive()
                     input.handle()
                     if (RIGHT_MOUSE.isKeyClicked()) {
                         input.clear()
-                    } else {
-                        input.disable()
                     }
-                    super.render(mouseOffsetX, mouseOffsetY)
+                } else {
+                    input.disable()
                 }
+
+                // Render text with some padding
+                DrawContextUtils.translate(3f, 3f, 0f)
+                super.render(mouseOffsetX - 3, mouseOffsetY - 3)
+                DrawContextUtils.translate(-3f, -3f, 0f)
             }
         }
     }
