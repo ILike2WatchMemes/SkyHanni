@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -23,36 +24,45 @@ import de.hype.bingonet.BNConnection.reconnectToBNServer
 import de.hype.bingonet.environment.packetconfig.InterceptPacketInfo
 import de.hype.bingonet.shared.packets.network.RequestAuthentication
 import de.hype.bingonet.shared.packets.network.RequestRegisterPacket
+import java.lang.Thread.sleep
 import kotlin.time.Duration.Companion.minutes
 
 class RegistrationScreen(
     val discordUserId: String,
     val discordUserName: String,
 ) : SkyhanniBaseScreen() {
-    private val title = Renderable.text("Bingo Net Registration", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
-    private val description = Renderable.text(
+    val contentWidth = 4 * this.width / 5
+    val contentHeight = 4 * this.height / 5
+    val xTranslate = this.width / 10
+    val yTranslate = this.height / 10
+    val textWidth = contentWidth - 40
+
+    private val title = centeredText("§b§lBingo Net Registration")
+    private val description = text(
         "§c⚠ Warning ⚠: The Bingo Net Server is a closed source Project by Hype_the_Time. " +
             "We as the Sky Hanni Team DO NOT HAVE ACCESS to the Server nor its Code.",
     )
-    private val repeatLabel = Renderable.text("Please repeat the following Text in the Box below: ${RequestRegisterPacket.PHRASE}")
+    private val repeatLabel = text("Please repeat the following Text in the Box below: ${RequestRegisterPacket.PHRASE}")
     val textInput = TextInput()
     private val textBox = Renderable.textBox("", TextInput(), width / 3)
     private val correctAccount = Renderable.clickable(
-        "We auto detected your running Discord. Do you want to register with your §6$discordUserName§r Account? The Mc and DC connection can not be changed anymore afterwards! If this is not the desired Account swap over to it and follow the Bots DM instructions",
-        {
+        render = text("We auto detected your running §bDiscord§r. Do you want to register with your §6$discordUserName§r Account? The Mc and DC connection can not be changed anymore afterwards! If this is not the desired Account swap over to it and follow the Bots DM instructions"),
+        onLeftClick = {
             OSUtils.openBrowser("https://hackthetime.de/discord")
         },
     )
-    private val discordLabel = Renderable.text(
+    private val discordLabel = text(
         "Due too how Bingo Net works you break parts of the Functionality for you, BUT ALSO FOR OTHERS if you are not on the Discord." +
             " During Registration you HAVE to be in the Discord!",
     )
     private val discordLink = Renderable.link(
-        Renderable.text("Bingo Net Discord: https://hackthetime.de/discord"), bypassChecks = true,
-        onLeftClick = {},
+        text("Bingo Net Discord: https://hackthetime.de/discord"), bypassChecks = true,
+        onLeftClick = {
+            OSUtils.openBrowser("https://hackthetime.de/discord")
+        },
     )
     private val openTerms = Renderable.clickable(
-        "(Click to open Terms of Service, Privacy Policy and Rules)",
+        text("(Click to open Terms of Service, Privacy Policy and Rules)"),
         {
             clickedTos = SimpleTimeMark.now()
             openTerms()
@@ -60,7 +70,7 @@ class RegistrationScreen(
     )
     var clickedTos: SimpleTimeMark? = null
     private val confirmButton = Renderable.darkRectButton(
-        Renderable.text(
+        text(
             "I accept the Terms of Service, Privacy Policy and Rules (click to register)",
         ),
         onClick = {
@@ -68,7 +78,8 @@ class RegistrationScreen(
             if (clicked == null) {
                 openTerms()
                 clickedTos = SimpleTimeMark.now().plus(3.minutes)
-                feedbackMessage = "§c You did not read the Terms of Service. You have a minimum of 3 Minutes to get an overview."
+                feedbackMessage =
+                    "§cYou did not read the Terms of Service. You cant continue for 3 minutes now so get yourself an overview."
                 return@darkRectButton
             } else if (clicked.isInPast()) {
                 registerNow()
@@ -82,11 +93,6 @@ class RegistrationScreen(
 
     override fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
         // Calculate the main area similar to ChangeLogViewerScreen
-        val contentWidth = 4 * this.width / 5
-        val contentHeight = 4 * this.height / 5
-        val xTranslate = this.width / 10
-        val yTranslate = this.height / 10
-
         drawDefaultBackground(mouseX, mouseY, partialTicks)
         DrawContextUtils.translate(xTranslate - 2.0, yTranslate - 2.0, 0.0)
         GuiRenderUtils.drawFloatingRectDark(0, 0, contentWidth, contentHeight)
@@ -95,58 +101,18 @@ class RegistrationScreen(
         DrawContextUtils.translate(xTranslate.toFloat(), yTranslate.toFloat() + 5, 0f)
         Renderable.withMousePosition(mouseX - xTranslate, mouseY - yTranslate) {
             // Text width should be smaller than content width for proper wrapping
-            val textWidth = contentWidth - 40
 
             // Create a list of all UI elements
             val elements = mutableListOf<Renderable>()
-            elements.add(Renderable.text("§l§9Bingo Net Registration", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER))
-            elements.add(Renderable.wrappedText(
-                "§c⚠ Warning ⚠: The Bingo Net Server is a closed source Project by Hype_the_Time. " +
-                "We as the Sky Hanni Team DO NOT HAVE ACCESS to the Server nor its Code.",
-                textWidth
-            ))
-            elements.add(Renderable.wrappedText(
-                "We auto detected your running Discord. Do you want to register with your §6$discordUserName§r Account? " +
-                "The Mc and DC connection can not be changed anymore afterwards! If this is not the desired Account " +
-                "swap over to it and follow the Bots DM instructions",
-                textWidth
-            ))
-            elements.add(Renderable.wrappedText(
-                "Due too how Bingo Net works you break parts of the Functionality for you, BUT ALSO FOR OTHERS " +
-                "if you are not on the Discord. During Registration you HAVE to be in the Discord!",
-                textWidth
-            ))
+            elements.add(title)
+            elements.add(description)
+            elements.add(repeatLabel)
+            elements.add(textBox)
+            elements.add(correctAccount)
+            elements.add(discordLabel)
             elements.add(discordLink)
-            elements.add(Renderable.wrappedText(
-                "Please repeat the following Text in the Box below: ${RequestRegisterPacket.PHRASE}",
-                textWidth
-            ))
-            elements.add(Renderable.textBox("", textInput, textWidth / 2))
-            elements.add(Renderable.clickable(
-                text="§e(Click to open Terms of Service, Privacy Policy and Rules)§r",
-                onLeftClick= {
-                    clickedTos = SimpleTimeMark.now()
-                    openTerms()
-                },
-            ))
-            elements.add(Renderable.darkRectButton(
-                Renderable.wrappedText(
-                    "I accept the Terms of Service, Privacy Policy and Rules (click to register)",
-                    textWidth / 2
-                ),
-                onClick = {
-                    val clicked = clickedTos
-                    if (clicked == null) {
-                        openTerms()
-                        clickedTos = SimpleTimeMark.now().plus(3.minutes)
-                        feedbackMessage = "§c You did not read the Terms of Service. You have a minimum of 3 Minutes to get an overview."
-                        return@darkRectButton
-                    } else if (clicked.isInPast()) {
-                        registerNow()
-                    } else openTerms()
-                },
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-            ))
+            elements.add(openTerms)
+            elements.add(confirmButton)
             feedbackMessage?.let { msg ->
                 elements.add(Renderable.wrappedText(msg, textWidth))
             }
@@ -155,17 +121,20 @@ class RegistrationScreen(
             Renderable.vertical(
                 elements,
                 spacing = 10,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             ).renderXYAligned(0, 0, contentWidth, contentHeight)
         }
         DrawContextUtils.translate(-xTranslate.toFloat(), -yTranslate.toFloat() - 5, 0f)
     }
 
     fun openTerms() {
-        val url = "https://hackthetime.de/"
+        val url = "https://hackthetime.de"
         OSUtils.openBrowser("$url/privacy")
+        sleep(100)
         OSUtils.openBrowser("$url/tos")
+        sleep(100)
         OSUtils.openBrowser("$url/rules")
+        sleep(100)
     }
 
     fun registerNow() {
@@ -230,6 +199,8 @@ class RegistrationScreen(
                     ChatUtils.chat("Starting Rich Presence to obtain Discord User ID and Username.")
                     DiscordRPCManager.start(false)
                 }
+                val user = DiscordRPCManager.getSelfUser()
+                sleep(500)
                 val userId = DiscordRPCManager.getDiscordUserId()
                 val username = DiscordRPCManager.getDiscordUsername()
                 val hasDiscordAvailable = userId != null && username != null
@@ -261,4 +232,19 @@ class RegistrationScreen(
             }
         }
     }
+
+    fun centeredText(text: String): Renderable =
+        Renderable.wrappedText(
+            text,
+            textWidth,
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+        )
+
+
+    fun text(text: String): Renderable =
+        Renderable.wrappedText(
+            text,
+            textWidth,
+        )
+
 }
