@@ -166,7 +166,7 @@ object TitleManager {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shsendtitle") {
+        event. registerBrigadier("shsendtitle") {
             description = "Display a title on the screen with the specified settings."
             category = CommandCategory.DEVELOPER_TEST
             arg("duration", BrigadierArguments.string()) { duration ->

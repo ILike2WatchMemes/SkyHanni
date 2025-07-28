@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.event.bingo
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -15,6 +16,16 @@ class BingoNetConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var useBN: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Bingo Net Server (Main/Beta/Alpha)",
+        desc = "Which Server Version do you want to connect to by default?\n"+
+        "Do Not Change this unless you know what you are doing!"
+    )
+    @ConfigEditorDropdown
+    var system : BingoNetSystem = BingoNetSystem.MAIN
+
     @Expose
     @ConfigOption(
         name = "Bingo Net API/Legacy Key - Optional",
@@ -22,4 +33,22 @@ class BingoNetConfig {
     )
     @ConfigEditorText
     var BNApiKey: String = ""
+
+    enum class BingoNetSystem {
+        MAIN("Main Server",5000),
+        BETA("Beta Server",5011),
+        ALPHA("Alpha Server",5012);
+
+        private val displayName: String
+        val port: Int
+
+        constructor(displayName: String, port: Int) {
+            this.displayName = displayName
+            this.port = port
+        }
+
+        override fun toString(): String {
+            return displayName
+        }
+    }
 }
