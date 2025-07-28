@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.features.event.bingo.BingoNetConfig
 import at.hannibal2.skyhanni.config.features.inventory.hubselector.HubSelectorKeybinds
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.toBNIsland
+import at.hannibal2.skyhanni.features.bingo.bingonet.RegistrationScreen
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import de.hype.bingonet.BNConnection.reconnectToBNServer
@@ -31,15 +32,13 @@ object BNCommands {
         event.registerBrigadier("bnreconnectserver") {
             description = "(Re)Starts the Connection to the Bingo Net Server."
             category = CommandCategory.BINGO_NET
-            callback {
-                arg(
-                    "server",
-                    BrigadierArguments.word(),
-                    BingoNetConfig.BingoNetSystem.entries.map { it.name }+"disconnect",
-                ) {
-                    callback {
-                        connectServerCommand(getArg(it))
-                    }
+            arg(
+                "server",
+                BrigadierArguments.string(),
+                BingoNetConfig.BingoNetSystem.entries.map { it.name } + "disconnect",
+            ) {
+                callback {
+                    connectServerCommand(getArg(it))
                 }
             }
             simpleCallback {
@@ -50,14 +49,12 @@ object BNCommands {
         event.registerBrigadier("bc") {
             description = "Send a Message to Bingo Net Chat."
             category = CommandCategory.BINGO_NET
-            callback {
-                arg(
-                    "message",
-                    BrigadierArguments.greedyString(),
-                ) {
-                    callback {
-                        BNConnection.sendPacket(BingoChatMessagePacket(null, "", getArg(it), 0))
-                    }
+            arg(
+                "message",
+                BrigadierArguments.greedyString(),
+            ) {
+                callback {
+                    BNConnection.sendPacket(BingoChatMessagePacket(null, "", getArg(it), 0))
                 }
             }
         }
@@ -66,7 +63,7 @@ object BNCommands {
             event.registerBrigadier("bnsplash") {
                 description = "Announce a Splash (Announces a Splash for the Lobby your currently in)."
                 category = CommandCategory.BINGO_NET
-                arg("location", BrigadierArguments.word(), SplashLocations.values().map { it.getName() }) { loc ->
+                arg("location", BrigadierArguments.string(), SplashLocations.values().map { it.getName() }) { loc ->
                     arg("extraMessage", BrigadierArguments.greedyString()) { extra ->
                         callback {
                             val location = SplashLocations.values().find { it.getName() == getArg(loc) }
@@ -75,7 +72,7 @@ object BNCommands {
                                 ChatUtils.userError("Invalid splash location provided: ${getArg(loc)}. Only use a suggested location!")
                                 return@callback
                             }
-                            sendSplash(location, message,false)
+                            sendSplash(location, message, false)
                         }
                     }
                     callback {
@@ -84,14 +81,14 @@ object BNCommands {
                             ChatUtils.userError("Invalid splash location provided: ${getArg(loc)}. Only use a suggested location!")
                             return@callback
                         }
-                        sendSplash(location, null,false)
+                        sendSplash(location, null, false)
                     }
                 }
             }
             event.registerBrigadier("bnsplashdynamic") {
                 description = "Announce a Dynamic Hub Splash"
                 category = CommandCategory.BINGO_NET
-                arg("location", BrigadierArguments.word(), SplashLocations.values().map { it.getName() }) { loc ->
+                arg("location", BrigadierArguments.string(), SplashLocations.values().map { it.getName() }) { loc ->
                     arg("extraMessage", BrigadierArguments.greedyString()) { extra ->
                         callback {
                             val location = SplashLocations.values().find { it.getName() == getArg(loc) }
@@ -100,7 +97,7 @@ object BNCommands {
                                 ChatUtils.userError("Invalid splash location provided: ${getArg(loc)}. Only use a suggested location!")
                                 return@callback
                             }
-                            sendSplash(location, message,true)
+                            sendSplash(location, message, true)
                         }
                     }
                     callback {
@@ -109,11 +106,11 @@ object BNCommands {
                             ChatUtils.userError("Invalid splash location provided: ${getArg(loc)}. Only use a suggested location!")
                             return@callback
                         }
-                        sendSplash(location, null,true)
+                        sendSplash(location, null, true)
                     }
                 }
             }
-            event.registerBrigadier("bnrequestpottimes"){
+            event.registerBrigadier("bnrequestpottimes") {
                 category = CommandCategory.BINGO_NET
                 simpleCallback {
                     val packet = SplashTimeRequestPacket()
@@ -122,15 +119,41 @@ object BNCommands {
                 }
             }
         }
+
+        event.registerBrigadier(
+            "bnregistryscreen",
+            {
+                category = CommandCategory.DEVELOPER_DEBUG
+                description = "Opens the Bingo Net Registration Screen"
+                simpleCallback {
+                    RegistrationScreen.openHelper()
+                }
+            },
+        )
+
+        event.registerBrigadier(
+            "bndebugbreakpoint",
+            {
+                category = CommandCategory.DEVELOPER_DEBUG
+                description = "Opens the Bingo Net Registration Screen"
+                simpleCallback {
+                    SkyHanniMod.launchCoroutine {
+                        debugBreakpoint()
+                    }
+                }
+            },
+        )
     }
 
     fun connectServerCommand(arg: String? = null) {
-        val system = BingoNetConfig.BingoNetSystem.entries.find { it.name==arg }
+        val system = BingoNetConfig.BingoNetSystem.entries.find { it.name == arg }
         if (system == null) {
             BNConnection.disconnect()
             return
         }
-        BNConnection.reconnectToBNServer(false, system)
+        SkyHanniMod.launchCoroutine {
+            BNConnection.reconnectToBNServer(false, system)
+        }
     }
 
     fun sendSplash(location: SplashLocation, extraMessage: String? = null, dynamic: Boolean) {
@@ -153,6 +176,10 @@ object BNCommands {
             status = StatusConstants.WAITING,
         )
         BNConnection.sendPacket(SplashNotifyPacket(splashData))
+    }
+
+    suspend fun debugBreakpoint() {
+        ChatUtils.chat("Debug Breakpoint reached.")
     }
 
 }

@@ -1,20 +1,20 @@
 package at.hannibal2.skyhanni.features.bingo.bingonet
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.event.bingo.BingoNetConfig
 import at.hannibal2.skyhanni.data.model.TextInput
-import at.hannibal2.skyhanni.features.misc.update.ChangelogViewer
+import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.MojangUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import de.hype.bingonet.BNConnection
 import de.hype.bingonet.BNConnection.reconnectToBNServer
@@ -22,7 +22,6 @@ import de.hype.bingonet.environment.packetconfig.InterceptPacketInfo
 import de.hype.bingonet.shared.packets.network.RequestAuthentication
 import de.hype.bingonet.shared.packets.network.RequestRegisterPacket
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 class RegistrationScreen(
     val discordUserId: String,
@@ -196,6 +195,48 @@ class RegistrationScreen(
                 feedbackMessage = stringResponse
             }
         }
-        BNConnection.reconnectToBNServer(false, BingoNetConfig.BingoNetSystem.MAIN, listOf(intercept, reponseIntercept))
+        SkyHanniMod.launchCoroutine {
+            BNConnection.reconnectToBNServer(false, BingoNetConfig.BingoNetSystem.MAIN, listOf(intercept, reponseIntercept))
+        }
+    }
+
+    companion object {
+        fun openHelper() {
+            SkyHanniMod.launchCoroutine {
+                val isStarted = DiscordRPCManager.isStarted()
+                if (!isStarted || !DiscordRPCManager.isConnected()) {
+                    ChatUtils.chat("Starting Rich Presence to obtain Discord User ID and Username.")
+                    DiscordRPCManager.start(false)
+                }
+                val userId = DiscordRPCManager.getDiscordUserId()
+                val username = DiscordRPCManager.getDiscordUsername()
+                val hasDiscordAvailable = userId != null && username != null
+                if (hasDiscordAvailable) {
+                    ChatUtils.clickableChat(
+                        "§cYou are not registered in the Bingo Net Network. Click here to open the Registration Screen",
+                        {
+                            SkyHanniMod.screenToOpen =
+                                RegistrationScreen(userId, username)
+                        },
+                    )
+                } else {
+                    ChatUtils.chat(
+                        "Could not obtain Discord User ID or Username. Falling back to website Registration. " +
+                            "You may retry execution after starting Discord if it wasn't.",
+                    )
+                    ChatUtils.clickableChat(
+                        "§cYou are not registered in the Bingo Net Network." +
+                            " Click here to open the Discord Invite and follow the Bot DM instructions " +
+                            "(Will lead you to the correct place IN THE SERVER!)",
+                        {
+                            OSUtils.openBrowser("https://hackthetime.de/discord")
+                        },
+                    )
+                }
+                if (!isStarted) {
+                    DiscordRPCManager.stop()
+                }
+            }
+        }
     }
 }

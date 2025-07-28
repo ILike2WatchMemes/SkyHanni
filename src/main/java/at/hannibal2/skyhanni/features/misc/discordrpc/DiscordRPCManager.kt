@@ -30,6 +30,7 @@ import dev.cbyrne.kdiscordipc.core.event.impl.DisconnectedEvent
 import dev.cbyrne.kdiscordipc.core.event.impl.ErrorEvent
 import dev.cbyrne.kdiscordipc.core.event.impl.ReadyEvent
 import dev.cbyrne.kdiscordipc.data.activity.Activity
+import dev.cbyrne.kdiscordipc.data.user.User
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -60,12 +61,14 @@ object DiscordRPCManager {
         }
     }
 
-    private fun stop() {
+    fun stop() {
         if (!isConnected()) return
         updateDebugStatus("Stopped")
         client?.disconnect()
         started = false
     }
+
+    fun isStarted() = started
 
     private suspend fun setup(fromCommand: Boolean) {
         try {
@@ -93,7 +96,7 @@ object DiscordRPCManager {
         }
     }
 
-    private fun isConnected() = client?.connected == true
+    fun isConnected() = client?.connected == true
 
     @HandleEvent(ConfigLoadEvent::class)
     fun onConfigLoad() {
@@ -271,12 +274,20 @@ object DiscordRPCManager {
         }
     }
 
-
-    fun getDiscordUserId(): String? {
-        return client?.userManager?.currentUser?.id
+    suspend fun getSelfUser(): User? {
+        val manager = client?.userManager ?: return null
+        if (manager.currentUser==null){
+            manager.subscribeToUserUpdates()
+        }
+        return manager.currentUser
     }
 
-    fun getDiscordUsername(): String? {
-        return client?.userManager?.currentUser?.username
+
+    suspend fun getDiscordUserId(): String? {
+        return getSelfUser()?.id
+    }
+
+    suspend fun getDiscordUsername(): String? {
+        return getSelfUser()?.username
     }
 }

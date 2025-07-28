@@ -33,12 +33,12 @@ class BingoNetworksConfig {
     // TODO requires restart rn still so fix somehow?
 
     @Expose
-    @ConfigOption(name = "Bingo Net Splashes", desc = "Show Splashes announced via the Bingo Net Server.")
+    @ConfigOption(name = "Show Splashes", desc = "Show Splashes announcements")
     @ConfigEditorBoolean
     var showSplashes: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Bingo Net ChChests", desc = "Subscribe to the Bingo Net ChChests.")
+    @ConfigOption(name = "Show ChChests", desc = "Subscribe to ChChests.")
     @ConfigEditorBoolean
     var chestWaypoints: Boolean = true
 
@@ -51,7 +51,7 @@ class BingoNetworksConfig {
     var allowBNServerPartyManagement: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Show Bingo Chat", desc = "Bingo Chat is a Chat every Bingo Net ")
+    @ConfigOption(name = "Show Bingo Chat", desc = "Bingo Chat is a Chat for every Bingo Net participant.")
     @ConfigEditorBoolean
     var showBingoChat: Boolean = true
 

@@ -58,7 +58,7 @@ object SplashStatusUpdateListener {
     }
 
     public fun useOverlay(): Boolean {
-        return SkyHanniMod.feature.event.bingo.bingoNetworks.useSplasherOverlay
+        return SkyHanniMod.feature.event.bingo.bingoNetworks.splasherConfig.useSplasherOverlay
     }
 
     fun setStatus(newStatus: StatusConstants) {
