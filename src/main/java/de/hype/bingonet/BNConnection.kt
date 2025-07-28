@@ -51,6 +51,7 @@ import de.hype.bingonet.shared.packets.function.*
 // import de.hype.bingonet.shared.packets.function.MinionDataResponse.RequestMinionDataPacket
 import de.hype.bingonet.shared.packets.network.*
 import de.hype.bingonet.shared.packets.network.WantedSearchPacket.WantedSearchPacketReply
+import tv.twitch.chat.Chat
 import java.io.*
 import java.lang.String
 import java.net.Socket
@@ -334,7 +335,7 @@ object BNConnection {
         }
     }
 
-    fun BNConnection.reconnectToBNServer(ignoreIfConnected: Boolean = true, system: BingoNetConfig.BingoNetSystem = bnConfig.system) {
+    fun BNConnection.reconnectToBNServer(ignoreIfConnected: Boolean = true, system: BingoNetConfig.BingoNetSystem = bnConfig.system, packetIntercepts : List<InterceptPacketInfo<*>> = emptyList()) {
         if (bnConfig.useBN) {
             connect("hackthetime.de", system.port)
         } else {
@@ -342,7 +343,7 @@ object BNConnection {
                 "Bingo Net is currently disabled. (Click to enable). §cKeep in mind that Hype_the_Time controls the Server and NOT the Sky Hanni Team!",
                 {
                     bnConfig.useBN = true
-                    reconnectToBNServer(ignoreIfConnected, system)
+                    reconnectToBNServer(ignoreIfConnected, system, packetIntercepts)
                 },
             )
         }
@@ -715,6 +716,22 @@ object BNConnection {
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         waypoints.removeIf { it.value.deleteOnServerSwap }
+    }
+
+    fun disconnect() {
+        socket?.close()
+        reader = null
+        writer = null
+        messageQueue.clear()
+        messageReceiverThread?.interrupt()
+        messageSenderThread?.interrupt()
+        messageReceiverThread = null
+        messageSenderThread = null
+        socket = null
+        authenticated = null
+        packetIntercepts.clear()
+        waypoints.clear()
+        ChatUtils.chat("Disconnected from Bingo Net Server")
     }
 }
 
