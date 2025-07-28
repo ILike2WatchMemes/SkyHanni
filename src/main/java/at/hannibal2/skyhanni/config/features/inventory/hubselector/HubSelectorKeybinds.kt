@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.toBNIsland
-import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.features.bingo.bingonet.SplashManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -18,11 +17,14 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapKeysNotNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
+import de.hype.bingonet.shared.constants.Islands
 import de.hype.bingonet.shared.constants.StatusConstants
+import de.hype.bingonet.shared.objects.SplashData
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.item.ItemStack
 import java.time.Duration
 import java.time.Instant
+import kotlin.time.Duration.Companion.seconds
 
 
 @SkyHanniModule
@@ -31,16 +33,17 @@ object HubSelectorKeybinds {
     private var lastClick = SimpleTimeMark.farPast()
     private val patternGroup = RepoPattern.group("inventory.hubselector")
     val hubIdToNumberCache: BiMap<String, Int> = HashBiMap.create()
+    var lastUpdate = SimpleTimeMark.farPast()
 
     // TODO Dungeon Hub implementation
     private val hubSelectorGuiNamePattern by patternGroup.pattern(
         "gui-name",
-        ".*hub selector.*",
+        ".*Hub Selector.*",
     )
 
     private val itemNamePattern by patternGroup.pattern(
         "item-name",
-        "SkyBlock Hub #(?<hubNumber>\\d+)",
+        "((SkyBlock)|(Dungeon)) Hub #(?<hubNumber>\\d+)",
     )
 
     private val playersPattern by patternGroup.pattern(
@@ -49,17 +52,19 @@ object HubSelectorKeybinds {
     )
     private val serverIdPattern by patternGroup.pattern(
         "server-id",
-        "Server: (?<max>.*)",
+        "Server: (?<serverid>.*)",
     )
     private var mainInventory = InventoryDetector(
         openInventory = {
             hubIdToNumberCache.clear()
+            lastUpdate = SimpleTimeMark.now()
             for (stack in it.inventoryItems.values) {
                 val data = stack.parseToHubSelectorData() ?: continue
                 hubIdToNumberCache[data.serverId] = data.hubNumber
             }
         },
-    ) { name -> name == ".*Hub Selector" }
+        pattern = hubSelectorGuiNamePattern,
+    )
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onKeyPress(event: GuiKeyPressEvent) {
@@ -123,7 +128,7 @@ object HubSelectorKeybinds {
             } else if (serverIdPattern.matcher(line).matches()) {
                 val serverMatcher = serverIdPattern.matcher(line)
                 if (serverMatcher.matches()) {
-                    serverId = serverMatcher.group("max")
+                    serverId = serverMatcher.group("serverid")
                 }
             }
         }
@@ -137,6 +142,11 @@ object HubSelectorKeybinds {
             }
         }
         return null
+    }
+
+    fun getHubNumberById(serverId: String, island: Islands): SplashData.HubSelectorData? {
+        if (lastUpdate.plus(30.seconds).isInPast()) return null //Hub Swaps problem etc.
+        return SplashData.HubSelectorData(hubIdToNumberCache.get(serverId) ?: return null, island)
     }
 
     private class HubData(

@@ -2,17 +2,25 @@ package de.hype.bingonet
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.features.event.bingo.BingoNetConfig
 import de.hype.bingonet.environment.packetconfig.Packet
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.effect.EffectApi
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.bingo.bingonet.RegistrationScreen
 import at.hannibal2.skyhanni.features.bingo.bingonet.SplashManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
+import at.hannibal2.skyhanni.features.misc.update.ChangelogViewer.CommandContext
+import at.hannibal2.skyhanni.utils.CommandContextAwareObject
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CommandArgument
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -110,7 +118,7 @@ object BNConnection {
     }
 
     init {
-        if(bnConfig.useBN){
+        if (bnConfig.useBN) {
             reconnectToBNServer()
         }
     }
@@ -326,9 +334,18 @@ object BNConnection {
         }
     }
 
-    fun BNConnection.reconnectToBNServer(ignoreIfConnected: Boolean = true) {
-        connect(serverPort = 5000)
-        TODO("fix the port. just random from memory")
+    fun BNConnection.reconnectToBNServer(ignoreIfConnected: Boolean = true, system: BingoNetConfig.BingoNetSystem = bnConfig.system) {
+        if (bnConfig.useBN) {
+            connect("hackthetime.de", system.port)
+        } else {
+            ChatUtils.clickableChat(
+                "Bingo Net is currently disabled. (Click to enable). §cKeep in mind that Hype_the_Time controls the Server and NOT the Sky Hanni Team!",
+                {
+                    bnConfig.useBN = true
+                    reconnectToBNServer(ignoreIfConnected, system)
+                },
+            )
+        }
     }
 
     fun onBroadcastMessagePacket(packet: BroadcastMessagePacket) {
@@ -338,7 +355,7 @@ object BNConnection {
     fun onSplashNotifyPacket(packet: SplashNotifyPacket) {
         // influencing the delay in any way is disallowed!
         val waitTime: Int
-        if (packet.splash.announcer == PlayerUtils.getName() && config.autoSplashStatusUpdates) {
+        if (packet.splash.announcer == PlayerUtils.getName() && config.splasherConfig.autoSplashStatusUpdates) {
             ChatUtils.chat("The Splash Update Statuses will be updatet automatically for you. If you need to do something manually go into Discord Splash Dashboard")
         } else {
             SplashManager.addSplash(packet.splash, SplashManager.SplashSource.BN)

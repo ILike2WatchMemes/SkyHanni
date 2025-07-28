@@ -63,13 +63,9 @@ class BingoNetworksConfig {
 
     // TODO hide unless you have splasher perm?
     @Expose
-    @FeatureToggle
-    @ConfigOption(
-        name = "Splasher Overlay",
-        desc = "Show Data that is useful for a Splasher in an Overlay after you announced a Splash.",
-    )
-    @ConfigEditorBoolean
-    var useSplasherOverlay: Boolean = true
+    @ConfigOption(name = "§dSplasher Config", desc = "Only Important if you are a Splasher.")
+    @Accordion
+    val splasherConfig: SplasherConfig = SplasherConfig()
 
     @FeatureToggle
     @Expose
@@ -104,15 +100,6 @@ class BingoNetworksConfig {
     )
     @Accordion
     val serverActionChatPrompt = KeyBind()
-
-    @Expose
-    @FeatureToggle
-    @ConfigOption(
-        name = "Auto Splash Status Updates",
-        desc = "Will automatically change the Status of YOUR Splashes to match the current State.",
-    )
-    @ConfigEditorBoolean
-    var autoSplashStatusUpdates: Boolean = true
 
 
     @Expose
