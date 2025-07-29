@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.bingo.bingobrewers
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.Features
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -115,8 +117,13 @@ object BingoBrewersClient {
     }
 
     @HandleEvent
-    fun load(event: HypixelJoinEvent) {
-        // This will call the init method to set up the client if enabled.
+    fun commandRegistration(event: CommandRegistrationEvent){
+        event.registerBrigadier("bingobrewersreconnect",{
+            category = CommandCategory.BINGO_NET
+            description = "Reload the Bingo Brewers Client"
+            client?.close()
+            init()
+        })
     }
 
 
