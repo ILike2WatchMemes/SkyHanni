@@ -22,6 +22,7 @@ data class RequestRegisterPacket(
     ) : ReplyPacket() {
         enum class ResponseType {
             AWAITING_DC_USER_CONFIRMATION, // → Basically Success.
+
             // It means that the discord user got sent the request to confirm.
             NOT_ON_DISCORD, // → The user is not on the Bingo Net Discord Server.
             ALREADY_REGISTERED, // → DC User or MC UUID is already associated with an account.

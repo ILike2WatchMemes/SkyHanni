@@ -15,6 +15,7 @@ open class WaypointData(
     var doTracer: Boolean = true,
 ) {
     val waypointId: Int = counter++
+
     companion object {
         var counter: Int = 1
     }

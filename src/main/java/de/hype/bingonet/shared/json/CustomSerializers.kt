@@ -58,7 +58,7 @@ class ColorSerializer : JsonSerializer<Color>, JsonDeserializer<Color> {
     }
 }
 
- class DurationSerializer : JsonSerializer<Duration>, JsonDeserializer<Duration> {
+class DurationSerializer : JsonSerializer<Duration>, JsonDeserializer<Duration> {
     @Throws(JsonParseException::class)
     override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): Duration {
         if (json.isJsonObject) {

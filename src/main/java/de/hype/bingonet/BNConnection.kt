@@ -447,7 +447,7 @@ object BNConnection {
         } else if (reason == InternalReasonConstants.BANNED) {
             ChatUtils.chat("§cIt appears that you have been banned from the Bingo Net Network. Due to this the Bingo Net Integration deactivated itself!")
             bnConfig.useBN = false
-        } else if (packet.waitBeforeReconnect?.isEmpty() ?: true) {
+        } else if (packet.waitBeforeReconnect.isEmpty()) {
             ChatUtils.chat("§cBN: You have been disconnected from the Bingo Net Network.")
         } else {
             for (i in packet.waitBeforeReconnect) {

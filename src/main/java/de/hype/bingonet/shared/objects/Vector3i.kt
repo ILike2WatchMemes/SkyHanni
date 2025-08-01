@@ -116,10 +116,10 @@ open class Vector3i : Comparable<Vector3i> {
     override fun compareTo(other: Vector3i): Int {
         return if (this.y == other.y)
             (
-                if (this.z == other.z)
-                    (this.x - other.x)
-                else
-                    (this.z - other.z))
+                    if (this.z == other.z)
+                        (this.x - other.x)
+                    else
+                        (this.z - other.z))
         else
             (this.y - other.y)
     }

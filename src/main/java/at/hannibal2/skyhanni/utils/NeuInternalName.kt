@@ -4,10 +4,11 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import de.hype.bingonet.sharedcompilation.sbenums.BNNEUItem
 import net.minecraft.init.Items
 import kotlin.time.Duration.Companion.minutes
 
-class NeuInternalName private constructor(private val internalName: String) {
+class NeuInternalName private constructor(internalName: String): BNNEUItem(internalName)  {
 
     companion object {
 
