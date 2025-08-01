@@ -7,6 +7,10 @@ enum class BNRole(dbRoleName: String, visualRoleName: String) {
     BETA_TESTER("beta", "Beta Tester"),
     ADMIN("admin", "Admin"),
     MANIAC("maniac", "Maniac"),
+    PREANNOUNCE("preannounce_info", "Preannounce Info"),
+
+    //Given to users what have reasons to given access early. Such as those who did great for the community
+    //or temporary if needed for something specific
     SPLASHER("splasher", "Splasher"),
     ADVANCEDINFO("advancedinfo", "Advanced Info"),
     STRATMAKER("strat_maker", "Strat Maker"),
