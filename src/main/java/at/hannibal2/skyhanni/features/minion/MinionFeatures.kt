@@ -251,9 +251,10 @@ object MinionFeatures {
                 if (recipes.size != 1) continue
                 if (recipes.first { it.isCraftingRecipe() }.ingredients.any {
                         it.internalName.asString() == currentItem
-                    })
+                    }) {
                     HypixelCommands.viewRecipe(entry.value)
-                return@launchCoroutine
+                    return@launchCoroutine
+                }
             }
         }
     }
