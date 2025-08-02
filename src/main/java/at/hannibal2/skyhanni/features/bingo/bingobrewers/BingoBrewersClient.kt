@@ -121,8 +121,10 @@ object BingoBrewersClient {
         event.registerBrigadier("bingobrewersreconnect",{
             category = CommandCategory.BINGO_NET
             description = "Reload the Bingo Brewers Client"
-            client?.close()
-            init()
+            simpleCallback {
+                client?.close()
+                init()
+            }
         })
     }
 

@@ -61,13 +61,13 @@ object SplashManager {
         if (splash == null) return
         var tellraw: String
         if (splash.hubSelectorData == null) {
-            ChatUtils.clickableChat(
+            ChatUtils.chatPrompt(
                 "§d${splash.announcer} is Splashing in a §4PRIVATE§r Lobby.",
+                SkyHanniMod.feature.event.bingo.bingoNetworks.splashHubWarp,
                 {
                     joinParty(splash, source)
                 },
             )
-            // TODO add keybind activation too
         } else {
             var islandType: String
             if (splash.hubSelectorData.hubType == Islands.DUNGEON_HUB) {
@@ -76,13 +76,13 @@ object SplashManager {
                 islandType = "Hub"
             }
 
-            ChatUtils.clickableChat(
-                "§d${splash.announcer}§r is Splashing in $islandType #${splash.hubSelectorData.hubNumber}§r at ${splash.locationInHub.displayString} §7| §6${splash.extraMessage ?: ""}",
+            ChatUtils.chatPrompt(
+                "§d${splash.announcer}§r is Splashing in $islandType #${splash.hubSelectorData.hubNumber}§r at ${splash.locationInHub.displayString} (§aPress %KEY% to warp to a §d${splash.hubSelectorData.hubType}§r) §7| §6${splash.extraMessage ?: ""}",
+                SkyHanniMod.feature.event.bingo.bingoNetworks.splashHubWarp,
                 {
                     prepareHubWarp(splash, source)
                 },
             )
-            // TODO add keybind activation too
         }
     }
 

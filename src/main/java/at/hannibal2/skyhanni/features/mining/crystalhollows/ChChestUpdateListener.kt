@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.mining.crystalhollows
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
@@ -131,10 +132,10 @@ object ChChestUpdateListener {
 
     val config = SkyHanniMod.feature.event.bingo.bingoNetworks
 
-    @HandleEvent
-    fun onWorldLeave(event: WorldLeaveEvent) {
+    @HandleEvent(priority = HIGHEST)
+    fun onWorldLeave(event: IslandChangeEvent) {
         if (!config.chestWaypoints) return
-        if (HypixelData.skyBlockIsland != IslandType.CRYSTAL_HOLLOWS) return
+        if (event.oldIsland != IslandType.CRYSTAL_HOLLOWS) return
         val unsubpacket = UnSubscribeToChServer(
             HypixelData.serverId ?: error("Old Server Id is null but Island was loaded?"),
             EntityUtils.getPlayerList(),

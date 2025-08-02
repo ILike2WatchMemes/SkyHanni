@@ -38,6 +38,11 @@ class BingoNetworksConfig {
     var showSplashes: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Highlight Splash Hub", desc = "Highlight the Splash Hubs in the Hub Selector.")
+    @ConfigEditorBoolean
+    var highlightSplashHub : Boolean = true
+
+    @Expose
     @ConfigOption(name = "Show ChChests", desc = "Subscribe to ChChests.")
     @ConfigEditorBoolean
     var chestWaypoints: Boolean = true

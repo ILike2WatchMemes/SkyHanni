@@ -4,14 +4,21 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.toBNIsland
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.features.bingo.bingonet.SplashManager
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFBarnManager
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFTimeTowerManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapKeysNotNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -43,16 +50,16 @@ object HubSelectorKeybinds {
 
     private val itemNamePattern by patternGroup.pattern(
         "item-name",
-        "((SkyBlock)|(Dungeon)) Hub #(?<hubNumber>\\d+)",
+        "§.((SkyBlock)|(Dungeon)) Hub #(?<hubNumber>\\d+)",
     )
 
     private val playersPattern by patternGroup.pattern(
         "player-count",
-        "Players: (?<current>\\d+)/(?<max>\\d+)",
+        "§7Players: (?<current>\\d+)/(?<max>\\d+)",
     )
     private val serverIdPattern by patternGroup.pattern(
         "server-id",
-        "Server: (?<serverid>.*)",
+        "§8Server: (?<serverid>.*)",
     )
     private var mainInventory = InventoryDetector(
         openInventory = {
@@ -68,6 +75,7 @@ object HubSelectorKeybinds {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onKeyPress(event: GuiKeyPressEvent) {
+        if (HypixelData.joinedWorld.passedSince() <= 2.5.seconds) return
         val key = config.splashHubWarp.getEffectiveKey()
         if (!mainInventory.isInside()) return
 
@@ -116,21 +124,16 @@ object HubSelectorKeybinds {
     }
 
     private fun ItemStack.parseToHubSelectorData(): HubData? {
-        val hubNumber = itemNamePattern.matcher(displayName).groupOrNull("hubNumber")?.toIntOrNull() ?: return null
+        val hubNumber = itemNamePattern.matchGroup(displayName, "hubNumber")?.toIntOrNull() ?: return null
         var serverId: String? = null
         var playerCount: Int? = null
         var maxPlayerCount: Int? = null
         for (line in getLore()) {
-            val playerMatcher = playersPattern.matcher(line)
-            if (playerMatcher.matches()) {
-                playerCount = playerMatcher.group("current").toInt()
-                maxPlayerCount = playerMatcher.group("max").toInt()
-            } else if (serverIdPattern.matcher(line).matches()) {
-                val serverMatcher = serverIdPattern.matcher(line)
-                if (serverMatcher.matches()) {
-                    serverId = serverMatcher.group("serverid")
-                }
+            playersPattern.matchMatcher(line) {
+                playerCount = group("current").toInt()
+                maxPlayerCount = group("max").toInt()
             }
+            serverIdPattern.matchGroup(line, "serverid")?.let { serverId = it }
         }
         serverId?.let {
             maxPlayerCount?.let {
@@ -147,6 +150,38 @@ object HubSelectorKeybinds {
     fun getHubNumberById(serverId: String, island: Islands): SplashData.HubSelectorData? {
         if (lastUpdate.plus(30.seconds).isInPast()) return null //Hub Swaps problem etc.
         return SplashData.HubSelectorData(hubIdToNumberCache.get(serverId) ?: return null, island)
+    }
+
+    @HandleEvent
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!SkyHanniMod.feature.event.bingo.bingoNetworks.highlightSplashHub) return
+
+//         for (slot in InventoryUtils.getItemsInOpenChest()) {
+//             if (slot.stack == null) continue
+//             val slotIndex = slot.slotNumber
+//
+//             val currentUpdates = CFApi.factoryUpgrades
+//             currentUpdates.find { it.slotIndex == slotIndex }?.let { upgrade ->
+//                 if (upgrade.canAfford()) {
+//                     slot.highlight(LorenzColor.GREEN.addOpacity(75))
+//                 }
+//             }
+//             if (slotIndex == CFApi.bestAffordableSlot) {
+//                 slot.highlight(LorenzColor.GREEN.addOpacity(200))
+//             }
+//
+//             if (slotIndex == CFApi.barnIndex && CFBarnManager.isBarnFull()) {
+//                 slot.highlight(LorenzColor.RED)
+//             }
+//             if (slotIndex == CFApi.timeTowerIndex) {
+//                 if (CFTimeTowerManager.timeTowerActive()) {
+//                     slot.highlight(LorenzColor.LIGHT_PURPLE.addOpacity(200))
+//                 }
+//                 if (CFTimeTowerManager.timeTowerFull()) {
+//                     slot.highlight(LorenzColor.RED)
+//                 }
+//             }
+//         }
     }
 
     private class HubData(
