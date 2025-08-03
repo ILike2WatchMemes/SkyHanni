@@ -34,11 +34,6 @@ object SplashManager {
         SplashManager.display(splash.splashId, source)
     }
 
-    fun handleSplash(data: SplashData, source: SplashSource) {
-        addSplash(data, source)
-        display(data.splashId, source)
-    }
-
     fun updateSplash(packet: SplashUpdatePacket) {
         val splash = splashPool.get(packet.splashId)
         if (splash != null) {

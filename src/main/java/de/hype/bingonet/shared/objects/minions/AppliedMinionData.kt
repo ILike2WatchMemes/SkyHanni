@@ -1,6 +1,6 @@
 package de.hype.bingonet.shared.objects.minions
 
-import de.hype.bingonet.sharedcompilation.sbenumcode.withTierData
+import de.hype.bingonet.environment.withTierData
 import de.hype.bingonet.sharedcompilation.sbenums.BNNEUItem
 import de.hype.bingonet.sharedcompilation.sbenums.minions.Minion
 import de.hype.bingonet.sharedcompilation.sbenums.minions.MinionCategory
