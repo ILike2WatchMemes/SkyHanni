@@ -1,12 +1,11 @@
 package de.hype.bingonet.shared.objects.minions
 
-import de.hype.bingonet.server.extensionutils.toShared
-import de.hype.bingonet.shared.compilation.sbenums.SkyblockItems
-import de.hype.bingonet.shared.compilation.sbenums.minions.MinionTypes
+import de.hype.bingonet.environment.skyblockItemId
+import de.hype.bingonet.environment.toShared
+import de.hype.bingonet.generated.sbenums.SkyblockItems
+import de.hype.bingonet.generated.sbenums.minions.MinionTypes
 import de.hype.bingonet.shared.utils.modifyKeys
 import de.hype.bingonet.shared.utils.modifyValues
-import de.hype.bingonet.shared.utils.skyblockItemId
-import de.hype.bingonet.sharedcompilation.sbenumcode.toShared
 import de.hype.bingonet.sharedcompilation.sbenums.BNNEUItem
 import de.hype.bingonet.sharedcompilation.sbenums.minions.MinionCategory
 
@@ -20,7 +19,7 @@ enum class MinionItem(
             if (it.key.skyblockItemId.startsWith("LOG")) {
                 return@modifyKeys SkyblockItems.Coal.toShared()
             }
-            if (it.key.skyblockItemId.startsWith("CACTUS")) {
+            if (it.key == SkyblockItems.Cactus.toShared()) {
                 return@modifyKeys SkyblockItems.Cactus_Green.toShared()
             }
             return@modifyKeys it.key

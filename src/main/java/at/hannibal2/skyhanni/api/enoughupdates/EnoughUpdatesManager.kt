@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
+import de.hype.bingonet.sharedcompilation.sbenums.minions.MinionData
 import de.hype.bingonet.sharedcompilation.sbenums.minions.MinionType
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Mutex
@@ -66,7 +67,7 @@ object EnoughUpdatesManager {
 
     private var neuPetsJson: NeuPetsJson? = null
     private var neuPetNums: JsonObject? = null
-    private var neuMinions: List<NeuMinionTypeData>? = null
+    private var neuMinionTypes: Map<String, NeuMinionTypeData>? = null
 
     val titleWordMap = TreeMap<String, MutableMap<String, MutableList<Int>>>()
 
@@ -461,7 +462,8 @@ object EnoughUpdatesManager {
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         neuPetsJson = event.getConstant<NeuPetsJson>("pets")
         neuPetNums = event.getConstant<JsonObject>("petnums")
-        neuMinions = event.getConstant<List<NeuMinionTypeData>>("minions")
+        neuMinionTypes =  event.getConstant<List<NeuMinionTypeData>>("minions")
+            .associateBy { it.typeId }
         if (itemMap.isNotEmpty()) {
             ChatUtils.chat("Reloaded ${itemMap.size.addSeparators()} items in the NEU repo")
         }
@@ -481,12 +483,13 @@ object EnoughUpdatesManager {
         ChatUtils.chat("  §aNEU Repo Item Status:\n  $status", prefix = false)
     }
 
-    fun getMinionType(minionId: String) : MinionType {
+    fun getMinionType(minionId: String) : MinionType? {
         val minionId = minionId.replace("_\\d+".toRegex(), "")
-        //TODO
+        return neuMinionTypes?.get(minionId)
     }
 
-    fun getTypeMinions(type: MinionType) {
-        //TODO
+    fun getTypeMinions(type: MinionType) : List<MinionData>? {
+        TODO("Not yet implemented")
+        //Scan all items in neu repo including lore to parse the minion data such as base storage and speed for all tiers.
     }
 }

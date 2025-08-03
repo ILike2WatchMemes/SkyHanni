@@ -133,10 +133,10 @@ object BingoBrewersPackets {
                 false,
                 serverId,
                 hubSelectorData,
-                StatusConstants.OPEN,
+                StatusConstants.WAITING,
             )
             splashData.splashId = -(splash!!.toLong() and 0xFFFFFFFFL).toInt()
-            SplashManager.handleSplash(splashData, SplashManager.SplashSource.BB)
+            SplashManager.addSplash(splashData, SplashManager.SplashSource.BB)
         }
     }
 
