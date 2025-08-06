@@ -10,6 +10,7 @@ enum class ModrinthInfo(
         loader = "forge",
         dependencies = mapOf(
             ModrinthDependency.NOT_ENOUGH_UPDATES to DependencyType.OPTIONAL,
+            ModrinthDependency.SKYHANNI to DependencyType.INCOMPATIBLE,
         ),
     ),
     FABRIC_1_21_5(
@@ -18,6 +19,7 @@ enum class ModrinthInfo(
         dependencies = mapOf(
             ModrinthDependency.FABRIC_API to DependencyType.REQUIRED,
             ModrinthDependency.FABRIC_LANGUAGE_KOTLIN to DependencyType.REQUIRED,
+            ModrinthDependency.SKYHANNI to DependencyType.INCOMPATIBLE,
         ),
     ),
     FABRIC_1_21_7(
@@ -26,6 +28,7 @@ enum class ModrinthInfo(
         dependencies = mapOf(
             ModrinthDependency.FABRIC_API to DependencyType.REQUIRED,
             ModrinthDependency.FABRIC_LANGUAGE_KOTLIN to DependencyType.REQUIRED,
+            ModrinthDependency.SKYHANNI to DependencyType.INCOMPATIBLE,
         ),
     ),
 }
@@ -33,6 +36,7 @@ enum class ModrinthInfo(
 enum class ModrinthDependency(
     val projectId: String,
 ) {
+    BINGO_NET("Cp13oI7e"),
     SKYHANNI("byNkmv5G"),
     NOT_ENOUGH_UPDATES("GGamhqbw"),
     FABRIC_API("P7dR8mSH"),
