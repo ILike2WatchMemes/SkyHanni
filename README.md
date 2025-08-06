@@ -4,19 +4,19 @@
 
 ## Bingo Net (v2) is based on [SkyHanni](https://github.com/hannibal002/SkyHanni)
 
-This fork is done like if it was in the offical SkyHanni. I currently plan on merging it into the offical sh but this will be a long process if it happens. Majorly this means that the Third Party Server Stuff this Fork is about is **DISABLED BY DEFAULT AND HAS TO BE ENABLED MANUALLY**. It also means that the offical sh version has to be replaced by this mod.
+This fork is done as if it were in the official SkyHanni. I currently plan on merging it into the official sh, but this will be a long process if it happens. Majorly, this means that the Third Party Server Stuff this Fork is about is **DISABLED BY DEFAULT AND HAS TO BE ENABLED MANUALLY**. It also means that the official sh version has to be replaced by this mod.
 
-How to enable this Projects Details:
+How to enable this project's Details:
 
-Recommended: Enable widen config (not Bingo Net specific but it causes long config names)
+Recommended: Enable widen config (not Bingo Net specific, but it causes long config names)
 
-Go Into: Event → Bingo → Third Party Networks → Bingo Net → Use Bingo Net = ON
+Go Into: Event → Bingo → Third Party Networks → Bingo Net → Use Bingo Net : Off→ON
 
-Go back into Third Party Networks → Bingo Net → Use Bingo Brewers = ON
+Go back into Third Party Networks → Use Bingo Brewers : Off→ON
 
-It is recommended to also enable our Bingo Brewers Integration. Keep in mind that Indigo did not authorize this port but it should be compatible with his Network. It does not violate his License nor does a Terms of Service exists. This is the **ONLY** modern port of his Network (as far as I know)
+It is also recommended to enable our Bingo Brewers Integration. Keep in mind that Indigo did not authorize this port, but it should be compatible with his Network. It does not violate his License, nor does a Terms of Service exist. This is the **ONLY** modern port of his Network (as far as I know)
 
-Any type of Issue and a lot of normal behaviour will appear to be from SkyHanni even though it may come from this Fork. Please validate errors you recieve to be specific from this Project before reporting here. However, don't report to official SH either since they might have no clue where you're coming from.
+Any type of Issue and a lot of normal behaviour will appear to be from SkyHanni, even though it may come from this Fork. Please validate the errors you receive to be specific to this Project before reporting here. However, don't report to official SH either, since they might have no clue where you're coming from.
 
 <h1 align="center">
   SkyHanni: Mod for Hypixel SkyBlock
