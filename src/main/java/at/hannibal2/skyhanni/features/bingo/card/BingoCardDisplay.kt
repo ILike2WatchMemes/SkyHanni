@@ -180,8 +180,8 @@ object BingoCardDisplay {
         addString(" ")
     }
 
-    private fun percentageFormat(it: BingoGoal) = it.communtyGoalPercentage?.let {
-        " " + BingoApi.getCommunityPercentageColor(it)
+    private fun percentageFormat(it: BingoGoal) = it.communityGoalData?.let {
+        " " + BingoApi.getCommunityPercentageColor(it.percentage)
     }.orEmpty()
 
     private fun MutableList<Renderable>.addPersonalGoals() {

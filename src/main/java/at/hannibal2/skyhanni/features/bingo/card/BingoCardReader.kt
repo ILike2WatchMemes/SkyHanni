@@ -20,6 +20,8 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import de.hype.bingonet.BNConnection
+import de.hype.bingonet.shared.packets.function.PositionCommunityFeedback
 import kotlin.time.Duration
 
 @SkyHanniModule
@@ -29,22 +31,34 @@ object BingoCardReader {
     private val patternGroup = RepoPattern.group("bingo.card")
     private val percentagePattern by patternGroup.pattern(
         "percentage",
-        " {2}§8Top §.(?<percentage>.*)%"
+        " {2}§8Top §.(?<percentage>.*)%",
     )
+
+    private val positionPattern by patternGroup.pattern(
+        "position",
+        " {2}§6§l(?<position>\\d+) §fcontributor",
+    )
+
+    private val contributionPattern by patternGroup.pattern(
+        "contribution",
+        "§7Contribution: §a(?<contribution>.*) .*",
+    )
+
+
     private val goalCompletePattern by patternGroup.pattern(
         "goalcomplete",
-        "§6§lBINGO GOAL COMPLETE! §r§e(?<name>.*)"
+        "§6§lBINGO GOAL COMPLETE! §r§e(?<name>.*)",
     )
     private val personalHiddenGoalPattern by patternGroup.pattern(
         "hiddengoal",
-        ".*§7§eThe next hint will unlock in (?<time>.*)"
+        ".*§7§eThe next hint will unlock in (?<time>.*)",
     )
 
     @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!config.enabled) return
         if (event.inventoryName != "Bingo Card") return
-
+        val comGoalPositions = mutableMapOf<String, ComGoalPosition>()
         for ((slot, stack) in event.inventoryItems) {
             val lore = stack.getLore()
             val goalType = when {
@@ -70,9 +84,18 @@ object BingoCardReader {
             if (description.startsWith("§7§7")) {
                 description = description.substring(2)
             }
-
-            val done = lore.any { it.contains("GOAL REACHED") }
-            val communityGoalPercentage = readCommunityGoalPercentage(lore)
+            val done: Boolean
+            val communityGoalData: ComGoalPosition?
+            if (goalType == GoalType.COMMUNITY) {
+                done = false
+                communityGoalData = readCommunityGoalData(lore)
+                communityGoalData?.let {
+                    comGoalPositions[name] = communityGoalData
+                }
+            } else {
+                done = lore.any { it.contains("GOAL REACHED") }
+                communityGoalData = null
+            }
             val hiddenGoalData = getHiddenGoalData(name, description, goalType)
             val visualDescription = hiddenGoalData.tipNote
 
@@ -88,36 +111,74 @@ object BingoCardReader {
                 this.done = done
                 this.hiddenGoalData = hiddenGoalData
             }
-            communityGoalPercentage?.let {
+            communityGoalData?.let {
                 bingoGoalDifference(bingoGoal, it)
-                bingoGoal.communtyGoalPercentage = it
+                bingoGoal.communityGoalData = it
             }
         }
         BingoApi.lastBingoCardOpenTime = SimpleTimeMark.now()
-
+        sendBNComGoalData(comGoalPositions)
         BingoCardUpdateEvent.post()
     }
 
-    private fun bingoGoalDifference(bingoGoal: BingoGoal, new: Double) {
-        val old = bingoGoal.communtyGoalPercentage ?: 1.0
-
-        if (!config.communityGoalProgress) return
-        if (new == old) return
-
-        val oldFormat = BingoApi.getCommunityPercentageColor(old)
-        val newFormat = BingoApi.getCommunityPercentageColor(new)
-        val color = if (new > old) "§c" else "§a"
-        ChatUtils.chat("$color${bingoGoal.displayName}: $oldFormat §b->" + " $newFormat")
+    private fun sendBNComGoalData(comGoalPositions: MutableMap<String, ComGoalPosition>) {
+        if (!SkyHanniMod.feature.event.bingo.bingoNetworks.bingoNet.useBN) return
+        val filtered = comGoalPositions.filter { it.value.position != null || it.value.percentage < 0.01 }
+        val censored = filtered.mapValues {
+            if ((it.value.position ?: 101) <= 3) {
+                val asString = it.value.contribution.toString()
+                val censored = (asString.take(2) + "0".repeat(asString.length - 2)).toInt()
+                return@mapValues ComGoalPosition(it.value.position, it.value.percentage, censored)
+            }
+            return@mapValues it.value
+        }
+        //It is censored client side to eliminate any type of sniping #1 accusations using this System.
+        // Data can be used to show contributors count as well as top 100 data to users.
+        BNConnection.sendPacket(
+            PositionCommunityFeedback(
+                censored.map {
+                    PositionCommunityFeedback.ComGoalPosition(
+                        it.key,
+                        it.value.contribution,
+                        it.value.percentage * 100,
+                        it.value.position,
+                    )
+                }.toSet(),
+            ),
+        )
     }
 
-    private fun readCommunityGoalPercentage(lore: List<String>): Double? {
+    data class ComGoalPosition(val position: Int?, val percentage: Double, val contribution: Int) {}
+
+    private fun bingoGoalDifference(bingoGoal: BingoGoal, new: ComGoalPosition) {
+        val old = bingoGoal.communityGoalData
+
+        if (!config.communityGoalProgress) return
+        if (old!=null && ((new.position!=null && new.position == old.position)||(new.position==null && new.percentage==old.percentage))) return
+
+        val oldFormat = BingoApi.getCommunityPercentageColor(old?.percentage?:1.toDouble())
+        val newFormat = BingoApi.getCommunityPercentageColor(new.percentage)
+        val color = if (((new.position ?: 101) > (old?.position ?: 101)) || (new.percentage > (old?.percentage ?: 1.toDouble()))) "§c" else "§a"
+        ChatUtils.chat("$color${bingoGoal.displayName}: $oldFormat${if (old?.position!=null) "(§6#${old.position}$color)" else ""} §b->" + " $newFormat${if (new.position !=null) "(§6#${new.position}$color)" else ""}")
+    }
+
+    private fun readCommunityGoalData(lore: List<String>): ComGoalPosition? {
+        var percentage: Double? = null
+        var position: Int? = null
+        var contribution: Int? = null
         for (line in lore) {
             percentagePattern.matchMatcher(line) {
-                return group("percentage").toDouble() / 100
+                percentage = group("percentage").toDouble() / 100
+            }
+            positionPattern.matchMatcher(line) {
+                position = group("position").toInt()
+            }
+            contributionPattern.matchMatcher(line) {
+                contribution = group("contribution").toDouble().toInt()
             }
         }
-
-        return null
+        if (percentage == null || contribution == null) return null
+        return ComGoalPosition(position, percentage, contribution)
     }
 
     private fun getHiddenGoalData(

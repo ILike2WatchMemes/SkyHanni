@@ -2,7 +2,7 @@ package de.hype.bingonet.shared.packets.function
 
 import de.hype.bingonet.environment.packetconfig.AbstractPacket
 
-class PositionCommunityFeedback(@JvmField var positions: MutableSet<ComGoalPosition>) : AbstractPacket() {
+class PositionCommunityFeedback(@JvmField var positions: Set<ComGoalPosition>) : AbstractPacket() {
     class ComGoalPosition(
         @JvmField var goalName: String,
         @JvmField var contribution: Int,

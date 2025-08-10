@@ -59,7 +59,7 @@ object BingoApi {
                 add("  guide: '${goal.guide}'")
                 add("  done: '${goal.done}'")
                 add("  highlight: '${goal.highlight}'")
-                add("  communityGoalPercentage: '${goal.communtyGoalPercentage}'")
+                add("  communityGoalPercentage: '${goal.communityGoalData}'")
                 val hiddenGoalData = goal.hiddenGoalData
                 add("  hiddenGoalData")
                 add("    unknownTip: '${hiddenGoalData.unknownTip}'")
