@@ -33,7 +33,7 @@ interface Collections {
         val baseXp: Double,
         val baseCropOnBroken: Double,
         val copperCropMultiplier: Double,
-        vararg tiers: Int
+        vararg tiers: Int,
     ) : Collections {
         Cocoa_Beans(
             "INK_SACK:3",
@@ -114,7 +114,7 @@ interface Collections {
             5_000,
             10_000,
             20_000,
-            50_000
+            50_000,
         ),
         Pumpkin(
             "PUMPKIN",
@@ -132,7 +132,7 @@ interface Collections {
             25_000,
             50_000,
             100_000,
-            250_000
+            250_000,
         ),
         Wheat(
             "WHEAT",
@@ -150,7 +150,7 @@ interface Collections {
             15_000,
             25_000,
             50_000,
-            100_000
+            100_000,
         ),
         Seeds("SEEDS", "SEEDS_GENERATOR_1", 0.0, 0.0, 0.0, 50, 100, 250, 1_000, 2_500, 5_000, 25_000),
         Mushroom(
@@ -167,7 +167,7 @@ interface Collections {
             5_000,
             10_000,
             25_000,
-            50_000
+            50_000,
         ),
         Raw_Rabbit(
             "RABBIT",
@@ -200,7 +200,7 @@ interface Collections {
             50_000,
             75_000,
             100_000,
-            250_000
+            250_000,
         ),
         Mutton(
             "MUTTON",
@@ -325,7 +325,7 @@ interface Collections {
             50_000,
             100_000,
             150_000,
-            250_000
+            250_000,
         ),
         Redstone(
             "REDSTONE",
@@ -345,7 +345,7 @@ interface Collections {
             800_000,
             1_000_000,
             1_200_000,
-            1_400_000
+            1_400_000,
         ),
         Umber("UMBER", null, 1_000, 2_500, 10_000, 25_000, 100_000, 250_000, 500_000, 750_000, 1_000_000),
         Coal("COAL", "COAL_GENERATOR_1", 50, 100, 250, 1_000, 2_500, 5_000, 10_000, 25_000, 50_000, 100_000),
@@ -380,7 +380,7 @@ interface Collections {
             50_000,
             100_000,
             200_000,
-            400_000
+            400_000,
         ),
         Gemstone(
             "GEMSTONE_COLLECTION",
@@ -395,7 +395,7 @@ interface Collections {
             250_000,
             500_000,
             1_000_000,
-            2_000_000
+            2_000_000,
         ),
         Tungsten("TUNGSTEN", null, 1_000, 2_500, 10_000, 25_000, 100_000, 250_000, 500_000, 750_000, 1_000_000),
         Obsidian(
@@ -425,7 +425,7 @@ interface Collections {
             10_000,
             25_000,
             40_000,
-            70_000
+            70_000,
         ),
         Glowstone_Dust("GLOWSTONE_DUST", "GLOWSTONE_GENERATOR_1", 50, 100, 1_000, 2_500, 5_000, 10_000, 25_000),
         Gold_Ingot("GOLD_INGOT", "GOLD_GENERATOR_1", 50, 100, 250, 500, 1_000, 2_500, 5_000, 10_000, 25_000),
