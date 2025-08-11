@@ -36,12 +36,12 @@ object BingoCardReader {
 
     private val positionPattern by patternGroup.pattern(
         "position",
-        " {2}§6§l(?<position>\\d+) §fcontributor",
+        " {2}§6§l#(?<position>\\d+) §fcontributor",
     )
 
     private val contributionPattern by patternGroup.pattern(
         "contribution",
-        "§7Contribution: §a(?<contribution>.*) .*",
+        "§7Contribution: §a(?<contribution>[^ ]+) .*",
     )
 
 
@@ -148,7 +148,7 @@ object BingoCardReader {
         )
     }
 
-    data class ComGoalPosition(val position: Int?, val percentage: Double, val contribution: Int) {}
+    data class ComGoalPosition(val position: Int?, val percentage: Double, val contribution: Int)
 
     private fun bingoGoalDifference(bingoGoal: BingoGoal, new: ComGoalPosition) {
         val old = bingoGoal.communityGoalData
@@ -174,7 +174,7 @@ object BingoCardReader {
                 position = group("position").toInt()
             }
             contributionPattern.matchMatcher(line) {
-                contribution = group("contribution").toDouble().toInt()
+                contribution = group("contribution").replace(",","").toDouble().toInt()
             }
         }
         if (percentage == null || contribution == null) return null
