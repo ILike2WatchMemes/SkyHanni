@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import de.hype.bingonet.shared.constants.Islands
 import de.hype.bingonet.shared.objects.SplashData
@@ -44,6 +45,11 @@ object SplashManager {
                 }
             }
         }
+    }
+
+    fun getSplashInServer(mustBeFromSelf: Boolean,serverId: String? = HypixelData.serverId): DisplaySplash? {
+        if (serverId == null) return null
+        return splashPool.values.filter { it.serverID == serverId }.filter { !mustBeFromSelf || it.announcer.equals( PlayerUtils.getName(), ignoreCase = true) }.sortedBy { it.receivedTime }.firstOrNull()
     }
 
     enum class SplashSource {

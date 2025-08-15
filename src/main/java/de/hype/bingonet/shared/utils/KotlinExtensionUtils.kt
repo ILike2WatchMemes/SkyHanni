@@ -63,6 +63,10 @@ fun <T : List<V>, V> T.subList(from: Int): List<V> {
     return subList(from, size)
 }
 
+fun <T : List<V>, V> T.skip(count: Int): List<V> {
+    return subList(from = count)
+}
+
 fun <T : List<V>, V> T.subListTo(to: Int): List<V> {
     val to = to.coerceAtMost(size)
     if (to <= 0) return listOf()

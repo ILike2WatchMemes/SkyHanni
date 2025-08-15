@@ -613,4 +613,8 @@ object HypixelData {
     fun isInMega(): Boolean {
         return serverId?.startsWith("mega")?:false
     }
+
+    fun getRemainingSpace(): Int {
+        return getMaxPlayersForCurrentServer()-getPlayersOnCurrentServer()
+    }
 }

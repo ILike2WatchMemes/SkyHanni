@@ -243,4 +243,12 @@ object EntityUtils {
     //#else
     //$$ get() = this.getAttributeBaseValue(EntityAttributes.MAX_HEALTH).toInt()
     //#endif
+
+    fun EntityPlayer.isOnBingo(): Boolean{
+        return this.displayName.formattedText.endsWith("Ⓑ§r")
+    }
+
+    fun EntityPlayer.isOnIronman():Boolean{
+        return this.displayName.formattedText.endsWith("♲§r")
+    }
 }

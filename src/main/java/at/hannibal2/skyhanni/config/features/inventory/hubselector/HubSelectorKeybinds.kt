@@ -7,14 +7,11 @@ import at.hannibal2.skyhanni.data.toBNIsland
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.features.bingo.bingonet.SplashManager
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFBarnManager
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFTimeTowerManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -31,6 +28,7 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.item.ItemStack
 import java.time.Duration
 import java.time.Instant
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -40,6 +38,7 @@ object HubSelectorKeybinds {
     private var lastClick = SimpleTimeMark.farPast()
     private val patternGroup = RepoPattern.group("inventory.hubselector")
     val hubIdToNumberCache: BiMap<String, Int> = HashBiMap.create()
+    private var openedCache: Map<Int, HubData>? = null
     var lastUpdate = SimpleTimeMark.farPast()
 
     // TODO Dungeon Hub implementation
@@ -65,23 +64,29 @@ object HubSelectorKeybinds {
         openInventory = {
             hubIdToNumberCache.clear()
             lastUpdate = SimpleTimeMark.now()
-            for (stack in it.inventoryItems.values) {
+            val cache = HashMap<Int, HubData>()
+            for (slot in it.inventoryItems.entries) {
+                val stack = slot.value
                 val data = stack.parseToHubSelectorData() ?: continue
                 hubIdToNumberCache[data.serverId] = data.hubNumber
+                cache[slot.key] = data
             }
+            openedCache = cache
         },
+        closeInventory = { openedCache = null },
         pattern = hubSelectorGuiNamePattern,
     )
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onKeyPress(event: GuiKeyPressEvent) {
         if (HypixelData.joinedWorld.passedSince() <= 2.5.seconds) return
-        val key = config.splashHubWarp.getEffectiveKey()
         if (!mainInventory.isInside()) return
+        val cache = openedCache ?: return
 
         val chest = event.guiContainer as? GuiChest ?: return
 
-        if (!key.isKeyClicked()) return
+        val key = config.splashHubWarp.getEffectiveKey()
+        if (!key.isKeyHeld() || lastClick.passedSince()<250.milliseconds) return
         lastClick = SimpleTimeMark.now()
         event.cancel()
         // First Score | Second Index
@@ -99,15 +104,15 @@ object HubSelectorKeybinds {
                     return@mapKeysNotNull hubIdToNumberCache.inverse()[it.value.hubSelectorData?.hubNumber]
 
                 }
-        event.guiContainer.inventorySlots.inventorySlots.forEachIndexed { index, slot ->
-            val data = slot.stack.parseToHubSelectorData() ?: return@forEachIndexed
+        event.guiContainer.inventorySlots.inventorySlots.forEach { slot ->
+            val data = cache[slot.slotNumber]?:return@forEach
             val score = calculateScore(splashPool.get(data.serverId), data)
             if (score != null) {
                 if (bestClick == null) {
-                    bestClick = Pair(score, index)
-                    return@forEachIndexed
+                    bestClick = Pair(score, slot.slotNumber)
+                    return@forEach
                 } else if (score < bestClick.first)
-                    bestClick = Pair(score, index)
+                    bestClick = Pair(score, slot.slotNumber)
             }
         }
         bestClick?.let {
@@ -154,34 +159,29 @@ object HubSelectorKeybinds {
 
     @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!SkyHanniMod.feature.event.bingo.bingoNetworks.highlightSplashHub) return
+        if (!SkyHanniMod.feature.event.bingo.bingoNetworks.highlightSplashHub || !mainInventory.isInside()) return
+        val cache = openedCache ?: return
 
-//         for (slot in InventoryUtils.getItemsInOpenChest()) {
-//             if (slot.stack == null) continue
-//             val slotIndex = slot.slotNumber
-//
-//             val currentUpdates = CFApi.factoryUpgrades
-//             currentUpdates.find { it.slotIndex == slotIndex }?.let { upgrade ->
-//                 if (upgrade.canAfford()) {
-//                     slot.highlight(LorenzColor.GREEN.addOpacity(75))
-//                 }
-//             }
-//             if (slotIndex == CFApi.bestAffordableSlot) {
-//                 slot.highlight(LorenzColor.GREEN.addOpacity(200))
-//             }
-//
-//             if (slotIndex == CFApi.barnIndex && CFBarnManager.isBarnFull()) {
-//                 slot.highlight(LorenzColor.RED)
-//             }
-//             if (slotIndex == CFApi.timeTowerIndex) {
-//                 if (CFTimeTowerManager.timeTowerActive()) {
-//                     slot.highlight(LorenzColor.LIGHT_PURPLE.addOpacity(200))
-//                 }
-//                 if (CFTimeTowerManager.timeTowerFull()) {
-//                     slot.highlight(LorenzColor.RED)
-//                 }
-//             }
-//         }
+        val splashHubs = SplashManager.splashPool.filter { it.value.status == StatusConstants.WAITING }.map { it.value.serverID }
+        val minPlayerCount = SkyHanniMod.feature.event.bingo.bingoNetworks.splasherConfig.lowestPlayerHub.let {
+            if (it){
+                cache.maxBy { it.value.maxPlayerCount-it.value.playerCount }.value.serverId
+            }else{
+                null
+            }
+        }
+
+
+        InventoryUtils.getItemsInOpenChest().forEach { slot ->
+            val slotNumber = slot.slotNumber
+            val cacheData = cache[slotNumber] ?: return@forEach
+            if (splashHubs.contains(cacheData.serverId)) {
+                slot.highlight(LorenzColor.YELLOW.addOpacity(255))
+            }
+            if (minPlayerCount == cacheData.serverId) {
+                slot.highlight(LorenzColor.LIGHT_PURPLE.addOpacity(255))
+            }
+        }
     }
 
     private class HubData(
