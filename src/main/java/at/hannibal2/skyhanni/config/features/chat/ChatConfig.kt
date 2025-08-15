@@ -17,7 +17,6 @@ import org.lwjgl.input.Keyboard
 
 class ChatConfig {
 
-
     @Expose
     @ConfigOption(name = "Peek Chat", desc = "Hold this key to keep the chat open.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_Z)
@@ -236,4 +235,20 @@ class ChatConfig {
     @Accordion
     val npcResponseSuggestion : KeyBind = KeyBind()
 
+
+    @Expose
+    @ConfigOption(
+        name = "Contains Command Tab Completion",
+        desc = "Suggestion will be matched based on contains instead of start matching."
+    )
+    @ConfigEditorBoolean
+    var tabCompletionUseContainsSuggestion: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Ignore Case Command Completion",
+        desc = "Suggestion will be matched based on contains instead of start matching."
+    )
+    @ConfigEditorBoolean
+    var tabIgnoreCaseSuggestion: Boolean = true
 }

@@ -162,6 +162,7 @@ object EnoughUpdatesManager {
         val lore = stack.getLore()
 
         val json = JsonObject()
+        json.addProperty("count", stack.stackSize)
         json.addProperty("itemid", stack.item.getIdentifierString())
         json.addProperty("displayname", stack.displayName)
         //#if MC < 1.21
@@ -491,5 +492,9 @@ object EnoughUpdatesManager {
     fun getTypeMinions(type: MinionType) : List<MinionData>? {
         TODO("Not yet implemented")
         //Scan all items in neu repo including lore to parse the minion data such as base storage and speed for all tiers.
+    }
+
+    val allSkyblockItemIds : Set<String> by lazy {
+        itemMap.keys.map { it.replace("-",":") }.toHashSet()
     }
 }

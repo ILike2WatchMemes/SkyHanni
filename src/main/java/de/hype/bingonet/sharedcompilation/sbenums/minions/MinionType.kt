@@ -8,7 +8,7 @@ open class MinionType(
     open val category: MinionCategory,
     open val drops: Map<BNNEUItem, Double>,
     open val requiredActions: Int
-){
+) {
 
     override fun hashCode(): Int {
         return typeId.hashCode()

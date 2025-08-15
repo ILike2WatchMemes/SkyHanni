@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -52,7 +53,7 @@ object NeuItems {
      */
     private val neuPetLevelRegex by patternGroup.pattern(
         "pet-level",
-        "(?i)(?:§.)+\\[lvl (?:\\d+➡\\d+|\\{lvl})\\] "
+        "(?i)(?:§.)+\\[lvl (?:\\d+➡\\d+|\\{lvl})\\] ",
     )
 
     /** Keys are internal names as String */
@@ -213,10 +214,19 @@ object NeuItems {
     private val npcName = ".*\\((?:(?:rift )?npc|monster|mayor)\\)".toPattern()
     private val npcInternal = ".*\\((?:(?:RIFT_)?NPC|MONSTER|MAYOR)\\)".toPattern()
 
-    fun findItemNameStartingWithWithoutNPCs(prefix: String, valid: (NeuInternalName) -> Boolean): Set<String> =
-        findItemNameStartingWith(prefix).filterNot { npcName.matches(it.key) }.filter { valid(it.value) }.keys
+    fun findItemNameWithoutNPCs(
+        prefix: String,
+        valid: (NeuInternalName) -> Boolean,
+        useContain: Boolean = SkyHanniMod.feature.chat.tabCompletionUseContainsSuggestion,
+    ): Set<String> =
+        findItemWith(prefix, useContain).filterNot { npcName.matches(it.key) }.filter { valid(it.value) }.keys
 
-    fun findItemNameStartingWith(prefix: String) = StringUtils.subMapOfStringsStartingWith(prefix, itemNamesWithoutColor)
+    fun findItemWith(prefix: String, useContain: Boolean = SkyHanniMod.feature.chat.tabCompletionUseContainsSuggestion): NavigableMap<String, NeuInternalName> {
+        if (!useContain) return StringUtils.subMapOfStringsStartingWith(prefix, itemNamesWithoutColor)
+        else {
+            return StringUtils.subMapOfStringsContains(prefix, itemNamesWithoutColor)
+        }
+    }
 
     fun getPrimitiveMultiplier(internalName: NeuInternalName, tryCount: Int = 0): PrimitiveItemStack {
         multiplierCache[internalName]?.let { return it }

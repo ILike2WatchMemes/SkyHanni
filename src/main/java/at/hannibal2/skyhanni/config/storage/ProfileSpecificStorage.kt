@@ -84,6 +84,10 @@ class ProfileSpecificStorage(
     var crimsonIsleFaction: FactionType? = null
 
     // features
+    // - inventory
+    @Expose
+    var itemTags: MutableMap<String, String> = mutableMapOf() // Tag -> UUID mapping
+
     // - combat
     @Expose
     var ghostStorage: GhostStorage = GhostStorage()
