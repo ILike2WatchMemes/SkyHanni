@@ -38,6 +38,7 @@ object SkyBlockItemModifierUtils {
     private val drillPartTypes = listOf("drill_part_upgrade_module", "drill_part_engine", "drill_part_fuel_tank")
 
     fun ItemStack.getHotPotatoCount() = getAttributeInt("hot_potato_count")
+    fun ItemStack.getDungeonQuality() = getExtraAttributes()?.getInteger("baseStatBoostPercentage")
 
     fun ItemStack.getFarmingForDummiesCount() = getAttributeInt("farming_for_dummies_count")
 
