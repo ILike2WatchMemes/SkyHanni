@@ -1,7 +1,5 @@
 package de.hype.bingonet.environment.packetconfig
 
-import de.hype.bingonet.environment.packetconfig.AbstractPacket
-
 internal fun interface PacketRunnable<T : AbstractPacket> {
     fun run(packet: T)
 

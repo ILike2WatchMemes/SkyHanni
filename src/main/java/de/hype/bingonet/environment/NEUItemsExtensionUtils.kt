@@ -1,7 +1,6 @@
 package de.hype.bingonet.environment
 
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
-import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems

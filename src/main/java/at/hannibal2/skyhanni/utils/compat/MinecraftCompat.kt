@@ -5,9 +5,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.Entity
-import net.minecraft.potion.Potion
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 object MinecraftCompat {
 

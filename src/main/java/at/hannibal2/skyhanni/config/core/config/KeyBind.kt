@@ -5,9 +5,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.luaj.vm2.ast.Str
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds

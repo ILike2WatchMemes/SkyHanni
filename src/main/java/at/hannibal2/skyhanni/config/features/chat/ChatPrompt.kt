@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.config.features.chat
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.KeyBind
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
