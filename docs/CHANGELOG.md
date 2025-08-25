@@ -1,7 +1,6 @@
 # Bingo Net
 
-Please check the official [Sky Hanni](https://github.com/hannibal002/SkyHanni) changelog for any changes made in the official. Usually all
-Changes happening 1:1 on fork sync.
+#### Chat Features
 
 The following List does not include Bug Fixes. If empty may be only Bug Fixes.
 

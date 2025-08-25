@@ -211,6 +211,15 @@ class ChatConfig {
 
     @Expose
     @ConfigOption(
+        name = "Hide Clickable Hints",
+        desc = "Hides the 'Click to x' chat line from SkyHanni messages. " +
+            "The message is still clickable and shows infos on hover.",
+    )
+    @ConfigEditorBoolean
+    var hideClickableHint: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Default Chat Prompt Keybind",
         desc = "Some clickable messages have a Keybind you can use to execute their Code instead of having to click. " +
             "All other Keybind can be configured to be different," +
