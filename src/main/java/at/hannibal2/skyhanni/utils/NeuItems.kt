@@ -90,6 +90,16 @@ object NeuItems {
         }
     }
 
+    var npcs = mapOf<String, NeuNPC>()
+        private set
+
+
+    fun findItemByNameWithoutColor(
+        name: String,
+    ): NeuInternalName? {
+        return itemNamesWithoutColor[name]
+    }
+
     private fun readAllNeuItems() {
         allInternalNames.clear()
         val tempAllItemCache = mutableMapOf<String, NeuInternalName>()
@@ -221,7 +231,10 @@ object NeuItems {
     ): Set<String> =
         findItemWith(prefix, useContain).filterNot { npcName.matches(it.key) }.filter { valid(it.value) }.keys
 
-    fun findItemWith(prefix: String, useContain: Boolean = SkyHanniMod.feature.chat.tabCompletionUseContainsSuggestion): NavigableMap<String, NeuInternalName> {
+    fun findItemWith(
+        prefix: String,
+        useContain: Boolean = SkyHanniMod.feature.chat.tabCompletionUseContainsSuggestion,
+    ): NavigableMap<String, NeuInternalName> {
         if (!useContain) return StringUtils.subMapOfStringsStartingWith(prefix, itemNamesWithoutColor)
         else {
             return StringUtils.subMapOfStringsContains(prefix, itemNamesWithoutColor)

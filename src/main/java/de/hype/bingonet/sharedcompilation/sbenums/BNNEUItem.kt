@@ -5,4 +5,11 @@ open class BNNEUItem(
     val internalName: String
 ) {
 
+    override fun hashCode(): Int {
+        return internalName.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return internalName == (other as? BNNEUItem)?.internalName
+    }
 }

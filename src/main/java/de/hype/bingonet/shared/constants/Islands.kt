@@ -59,12 +59,11 @@ enum class Islands(val internalName: String, private val displayName: String) {
 
         @JvmStatic
         fun getIslandByMap(map: String): Islands? {
-            for (island in entries) {
-                if (island.displayName == map) {
-                    return island
-                }
-            }
-            return null
+            return entries.find { it.displayName == map }
+        }
+
+        fun fromInternalName(key: String): Islands? {
+            return entries.firstOrNull { it.internalName == key }
         }
     }
 }
