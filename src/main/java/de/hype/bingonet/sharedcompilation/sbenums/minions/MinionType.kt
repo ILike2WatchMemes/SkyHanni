@@ -13,6 +13,10 @@ open class MinionType(
     override fun hashCode(): Int {
         return typeId.hashCode()
     }
+
+    override fun equals(other: Any?): Boolean {
+        return typeId == (other as? MinionType)?.typeId
+    }
 }
 
 enum class MinionCategory {

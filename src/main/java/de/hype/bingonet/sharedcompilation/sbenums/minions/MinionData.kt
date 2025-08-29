@@ -1,8 +1,11 @@
 package de.hype.bingonet.sharedcompilation.sbenums.minions
 
-class MinionData(
+class MinionData constructor(
     val displayName: String,
     val itemId: String,
+    /**
+     * This is multiplied by the number of needed actions automatically
+     */
     var timeBetweenActions: Double,
     var storage: Int,
     val simpleUpgradeCost: Int?,
