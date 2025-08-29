@@ -6,7 +6,14 @@ The following List does not include Bug Fixes. If empty may be only Bug Fixes.
 
 ## Bingo Net Changes:
 
-- empty
+- Modified the NEU Repo Location to HacktheTime Fork Repo. Reset the value or modify the Config under Dev → Neu Repository → Neu Repository
+  Location → Repository User = HacktheTime
+    - The Default is only for new users. Old users have to update it manually!
+
+- various fixes and minor improvements.
+
+- added /searchitem and /shtagitem commands (CHECK THEM OUT!) Still Beta but extremely useful.
+
 
 ## Static Info for modrinth:
 
@@ -16,6 +23,7 @@ manually, as it is planned to be disabled by default, since from sh perspective 
 
 To enable do:
 `/sh` → Events → Bingo → Third Party Networks →
+
 1) Bingo Net → Use Bingo Net = Off → ON
 2) Use Bingo Brewers = OFF → ON
 
