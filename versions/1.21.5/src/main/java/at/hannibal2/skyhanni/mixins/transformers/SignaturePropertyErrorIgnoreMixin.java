@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.hypixelerrorsfix;
+package at.hannibal2.skyhanni.mixins.transformers;
 
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.yggdrasil.YggdrasilServicesKeyInfo;
