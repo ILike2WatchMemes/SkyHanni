@@ -494,7 +494,7 @@ object ChatFilter {
      */
     private val swoopAxePattern by huntingPatternGroup.pattern(
         "swoop-axe-message",
-        "§e\\[NPC] §bSwoop§f: §rWow! I forgot to tell you, monsters around here can only take damage from Axes!"
+        "§e\\[NPC] §bSwoop§f: §rWow! I forgot to tell you, monsters around here can only take damage from Axes!",
     )
 
     private val patternsMap: Map<String, List<Pattern>> = mapOf(

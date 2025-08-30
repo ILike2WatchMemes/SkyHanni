@@ -6,13 +6,14 @@ import net.minecraft.block.Block
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 //#if MC < 1.16
- import net.minecraft.tileentity.TileEntityChest
+import net.minecraft.tileentity.TileEntityChest
+
 //#else
 //$$ import net.minecraft.block.entity.ChestBlockEntity
 //#endif
 
 object BlockCompat {
-    fun LorenzVec.isChestOpened(): Boolean{
+    fun LorenzVec.isChestOpened(): Boolean {
         //#if MC < 1.16
         val test = getTileEntity() as TileEntityChest
         return test.numPlayersUsing > 0f

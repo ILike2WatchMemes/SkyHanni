@@ -9,7 +9,7 @@ class PersonalBestsConfig {
     @Expose
     @ConfigOption(
         name = "Personal Best Increase FF",
-        desc = "Show in chat how much more FF you get from farming contest personal best bonus after beating the previous record."
+        desc = "Show in chat how much more FF you get from farming contest personal best bonus after beating the previous record.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -18,7 +18,7 @@ class PersonalBestsConfig {
     @Expose
     @ConfigOption(
         name = "Overflow Personal Bests",
-        desc = "Show in chat how much more FF you would have gotten over your previous record if personal best fortune cap was not 100."
+        desc = "Show in chat how much more FF you would have gotten over your previous record if personal best fortune cap was not 100.",
     )
     @ConfigEditorBoolean
     var overflow: Boolean = false

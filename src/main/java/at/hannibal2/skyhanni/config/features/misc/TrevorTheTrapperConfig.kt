@@ -15,7 +15,7 @@ class TrevorTheTrapperConfig {
     @ConfigOption(
         name = "Enable Data Tracker",
         desc = "Track all of your data from doing Trevor Quests.\n" +
-            "Shows based on the setting below."
+            "Shows based on the setting below.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -25,7 +25,7 @@ class TrevorTheTrapperConfig {
     @ConfigOption(
         name = "Show Between Quests",
         desc = "Show the tracker during and between quests otherwise it will only show during them.\n" +
-            "Will show in the Trapper's Den regardless. §cToggle 'Enable Data Tracker' above."
+            "Will show in the Trapper's Den regardless. §cToggle 'Enable Data Tracker' above.",
     )
     @ConfigEditorBoolean
     var displayType: Boolean = true
@@ -44,7 +44,7 @@ class TrevorTheTrapperConfig {
         TrackerEntry.UNTRACKABLE,
         TrackerEntry.UNDETECTED,
         TrackerEntry.ENDANGERED,
-        TrackerEntry.ELUSIVE
+        TrackerEntry.ELUSIVE,
     )
 
     enum class TrackerEntry(private val displayName: String) {
@@ -74,7 +74,7 @@ class TrevorTheTrapperConfig {
         name = "Trapper Solver",
         desc = "Assist in finding Trevor's mobs.\n" +
             "§eNote: May not always work as expected.\n" +
-            "§cWill not help you to find rabbits or sheep in the Oasis!"
+            "§cWill not help you to find rabbits or sheep in the Oasis!",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -94,7 +94,7 @@ class TrevorTheTrapperConfig {
     @Expose
     @ConfigOption(
         name = "Accept Trapper Quest",
-        desc = "Click this key after the chat prompt to accept Trevor's quest."
+        desc = "Click this key after the chat prompt to accept Trevor's quest.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -104,7 +104,7 @@ class TrevorTheTrapperConfig {
     @ConfigOption(
         name = "Trapper Hotkey",
         desc = "Press this key to warp to Trevor's Den or to accept the quest. " +
-            "§eRequires the relevant above settings to be toggled"
+            "§eRequires the relevant above settings to be toggled",
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var keyBind: Int = Keyboard.KEY_NONE
@@ -118,7 +118,7 @@ class TrevorTheTrapperConfig {
     @Expose
     @ConfigOption(
         name = "Trapper Ready Title",
-        desc = "Show a title and play a sound when the cooldown is over and Trapper is ready for the next quest."
+        desc = "Show a title and play a sound when the cooldown is over and Trapper is ready for the next quest.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -127,7 +127,7 @@ class TrevorTheTrapperConfig {
     @Expose
     @ConfigOption(
         name = "Trapper Cooldown GUI",
-        desc = "Show the cooldown on screen in an overlay (intended for Abiphone users)."
+        desc = "Show the cooldown on screen in an overlay (intended for Abiphone users).",
     )
     @ConfigEditorBoolean
     var cooldownGui: Boolean = false

@@ -22,7 +22,7 @@ class SkillProgressConfig {
     @ConfigOption(name = "Text Alignment", desc = "Align the display text with the progress bar.")
     @ConfigEditorDropdown
     val textAlignmentProperty: Property<TextAlignment> = Property.of(
-        TextAlignment.CENTERED
+        TextAlignment.CENTERED,
     )
 
     enum class TextAlignment(private val displayName: String, val alignment: RenderUtils.HorizontalAlignment?) {

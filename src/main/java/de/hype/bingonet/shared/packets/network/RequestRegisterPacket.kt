@@ -15,7 +15,7 @@ import de.hype.bingonet.shared.packets.base.ExpectReplyPacket
 data class RequestRegisterPacket(
     val mcuuid: java.util.UUID,
     val discordId: String,
-    val clientMojangServerId: String
+    val clientMojangServerId: String,
 ) : ExpectReplyPacket<RequestRegisterPacket.MCRegistrationResponsePacket>() {
     data class MCRegistrationResponsePacket(
         val response: ResponseType,
@@ -41,9 +41,9 @@ data class RequestRegisterPacket(
         }
 
         fun calculateSimilarity(str1: String, str2: String): Int {
-            val longer = Math.max(str1.length, str2.length);
-            val distance = levenshteinDistance(str1, str2);
-            return ((longer - distance) / longer) * 100;
+            val longer = Math.max(str1.length, str2.length)
+            val distance = levenshteinDistance(str1, str2)
+            return ((longer - distance) / longer) * 100
         }
 
         // Function to calculate Levenshtein distance

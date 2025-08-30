@@ -13,7 +13,7 @@ class NonGodPotEffectsConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Display the active potion effects that are not part of the God Pot."
+        desc = "Display the active potion effects that are not part of the God Pot.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -41,7 +41,7 @@ class NonGodPotEffectsConfig {
     @Expose
     @ConfigOption(
         name = "Expire Warning Time",
-        desc = "Change the time in seconds before the potion expries to warn you."
+        desc = "Change the time in seconds before the potion expries to warn you.",
     )
     @ConfigEditorSlider(minValue = 30f, maxValue = 300f, minStep = 5f)
     var expireWarnTime: Int = 30

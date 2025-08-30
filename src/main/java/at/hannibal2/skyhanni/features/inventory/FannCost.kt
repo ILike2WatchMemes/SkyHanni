@@ -126,7 +126,7 @@ object FannCost {
      */
     private val trainingModeLorePattern by patternGroup.pattern(
         "lore.training-mode",
-        "(?:§.)+▶ (?<selection>.*)"
+        "(?:§.)+▶ (?<selection>.*)",
     )
 
     /**
@@ -149,7 +149,7 @@ object FannCost {
      */
     private val dayUserInputLorePattern by patternGroup.pattern(
         "lore.day-user-input",
-        "(?:§.)+▶ (?<days>\\d+) Days?"
+        "(?:§.)+▶ (?<days>\\d+) Days?",
     )
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -173,13 +173,13 @@ object FannCost {
 
         return listOf(
             coinsPattern to "§7 = §6${coinPerExp.roundTo(2)} Coins§7/§bXP",
-            bitsPattern to "§7 = §b${xpPerBit.roundTo(2)} XP§7/§bBit"
+            bitsPattern to "§7 = §b${xpPerBit.roundTo(2)} XP§7/§bBit",
         )
     }
 
     private fun List<String>.getGroupDouble(
         pattern: Pattern,
-        groupName: String
+        groupName: String,
     ): Double? = pattern.firstMatcher(this) {
         group(groupName).formatDouble()
     }
@@ -203,7 +203,7 @@ object FannCost {
         val duration = durationPattern.firstMatcher(beginTrainingLore) {
             TimeUtils.getDuration(group("time"))
         } ?: dayUserInputLorePattern.firstMatcher(
-            event.inventoryItems[USER_INPUT_SLOT_NUM]?.getLore().orEmpty()
+            event.inventoryItems[USER_INPUT_SLOT_NUM]?.getLore().orEmpty(),
         ) { group("days").formatInt().days } ?: Duration.ZERO
 
         val trainingDurationSlot = event.inventoryItems[TRAINING_DURATION_SLOT_NUM] ?: return

@@ -8,7 +8,7 @@ import de.hype.bingonet.sharedcompilation.sbenums.BNNEUItem
 import net.minecraft.init.Items
 import kotlin.time.Duration.Companion.minutes
 
-class NeuInternalName private constructor(internalName: String): BNNEUItem(internalName)  {
+class NeuInternalName private constructor(internalName: String) : BNNEUItem(internalName) {
 
     companion object {
 

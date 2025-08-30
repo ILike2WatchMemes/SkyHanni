@@ -14,7 +14,7 @@ class HotmConfig {
     @Expose
     @ConfigOption(
         name = "Enable Highlight",
-        desc = "Highlight enabled perks in the HOTM tree §agreen§7, and disabled §cred§7. Locked perks are highlighted gray."
+        desc = "Highlight enabled perks in the HOTM tree §agreen§7, and disabled §cred§7. Locked perks are highlighted gray.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -57,7 +57,7 @@ class HotmConfig {
     @Expose
     @ConfigOption(
         name = "Powder for 10 Levels",
-        desc = "Show the amount of powder needed to level a perk up 10 times when holding the shift key."
+        desc = "Show the amount of powder needed to level a perk up 10 times when holding the shift key.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -66,7 +66,7 @@ class HotmConfig {
     @Expose
     @ConfigOption(
         name = "Current Powder",
-        desc = "Displays the current amount of powder available for the specific perk when viewing its tooltip."
+        desc = "Displays the current amount of powder available for the specific perk when viewing its tooltip.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

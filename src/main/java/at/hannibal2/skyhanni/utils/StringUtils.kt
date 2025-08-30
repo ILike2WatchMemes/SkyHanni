@@ -27,6 +27,7 @@ import java.util.regex.Pattern
 import java.util.TreeMap
 //#if FORGE
 import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
+
 //#else
 //$$ import net.minecraft.client.util.ChatMessages
 //$$ import net.minecraft.text.TextColor
@@ -382,23 +383,23 @@ object StringUtils {
                         val formatting = enumChatFormattingByCode(formattingChar) ?: continue
                         when (formatting) {
                             EnumChatFormatting.OBFUSCATED -> {
-                                colorOverride.setObfuscated(true)
+                                colorOverride.obfuscated = true
                             }
 
                             EnumChatFormatting.BOLD -> {
-                                colorOverride.setBold(true)
+                                colorOverride.bold = true
                             }
 
                             EnumChatFormatting.STRIKETHROUGH -> {
-                                colorOverride.setStrikethrough(true)
+                                colorOverride.strikethrough = true
                             }
 
                             EnumChatFormatting.UNDERLINE -> {
-                                colorOverride.setUnderlined(true)
+                                colorOverride.underlined = true
                             }
 
                             EnumChatFormatting.ITALIC -> {
-                                colorOverride.setItalic(true)
+                                colorOverride.italic = true
                             }
 
                             else -> {

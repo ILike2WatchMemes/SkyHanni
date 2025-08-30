@@ -31,7 +31,7 @@ object TitleManager {
     val existingIntentions = guiConfig.titleIntentionPositions.values.map { it.keys }.flatten().toSet()
     val intentionMapper: MutableMap<String, TitleIntention> = mutableMapOf()
 
-    inline fun<reified E : Enum<E>> registerIntentions(
+    inline fun <reified E : Enum<E>> registerIntentions(
         invokerClazz: Class<Any>,
         defaultPosition: Position? = null,
     ) {
@@ -54,7 +54,7 @@ object TitleManager {
             val collisionItem = existingIntentions.firstOrNull { it != reifiedName && it.endsWith(".$name") }
             if (collisionItem != null) ErrorManager.skyHanniError(
                 "Unique title intention violation - ${invokerClazz.simpleName} " +
-                    "attempted to register $name, but $collisionItem already exists."
+                    "attempted to register $name, but $collisionItem already exists.",
             )
 
             intentionMapper[name] = intentionContext
@@ -166,7 +166,7 @@ object TitleManager {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event. registerBrigadier("shsendtitle") {
+        event.registerBrigadier("shsendtitle") {
             description = "Display a title on the screen with the specified settings."
             category = CommandCategory.DEVELOPER_TEST
             arg("duration", BrigadierArguments.string()) { duration ->

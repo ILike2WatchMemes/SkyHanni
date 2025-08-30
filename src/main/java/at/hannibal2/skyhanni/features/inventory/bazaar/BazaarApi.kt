@@ -115,7 +115,7 @@ object BazaarApi {
 
     private var taxRate: Double
         get() = storage?.taxRate ?: 1.25
-        private set(value) {
+        set(value) {
             storage?.taxRate = value
         }
 

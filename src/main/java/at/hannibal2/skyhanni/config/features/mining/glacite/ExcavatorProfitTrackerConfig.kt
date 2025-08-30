@@ -17,7 +17,7 @@ class ExcavatorProfitTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Track Glacite Powder",
-        desc = "Track Glacite Powder gained as well (no profit, but progress)."
+        desc = "Track Glacite Powder gained as well (no profit, but progress).",
     )
     @ConfigEditorBoolean
     var trackGlacitePowder: Boolean = true

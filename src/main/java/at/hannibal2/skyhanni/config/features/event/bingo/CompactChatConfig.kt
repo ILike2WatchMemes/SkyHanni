@@ -10,7 +10,7 @@ class CompactChatConfig {
     @ConfigOption(
         name = "Enable",
         desc = "Shorten chat messages about skill level ups, collection gains, " +
-            "new area discoveries and SkyBlock level up messages while on Bingo."
+            "new area discoveries and SkyBlock level up messages while on Bingo.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -19,7 +19,7 @@ class CompactChatConfig {
     @Expose
     @ConfigOption(
         name = "Hide Border",
-        desc = "Hide the border messages before and after the compact level up messages."
+        desc = "Hide the border messages before and after the compact level up messages.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -28,7 +28,7 @@ class CompactChatConfig {
     @Expose
     @ConfigOption(
         name = "Outside Bingo",
-        desc = "Compact the level up chat messages outside of a Bingo profile as well."
+        desc = "Compact the level up chat messages outside of a Bingo profile as well.",
     )
     @ConfigEditorBoolean
     var outsideBingo: Boolean = false

@@ -37,7 +37,7 @@ object ColorfulItemStats {
                 val oldColor = group("oldColor")
 
                 val skyblockStat = SkyblockStat.getValueOrNull(
-                    stat.uppercase().replace(" ", "_")
+                    stat.uppercase().replace(" ", "_"),
                 ) ?: return@replace this.group()
 
                 val bonusGroup = group("bonus")

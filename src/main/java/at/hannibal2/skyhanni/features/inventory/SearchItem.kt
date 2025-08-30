@@ -14,11 +14,9 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.StringUtils
-import net.minecraft.item.ItemStack
 import at.hannibal2.skyhanni.api.storage.filterByDescription
 import at.hannibal2.skyhanni.api.storage.filterByItemId
 import at.hannibal2.skyhanni.api.storage.outputToChat
-import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import com.mojang.brigadier.suggestion.SuggestionProvider
 import java.util.UUID
@@ -38,9 +36,12 @@ object SearchItem {
 
     private val nameSuggestionProvider = SuggestionProvider<Any?> { _, builder ->
         val remaining = builder.remainingLowerCase
-        val names = NeuItems.findItemNameWithoutNPCs(remaining, { _->
-            return@findItemNameWithoutNPCs true
-        })
+        val names = NeuItems.findItemNameWithoutNPCs(
+            remaining,
+            { _ ->
+                return@findItemNameWithoutNPCs true
+            },
+        )
         for (n in names) builder.suggest(n)
         builder.buildFuture()
     }
@@ -104,7 +105,11 @@ object SearchItem {
             }
             // uuid subcommand
             literal("uuid") {
-                arg("uuid", BrigadierArguments.string(), dynamicSuggestionProvider { ItemTagManager.getAllTaggedItems().values }) { uuidArg ->
+                arg(
+                    "uuid",
+                    BrigadierArguments.string(),
+                    dynamicSuggestionProvider { ItemTagManager.getAllTaggedItems().values },
+                ) { uuidArg ->
                     callback { searchByUuidString(getArg(uuidArg)) }
                 }
                 simpleCallback { ChatUtils.userError("Usage: /searchitem uuid <uuid>") }

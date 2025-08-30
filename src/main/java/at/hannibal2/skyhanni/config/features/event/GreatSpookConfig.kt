@@ -29,7 +29,7 @@ class GreatSpookConfig {
     @ConfigOption(
         name = "Fear Stat Display",
         desc = "Show Fear stat as single GUI element.\n" +
-            "§eRequires tab list widget enabled and Fear selected to update live."
+            "§eRequires tab list widget enabled and Fear selected to update live.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

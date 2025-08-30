@@ -4,7 +4,7 @@ import de.hype.bingonet.environment.NeuEnvironmentRepo
 import de.hype.bingonet.sharedcompilation.sbenums.BNNEUItem
 import kotlin.math.min
 
-@Suppress("unused", "EnumEntryName")
+@Suppress("unused", "EnumEntryNameCase")
 interface Collections {
 
     val id: String
@@ -49,7 +49,7 @@ interface Collections {
             10_000,
             20_000,
             50_000,
-            100_000
+            100_000,
         ),
         Carrot(
             "CARROT_ITEM",
@@ -65,7 +65,7 @@ interface Collections {
             10_000,
             25_000,
             50_000,
-            100_000
+            100_000,
         ),
         Cactus(
             "CACTUS",
@@ -81,7 +81,7 @@ interface Collections {
             5_000,
             10_000,
             25_000,
-            50_000
+            50_000,
         ),
         Raw_Chicken(
             "RAW_CHICKEN",
@@ -98,7 +98,7 @@ interface Collections {
             10_000,
             25_000,
             50_000,
-            100_000
+            100_000,
         ),
         Sugar_Cane(
             "SUGAR_CANE",
@@ -183,7 +183,7 @@ interface Collections {
             5_000,
             10_000,
             25_000,
-            50_000
+            50_000,
         ),
         Nether_Wart(
             "NETHER_STALK",
@@ -217,7 +217,7 @@ interface Collections {
             10_000,
             25_000,
             50_000,
-            100_000
+            100_000,
         ),
         Melon(
             "MELON",
@@ -233,7 +233,7 @@ interface Collections {
             25_000,
             50_000,
             100_000,
-            250_000
+            250_000,
         ),
         Potato(
             "POTATO_ITEM",
@@ -249,7 +249,7 @@ interface Collections {
             10_000,
             25_000,
             50_000,
-            100_000
+            100_000,
         ),
         Leather(
             "LEATHER",
@@ -267,7 +267,7 @@ interface Collections {
             10_000,
             25_000,
             50_000,
-            100_000
+            100_000,
         ),
         Raw_Porkchop(
             "PORK",
@@ -283,7 +283,7 @@ interface Collections {
             5_000,
             10_000,
             25_000,
-            50_000
+            50_000,
         ),
         Feather(
             "FEATHER",
@@ -299,7 +299,7 @@ interface Collections {
             5_000,
             10_000,
             25_000,
-            50_000
+            50_000,
         ),
         ;
 
@@ -362,7 +362,7 @@ interface Collections {
             10_000,
             15_000,
             25_000,
-            50_000
+            50_000,
         ),
         Nether_Quartz("QUARTZ", "QUARTZ_GENERATOR_1", 50, 100, 250, 1_000, 2_500, 5_000, 10_000, 25_000, 50_000),
         Sand("SAND", "SAND_GENERATOR_1", 50, 100, 250, 500, 1_000, 2_500, 5_000),
@@ -410,7 +410,7 @@ interface Collections {
             10_000,
             25_000,
             50_000,
-            100_000
+            100_000,
         ),
         Diamond("DIAMOND", "DIAMOND_GENERATOR_1", 50, 100, 250, 1_000, 2_500, 5_000, 10_000, 25_000, 50_000),
         Cobblestone(
@@ -442,7 +442,7 @@ interface Collections {
             10_000,
             250_000,
             500_000,
-            1_000_000
+            1_000_000,
         ),
         Emerald("EMERALD", "EMERALD_GENERATOR_1", 50, 100, 250, 1_000, 5_000, 15_000, 30_000, 50_000, 100_000),
         Red_Sand("SAND:1", "RED_SAND_GENERATOR_1", 50, 500, 2_500, 10_000, 15_000, 25_000, 50_000, 100_000),
@@ -467,7 +467,7 @@ interface Collections {
             10_000,
             15_000,
             25_000,
-            50_000
+            50_000,
         ),
         Chili_Pepper("CHILI_PEPPER", null, 10, 25, 75, 250, 1_000, 2_500, 5_000, 10_000, 20_000),
         Slimeball("SLIME_BALL", "SLIME_GENERATOR_1", 50, 100, 250, 1_000, 2_500, 5_000, 10_000, 25_000, 50_000),
@@ -486,7 +486,7 @@ interface Collections {
             10_000,
             25_000,
             50_000,
-            100_000
+            100_000,
         ),
         Spider_Eye("SPIDER_EYE", "CAVESPIDER_GENERATOR_1", 50, 100, 250, 1_000, 2_500, 5_000, 10_000, 25_000, 50_000),
         Bone("BONE", "SKELETON_GENERATOR_1", 50, 100, 250, 500, 1_000, 5_000, 10_000, 25_000, 50_000, 150_000),
@@ -526,7 +526,7 @@ interface Collections {
             15_000,
             30_000,
             45_000,
-            60_000
+            60_000,
         ),
         Clownfish("RAW_FISH:2", "FISHING_GENERATOR_1", 10, 25, 50, 100, 200, 400, 800, 1_600, 4_000),
         Raw_Salmon("RAW_FISH:1", "FISHING_GENERATOR_1", 20, 50, 100, 250, 500, 1_000, 2_500, 5_000, 10_000),
@@ -544,7 +544,7 @@ interface Collections {
             75_000,
             100_000,
             250_000,
-            500_000
+            500_000,
         ),
         Prismarine_Crystals("PRISMARINE_CRYSTALS", "FISHING_GENERATOR_1", 10, 25, 50, 100, 200, 400, 800),
         Clay("CLAY_BALL", "CLAY_GENERATOR_1", 50, 100, 250, 1_000, 1_500, 2_500),

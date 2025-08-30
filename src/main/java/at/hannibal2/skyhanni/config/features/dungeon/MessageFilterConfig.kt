@@ -15,7 +15,7 @@ class MessageFilterConfig {
     @Expose
     @ConfigOption(
         name = "Keys and Doors",
-        desc = "Hide the chat message when picking up keys or opening doors in Dungeons."
+        desc = "Hide the chat message when picking up keys or opening doors in Dungeons.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

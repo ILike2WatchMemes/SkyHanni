@@ -41,7 +41,7 @@ class DebugMobConfig {
         @ConfigOption(
             name = "Player Highlight",
             desc = "Highlight each entity that is a real Player in blue " +
-                "(you are also included in the list but won't be highlighted for obvious reasons)."
+                "(you are also included in the list but won't be highlighted for obvious reasons).",
         )
         @ConfigEditorBoolean
         var realPlayerHighlight: Boolean = false
@@ -50,7 +50,7 @@ class DebugMobConfig {
         @Expose
         @ConfigOption(
             name = "DisplayNPC",
-            desc = "Shows the internal mobs that are 'DisplayNPC' as highlight (in red) or the name."
+            desc = "Shows the internal mobs that are 'DisplayNPC' as highlight (in red) or the name.",
         )
         @ConfigEditorDropdown
         var displayNPC: HowToShow = HowToShow.OFF
@@ -58,7 +58,7 @@ class DebugMobConfig {
         @Expose
         @ConfigOption(
             name = "SkyblockMob",
-            desc = "Shows the internal mobs that are 'SkyblockMob' as highlight (in green) or the name."
+            desc = "Shows the internal mobs that are 'SkyblockMob' as highlight (in green) or the name.",
         )
         @ConfigEditorDropdown
         var skyblockMob: HowToShow = HowToShow.OFF
@@ -66,7 +66,7 @@ class DebugMobConfig {
         @Expose
         @ConfigOption(
             name = "Summon",
-            desc = "Shows the internal mobs that are 'Summon' as highlight (in yellow) or the name."
+            desc = "Shows the internal mobs that are 'Summon' as highlight (in yellow) or the name.",
         )
         @ConfigEditorDropdown
         var summon: HowToShow = HowToShow.OFF
@@ -74,7 +74,7 @@ class DebugMobConfig {
         @Expose
         @ConfigOption(
             name = "Special",
-            desc = "Shows the internal mobs that are 'Special' as highlight (in aqua) or the name."
+            desc = "Shows the internal mobs that are 'Special' as highlight (in aqua) or the name.",
         )
         @ConfigEditorDropdown
         var special: HowToShow = HowToShow.OFF
@@ -82,7 +82,7 @@ class DebugMobConfig {
         @Expose
         @ConfigOption(
             name = "Show Invisible",
-            desc = "Shows invisible mobs (due to invisibility effect) if looked at directly."
+            desc = "Shows invisible mobs (due to invisibility effect) if looked at directly.",
         )
         @ConfigEditorBoolean
         var showInvisible: Boolean = false

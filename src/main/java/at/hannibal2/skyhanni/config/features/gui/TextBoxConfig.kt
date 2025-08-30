@@ -24,7 +24,7 @@ class TextBoxConfig {
         name = "Text",
         desc = "Enter text you want to display here.\n" +
             "§eUse '&' as the color code character.\n" +
-            "§eUse '\\n' as the line break character."
+            "§eUse '\\n' as the line break character.",
     )
     @ConfigEditorText
     val text: Property<String> = Property.of("&aYour Text Here\\n&bYour new line here")

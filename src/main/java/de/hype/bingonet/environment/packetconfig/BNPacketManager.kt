@@ -27,7 +27,7 @@ import de.hype.bingonet.shared.packets.network.SystemMessagePacket
 import de.hype.bingonet.shared.packets.network.WantedSearchPacket
 import de.hype.bingonet.shared.packets.network.WelcomeClientPacket
 
-object BNPacketManager{
+object BNPacketManager {
     var packets: MutableList<Packet<out AbstractPacket>> = ArrayList<Packet<out AbstractPacket>>()
 
     // Method to initialize packet actions

@@ -7,7 +7,7 @@ import kotlin.reflect.KProperty
 
 fun <S, T> lazyRemap(
     source: () -> S,
-    mapper: (S) -> T
+    mapper: (S) -> T,
 ): ReadOnlyProperty<Any?, T> =
     object : ReadOnlyProperty<Any?, T> {
         private var lastSource: S? = null
@@ -35,7 +35,7 @@ fun <T : Comparable<T>> T.max(other: T): T {
 fun <R, S> lazyRemap(
     prop: KMutableProperty0<R>,
     mapper: (R) -> S,
-    reverse: (S) -> R
+    reverse: (S) -> R,
 ): ReadWriteProperty<Any?, S> =
     object : ReadWriteProperty<Any?, S> {
         private var lastSource: R? = null

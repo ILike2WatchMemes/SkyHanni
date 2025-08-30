@@ -83,14 +83,17 @@ abstract class Resettable {
             val defaultValue = mutableProp.get(defaults)
             mutableProp.set(this@Resettable, defaultValue)
         }
+
         current is Property<*> -> {
             @Suppress("UNCHECKED_CAST")
             val propRef = this as KProperty1<Resettable, Property<Any?>>
             val defaultProp = propRef.get(defaults)
+
             @Suppress("UNCHECKED_CAST")
             val propCurrent = current as Property<Any?>
             propCurrent.set(defaultProp.get())
         }
+
         current is Resettable -> current.reset()
         current is MutableCollection<*> -> current.clear()
         current is MutableMap<*, *> -> current.clear()

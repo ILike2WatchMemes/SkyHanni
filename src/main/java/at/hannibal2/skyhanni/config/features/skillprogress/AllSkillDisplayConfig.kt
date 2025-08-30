@@ -27,6 +27,6 @@ class AllSkillDisplayConfig {
         SkillType.ENCHANTING,
         SkillType.ALCHEMY,
         SkillType.CARPENTRY,
-        SkillType.TAMING
+        SkillType.TAMING,
     )
 }

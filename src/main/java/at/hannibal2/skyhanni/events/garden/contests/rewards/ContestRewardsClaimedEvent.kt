@@ -12,5 +12,5 @@ data class ContestRewardSet(
     var carnivalTickets: Int = 0,
     var books: Map<CropType, Int> = emptyMap(),
     var medals: Map<AnitaMedalProfit.MedalType, Int> = emptyMap(),
-    var bits: Int = 0
+    var bits: Int = 0,
 ) : Resettable()

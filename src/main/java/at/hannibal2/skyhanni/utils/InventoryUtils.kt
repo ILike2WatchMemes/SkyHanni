@@ -194,7 +194,7 @@ object InventoryUtils {
         }
     }
 
-    fun clickSlot(slotNumber: Int, windowId: Int? = null, clickType : GuiContainerEvent.ClickType, mouseButton: Int = 0) {
+    fun clickSlot(slotNumber: Int, windowId: Int? = null, clickType: GuiContainerEvent.ClickType, mouseButton: Int = 0) {
         if (windowId != null) {
             InventoryCompat.clickInventorySlot(slotNumber, windowId, mouseButton = mouseButton, mode = clickType.id)
         } else {

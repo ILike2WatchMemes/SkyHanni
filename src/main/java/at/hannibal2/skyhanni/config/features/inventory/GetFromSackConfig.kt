@@ -10,7 +10,7 @@ class GetFromSackConfig {
     @Expose
     @ConfigOption(
         name = "Queued GfS",
-        desc = "If §e/gfs §7or §e/getfromsacks §7is used it queues up the commands so all items are guaranteed to be received."
+        desc = "If §e/gfs §7or §e/getfromsacks §7is used it queues up the commands so all items are guaranteed to be received.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -19,7 +19,7 @@ class GetFromSackConfig {
     @Expose
     @ConfigOption(
         name = "Bazaar GfS",
-        desc = "If you don't have enough items in sack get a prompt to buy them from bazaar."
+        desc = "If you don't have enough items in sack get a prompt to buy them from bazaar.",
     )
     @ConfigEditorBoolean
     var bazaarGFS: Boolean = false
@@ -27,7 +27,7 @@ class GetFromSackConfig {
     @Expose
     @ConfigOption(
         name = "Super Craft GfS",
-        desc = "Send a clickable message after supercrafting an item that grabs the item from your sacks when clicked."
+        desc = "Send a clickable message after supercrafting an item that grabs the item from your sacks when clicked.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

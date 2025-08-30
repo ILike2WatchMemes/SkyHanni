@@ -9,7 +9,7 @@ class EvolvingItemsConfig {
     @Expose
     @ConfigOption(
         name = "Time Held in Lore",
-        desc = "Show time held for Evolving Items (Bottle of Jyrre, Dark Cacao Truffle, etc.) in the lore."
+        desc = "Show time held for Evolving Items (Bottle of Jyrre, Dark Cacao Truffle, etc.) in the lore.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -18,7 +18,7 @@ class EvolvingItemsConfig {
     @Expose
     @ConfigOption(
         name = "Time Left in Lore",
-        desc = "Show time until maxed for Evolving Items (Bottle of Jyrre, Dark Cacao Truffle, etc.) in the lore."
+        desc = "Show time until maxed for Evolving Items (Bottle of Jyrre, Dark Cacao Truffle, etc.) in the lore.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

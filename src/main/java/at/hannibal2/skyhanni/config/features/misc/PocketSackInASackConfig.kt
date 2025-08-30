@@ -9,7 +9,7 @@ class PocketSackInASackConfig {
     @Expose
     @ConfigOption(
         name = "Show in Overlay",
-        desc = "Show the number of Pocket Sack-In-A-Sack applied on a sack icon as an overlay."
+        desc = "Show the number of Pocket Sack-In-A-Sack applied on a sack icon as an overlay.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

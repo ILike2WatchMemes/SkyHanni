@@ -52,7 +52,7 @@ open class TextInput {
         carriage = null
     }
 
-    val isActive get() = Companion.activeInstance == this
+    val isActive get() = activeInstance == this
 
     private val updateEvents = mutableMapOf<Int, (TextInput) -> Unit>()
 
@@ -188,7 +188,7 @@ open class TextInput {
             //#if MC < 1.21
             if (timeSinceKeyEvent == Keyboard.getEventNanoseconds()) return
             timeSinceKeyEvent = Keyboard.getEventNanoseconds()
-            val char: Char? = Keyboard.getEventCharacter()
+            val char: Char = Keyboard.getEventCharacter()
             //#endif
             textBox = when (char) {
                 Char(0) -> return

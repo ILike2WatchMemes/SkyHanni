@@ -62,7 +62,7 @@ object VoltHighlighter {
 
             if (config.voltMoodMeter) RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
-                state.color.toColor()
+                state.color.toColor(),
             ) { config.voltMoodMeter }
 
             if (state == VoltState.DOING_LIGHTNING && config.voltRange) {

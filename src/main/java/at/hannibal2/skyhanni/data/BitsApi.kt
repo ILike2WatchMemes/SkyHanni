@@ -415,6 +415,7 @@ object BitsApi {
 
     private fun sendBitsSpentEvent(difference: Int) =
         BitsUpdateEvent.BitsSpent(bits, bitsAvailable, difference).post()
+
     private fun sendBitsAvailableGainedEvent() = BitsAvailableUpdateEvent(bitsAvailable).post()
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && !SkyBlockUtils.isOnAlphaServer && profileStorage != null

@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.features.event.bingo.BingoNetConfig
+import at.hannibal2.skyhanni.config.features.event.bingo.BingoNetSystem
 import at.hannibal2.skyhanni.config.features.inventory.hubselector.HubSelectorKeybinds
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.toBNIsland
@@ -23,6 +24,7 @@ import de.hype.bingonet.shared.packets.function.SplashTimeRequestPacket
 import de.hype.bingonet.shared.packets.network.BingoChatMessagePacket
 
 @SkyHanniModule
+@Suppress("LongMethod", "NoUnusedImports")
 object BNCommands {
     val config = SkyHanniMod.feature.event.bingo.bingoNetworks
     val bnConfig = SkyHanniMod.feature.event.bingo.bingoNetworks.bingoNet
@@ -35,7 +37,7 @@ object BNCommands {
             arg(
                 "server",
                 BrigadierArguments.string(),
-                BingoNetConfig.BingoNetSystem.entries.map { it.name } + "disconnect",
+                BingoNetSystem.entries.map { it.name } + "disconnect",
             ) {
                 callback {
                     connectServerCommand(getArg(it))
@@ -146,7 +148,7 @@ object BNCommands {
     }
 
     fun connectServerCommand(arg: String? = null) {
-        val system = BingoNetConfig.BingoNetSystem.entries.find { it.name == arg }
+        val system = BingoNetSystem.entries.find { it.name == arg }
         if (system == null) {
             BNConnection.disconnect()
             return

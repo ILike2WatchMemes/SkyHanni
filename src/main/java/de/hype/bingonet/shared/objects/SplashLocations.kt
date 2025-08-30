@@ -6,6 +6,7 @@ object SplashLocations {
     val ENCHANTING_TABLE: SplashLocation = SplashLocation("Enchanting-Table", -33, 69, -109)
     val COMMUNITY_CENTER: SplashLocation = SplashLocation("Community-Center", 2, 71, -99)
     val HUB_SPAWN: SplashLocation = SplashLocation("Hub-Spawn", -3, 69, -70)
+
     @JvmStatic
     fun values(): List<SplashLocation> {
         return listOf(BEA, KAT, ENCHANTING_TABLE, COMMUNITY_CENTER)

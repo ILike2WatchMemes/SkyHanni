@@ -11,7 +11,7 @@ class ModifyWordsConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Enable replacing all instances of a word or phrase with another word or phrase."
+        desc = "Enable replacing all instances of a word or phrase with another word or phrase.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

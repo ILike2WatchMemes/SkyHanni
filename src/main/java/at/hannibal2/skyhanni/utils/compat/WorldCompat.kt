@@ -16,8 +16,8 @@ object WorldCompat {
         get() = localWorldOrNull?.worldTime
 
     // TODO maybe make it so if absurd high number we use spooky new day every x ticks and use that to include in the calculation?
-    val worldDay
-        get() : Int? {
+    val worldDay: Int?
+        get() {
             val ticks = worldTime ?: return null
             return (ticks / (20 * 60 * 20)).toInt() // 20 ticks per second, 60 seconds per minute, 20 minutes per day
         }

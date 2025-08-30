@@ -195,7 +195,7 @@ object TestTable : RenderableTestSuite.TestRenderable("table") {
                 textInput = textInput,
                 xSpacing = 8,
                 ySpacing = 2,
-                showScrollableTipsInList = true
+                showScrollableTipsInList = true,
             ),
             "Searchable Scroll with Header and hints" to searchableScrollTable(
                 content = input,
@@ -206,7 +206,7 @@ object TestTable : RenderableTestSuite.TestRenderable("table") {
                 header = header,
                 xSpacing = 8,
                 ySpacing = 2,
-                showScrollableTipsInList = true
+                showScrollableTipsInList = true,
             ),
         )
 

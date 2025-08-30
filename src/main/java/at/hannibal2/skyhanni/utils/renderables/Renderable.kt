@@ -704,7 +704,7 @@ interface Renderable {
             hoveredColor: (Color) -> Color = { it.darker(0.5) },
             onClick: (Boolean) -> Unit,
             onHover: (Boolean) -> Unit = {},
-            button: Int = KeyboardManager.LEFT_MOUSE,
+            button: Int = LEFT_MOUSE,
             bypassChecks: Boolean = false,
             condition: (Boolean) -> Boolean = { true },
             startState: Boolean = false,
@@ -747,7 +747,7 @@ interface Renderable {
             content: Renderable,
             onClick: (Boolean) -> Unit,
             onHover: (Boolean) -> Unit = {},
-            button: Int = KeyboardManager.LEFT_MOUSE,
+            button: Int = LEFT_MOUSE,
             bypassChecks: Boolean = false,
             condition: (Boolean) -> Boolean = { true },
             startState: Boolean = false,
@@ -1328,7 +1328,7 @@ interface Renderable {
             override val text get() = prefix + input.editText()
 
             override val width = maxWidth
-            override val height = (9 * scale).toInt() + 6  // Add padding for the box
+            override val height = (9 * scale).toInt() + 6 // Add padding for the box
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 // Draw dark background box

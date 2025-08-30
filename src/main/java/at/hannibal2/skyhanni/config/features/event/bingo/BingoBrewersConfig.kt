@@ -7,7 +7,10 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class BingoBrewersConfig {
     @Expose
-    @ConfigOption(name = "Enable BB Integration", desc = "Whether your want to enable our BingoBrewers Port. (Since no official modern support)")
+    @ConfigOption(
+        name = "Enable BB Integration",
+        desc = "Whether your want to enable our BingoBrewers Port. (Since no official modern support)",
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     var useBB: Boolean = false
@@ -28,7 +31,10 @@ class BingoBrewersConfig {
     var chestWaypoints: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Allow Server Invite", desc = "Allow Bingo Brewers to party and warp Players into the Lobby on your behalf. §cNot implemented by Indigo Polecat yet but planned.")
+    @ConfigOption(
+        name = "Allow Server Invite",
+        desc = "Allow Bingo Brewers to party and warp Players into the Lobby on your behalf. §cNot implemented by Indigo Polecat yet but planned.",
+    )
     @ConfigEditorBoolean
     var allowBBServerPartyManagement: Boolean = true
 

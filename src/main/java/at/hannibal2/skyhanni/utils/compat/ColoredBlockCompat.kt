@@ -9,6 +9,7 @@ import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
 //#if MC < 1.21
 import net.minecraft.block.BlockCarpet
+
 //#else
 //$$ import net.minecraft.block.Block
 //#endif

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.compat
 import net.minecraft.client.Minecraft
 //#if MC < 1.16
 import net.minecraft.client.gui.ScaledResolution
+
 //#endif
 
 object GuiScreenUtils {
@@ -52,13 +53,14 @@ object GuiScreenUtils {
     private val globalMouseX get() = MouseCompat.getX()
     private val globalMouseY get() = MouseCompat.getY()
 
-    val mouseX: Int get() {
-        var x = globalMouseX * scaledWindowWidth / displayWidth
-        //#if MC > 1.21
-        //$$ if (mc.window.framebufferWidth > mc.window.width) x *= 2
-        //#endif
-        return x
-    }
+    val mouseX: Int
+        get() {
+            var x = globalMouseX * scaledWindowWidth / displayWidth
+            //#if MC > 1.21
+            //$$ if (mc.window.framebufferWidth > mc.window.width) x *= 2
+            //#endif
+            return x
+        }
 
     val mouseY: Int
         get() {

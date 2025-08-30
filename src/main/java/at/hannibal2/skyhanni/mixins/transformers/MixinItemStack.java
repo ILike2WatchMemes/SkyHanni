@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 //#if MC < 1.21
+
 import at.hannibal2.skyhanni.data.ToolTipData;
 //#endif
 import at.hannibal2.skyhanni.utils.compat.DrawContext;

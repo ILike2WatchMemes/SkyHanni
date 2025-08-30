@@ -46,7 +46,7 @@ enum class IslandType(private val nameFallback: String) {
         NONE,
         ANY,
         UNKNOWN,
-        -> false
+            -> false
 
         else -> true
     }
@@ -127,7 +127,7 @@ data class IslandData(
     val boundingBox: AxisAlignedBB?,
 )
 
- fun IslandType.toBNIsland(): Islands? {
+fun IslandType.toBNIsland(): Islands? {
     return when (this) {
         IslandType.PRIVATE_ISLAND -> Islands.PRIVATE_ISLAND
         IslandType.PRIVATE_ISLAND_GUEST -> Islands.PRIVATE_ISLAND

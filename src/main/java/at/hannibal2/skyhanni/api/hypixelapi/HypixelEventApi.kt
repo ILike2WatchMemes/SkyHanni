@@ -12,6 +12,7 @@ import net.hypixel.modapi.packet.impl.serverbound.ServerboundVersionedPacket
 import kotlin.jvm.optionals.getOrNull
 //#if MC < 1.21
 import at.hannibal2.skyhanni.features.misc.CurrentPing
+
 //#endif
 
 @SkyHanniModule

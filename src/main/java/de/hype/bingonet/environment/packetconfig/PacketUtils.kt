@@ -16,7 +16,7 @@ object PacketUtils {
         val rawJson = message.substring(packetName.length + 1)
         for (packet in BNPacketManager.packets) {
             if (packetName != packet.clazz.simpleName) continue
-            return Pair(packet,gson.fromJson(rawJson.replace("/n", "\n"), packet.clazz))
+            return Pair(packet, gson.fromJson(rawJson.replace("/n", "\n"), packet.clazz))
         }
         return null
     }

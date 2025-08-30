@@ -33,7 +33,7 @@ object AuctionHouseOpenPriceWebsite {
      */
     private val ahSearchPattern by patternGroup.pattern(
         "title.search",
-        "Auctions: \"(?<searchTerm>.*)\"?"
+        "Auctions: \"(?<searchTerm>.*)\"?",
     )
 
     private var searchTerm = ""
@@ -57,7 +57,7 @@ object AuctionHouseOpenPriceWebsite {
         "§7Click here to open",
         "§7the price history",
         "§7of §e$searchTerm",
-        "§7on §csky.coflnet.com"
+        "§7on §csky.coflnet.com",
     )
 
     @HandleEvent

@@ -39,8 +39,8 @@ object SplashStatusUpdateListener {
     private val selfSplashPattern = CompactSplashPotionMessage.selfSplashPattern
 
     @HandleEvent
-    public fun onIslandChange(event: IslandChangeEvent) {
-        val username = PlayerUtils.getName()
+    fun onIslandChange(event: IslandChangeEvent) {
+        PlayerUtils.getName()
         data = SplashManager.getSplashInServer(true)
         maxPlayers = HypixelData.getMaxPlayersForCurrentServer() - 5
         currentJob?.cancel()
@@ -62,7 +62,7 @@ object SplashStatusUpdateListener {
         }
     }
 
-    public fun useOverlay(): Boolean {
+    fun useOverlay(): Boolean {
         return SkyHanniMod.feature.event.bingo.bingoNetworks.splasherConfig.useSplasherOverlay
     }
 
@@ -89,7 +89,7 @@ object SplashStatusUpdateListener {
             if (previousStatus == StatusConstants.SPLASHING) return@matchMatcher
             setStatus(StatusConstants.SPLASHING)
             if (leecherConfig.enabled && HypixelData.getRemainingSpace() <= 2) {
-                //Sends a Packet to the Server that these Player Leeched the Splash. User can then confirm the List before Sanctions are caused.
+                // Sends a Packet to the Server that these Player Leeched the Splash. User can then confirm the List before Sanctions are caused.
                 val data = EntityUtils.getEntitiesNextToPlayer<EntityPlayer>(5.0).filter { !it.isOnBingo() }
                     .map { Triple(it.displayName.formattedText, it.uniqueID, it.isOnIronman()) }.toList()
                 if (HypixelData.getMaxPlayersForCurrentServer() - (HypixelData.getPlayersOnCurrentServer()) <= 2) {
@@ -112,7 +112,7 @@ object SplashStatusUpdateListener {
                 if (spots <= 2) {
                     val players: List<String> =
                         EntityUtils.getEntitiesNextToPlayer<EntityPlayer>(5.0).filter { !it.isOnBingo() }.map { it.name }.toList()
-                    //Splashes are done for Bingo People. Normals or Ironmans are allowed but only if theres no further need for Bingo.
+                    // Splashes are done for Bingo People. Normals or Ironmans are allowed but only if theres no further need for Bingo.
                     val messages = mutableListOf(StringBuilder("Leeching Splash will result in Bingo Net Sanctions! Leave now! "))
                     for (player in players) {
                         val last = messages.last()

@@ -3,7 +3,7 @@ package de.hype.bingonet.environment.packetconfig
 internal fun interface PacketRunnable<T : AbstractPacket> {
     fun run(packet: T)
 
-    fun parseAndRun(packet: AbstractPacket){
+    fun parseAndRun(packet: AbstractPacket) {
         @Suppress("UNCHECKED_CAST")
         run(packet as T)
     }
@@ -17,7 +17,7 @@ abstract class InterceptPacketInfo<T : AbstractPacket>(
     /**
      * block execution for completion is used whether the checks shall continue or the connection shall be paused until this is completed.
      */
-    val blockExecutionForCompletion: Boolean
+    val blockExecutionForCompletion: Boolean,
 ) : PacketRunnable<T> {
     val replyId: Long = -1
 

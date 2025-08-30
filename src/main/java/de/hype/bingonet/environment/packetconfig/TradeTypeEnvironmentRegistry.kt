@@ -23,5 +23,4 @@ enum class TradeTypeEnvironmentRegistry {
     CARRY_INK_SACKS,
     CRIMSON_ISLE_MAGE_FACTION,
     CHUM_BUCKET,
-    ;
 }

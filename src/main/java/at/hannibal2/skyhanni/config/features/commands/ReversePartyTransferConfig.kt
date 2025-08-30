@@ -16,7 +16,7 @@ class ReversePartyTransferConfig {
     @Expose
     @ConfigOption(
         name = "Clickable Message",
-        desc = "Allows transfer message to be clicked to transfer a party back to its previous leader if it has been transferred to you."
+        desc = "Allows transfer message to be clicked to transfer a party back to its previous leader if it has been transferred to you.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -25,7 +25,7 @@ class ReversePartyTransferConfig {
     @Expose
     @ConfigOption(
         name = "Response Message",
-        desc = "Sends a custom message to party chat when the party is reverse transferred."
+        desc = "Sends a custom message to party chat when the party is reverse transferred.",
     )
     @ConfigEditorText
     var message: String = "Nuh Uh"

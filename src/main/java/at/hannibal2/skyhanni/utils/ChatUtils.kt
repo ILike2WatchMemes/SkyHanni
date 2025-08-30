@@ -201,7 +201,7 @@ object ChatUtils {
             this.onClick(SimpleTimeMark.now().plus(keyBind.getEffectiveExpirationDuration()), true, code)
             this.hover = hover.asComponent()
         }
-        ChatPromptUtils.setActivePrompt(keyBind,code)
+        ChatPromptUtils.setActivePrompt(keyBind, code)
         chat(text)
     }
 
@@ -488,8 +488,8 @@ object ChatUtils {
     }
 
     fun suggestInChat(message: String) {
-        //TODO
-        ChatUtils.chat("Chat Suggestion is not implemented yet!")
+        // TODO
+        chat("Chat Suggestion is not implemented yet!")
     }
 
 }

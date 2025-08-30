@@ -17,7 +17,7 @@ class TranslatorConfig {
         name = "Translate On Click",
         desc = "Click on a message to translate it to your language.\n" +
             "Use §e/shcopytranslation§7 to translate from English.\n" +
-            "§cTranslation is not guaranteed to be 100% accurate."
+            "§cTranslation is not guaranteed to be 100% accurate.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -32,7 +32,7 @@ class TranslatorConfig {
     @ConfigOption(
         name = "Language Code",
         desc = "If your language doesn't show in the dropdown, enter your language code here. " +
-            "E.g. 'es' for Spanish or 'de' for German. Empty will use English."
+            "E.g. 'es' for Spanish or 'de' for German. Empty will use English.",
     )
     @ConfigEditorText
     val languageCode: Property<String> = Property.of("en")
@@ -41,7 +41,7 @@ class TranslatorConfig {
     @ConfigEditorButton(buttonText = "Open")
     val langCodesURL: Runnable = Runnable {
         openBrowser(
-            "https://cloud.google.com/translate/docs/languages#try-it-for-yourself"
+            "https://cloud.google.com/translate/docs/languages#try-it-for-yourself",
         )
     }
 }

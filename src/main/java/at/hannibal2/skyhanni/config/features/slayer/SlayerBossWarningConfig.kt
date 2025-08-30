@@ -21,7 +21,7 @@ class SlayerBossWarningConfig {
     @Expose
     @ConfigOption(
         name = "Repeat",
-        desc = "Resend the title and sound on every kill after reaching the configured percent value."
+        desc = "Resend the title and sound on every kill after reaching the configured percent value.",
     )
     @ConfigEditorBoolean
     var repeat: Boolean = false

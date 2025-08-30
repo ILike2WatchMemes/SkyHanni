@@ -30,7 +30,7 @@ object SuperPairsItemVisibility {
      */
     private val unknownSuperpairsClickPattern by ExperimentationTableApi.patternGroup.pattern(
         "superpairs.unknown-click",
-        "(?:§.)+(?:\\?|(?:Click a(?: seco)?n[dy]|Next) button(?: is instantly rewarded)?!?)"
+        "(?:§.)+(?:\\?|(?:Click a(?: seco)?n[dy]|Next) button(?: is instantly rewarded)?!?)",
     )
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)

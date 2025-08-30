@@ -8,6 +8,7 @@ import de.hype.bingonet.shared.constants.Islands
 import de.hype.bingonet.shared.objects.Position
 import de.hype.bingonet.shared.utils.skip
 
+@Suppress("UnusedPrivateProperty")
 class NeuNPC(
     @Expose
     @SerializedName("displayname")
@@ -45,7 +46,7 @@ class NeuNPC(
 
     @Expose
     @SerializedName("itemid")
-    private val item_id: String = "minecraft:skull"
+    private val itemId: String = "minecraft:skull"
 
     @Expose
     @SerializedName("damage")
@@ -59,7 +60,7 @@ class NeuNPC(
     @SerializedName("clickcommand")
     private val clickCommand: String = "viewrecipe"
 
-    //TODO whats the correct mod version here?
+    // TODO whats the correct mod version here?
     @Expose
     @SerializedName("modver")
     private val modVer: String = "2.1.1-PRE"
@@ -140,7 +141,7 @@ class NeuNPC(
 
     val allOffers: List<NeuNPCOffer>
         get() {
-            return _offers?:emptyList()
+            return _offers ?: emptyList()
         }
 
     val locations: Map<Islands, Position> by lazy {
@@ -172,14 +173,14 @@ class NeuNPC(
 
         @Expose
         @SerializedName("limit")
-        val limit: LimitData? = null
+        val limit: LimitData? = null,
     ) {
         @Expose
         @SerializedName("type")
         private val type = RecipeType.NPC_SHOP.name.lowercase()
 
-        fun getEffectiveLimit() : Int?{
-            return limit?.limit?.let { it-(it%result.count.toInt())}
+        fun getEffectiveLimit(): Int? {
+            return limit?.limit?.let { it - (it % result.count.toInt()) }
         }
 
         override fun equals(other: Any?): Boolean {

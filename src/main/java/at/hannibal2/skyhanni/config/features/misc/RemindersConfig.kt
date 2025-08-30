@@ -9,7 +9,7 @@ class RemindersConfig {
     @Expose
     @ConfigOption(
         name = "Auto Delete Reminders",
-        desc = "Automatically deletes reminders after they have been shown once."
+        desc = "Automatically deletes reminders after they have been shown once.",
     )
     @ConfigEditorBoolean
     var autoDeleteReminders: Boolean = false
@@ -17,7 +17,7 @@ class RemindersConfig {
     @Expose
     @ConfigOption(
         name = "Reminder Interval",
-        desc = "The interval in minutes in which reminders are shown again, after they have been shown once."
+        desc = "The interval in minutes in which reminders are shown again, after they have been shown once.",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 60f, minStep = 1f)
     var interval: Float = 5f

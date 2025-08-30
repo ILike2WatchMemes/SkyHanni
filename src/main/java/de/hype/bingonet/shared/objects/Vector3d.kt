@@ -3,6 +3,7 @@ package de.hype.bingonet.shared.objects
 import kotlin.math.PI
 import kotlin.math.sign
 
+@Suppress("TooManyFunctions")
 class Vector3d(val x: Double, val y: Double, val z: Double) : Comparable<Vector3d> {
 
     constructor(pos: Position) : this(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())
@@ -29,7 +30,7 @@ class Vector3d(val x: Double, val y: Double, val z: Double) : Comparable<Vector3
         return Vector3d(
             this.y * vec.z - this.z * vec.y,
             this.z * vec.x - this.x * vec.z,
-            this.x * vec.y - this.y * vec.x
+            this.x * vec.y - this.y * vec.x,
         )
     }
 
@@ -59,7 +60,7 @@ class Vector3d(val x: Double, val y: Double, val z: Double) : Comparable<Vector3
         return if (d3 in 0.0..1.0) Vector3d(
             this.x + d0 * d3,
             this.y + d1 * d3,
-            this.z + d2 * d3
+            this.z + d2 * d3,
         )
         else null
     }
@@ -74,7 +75,7 @@ class Vector3d(val x: Double, val y: Double, val z: Double) : Comparable<Vector3
         return if (d3 in 0.0..1.0) Vector3d(
             this.x + d0 * d3,
             this.y + d1 * d3,
-            this.z + d2 * d3
+            this.z + d2 * d3,
         )
         else null
     }
@@ -89,7 +90,7 @@ class Vector3d(val x: Double, val y: Double, val z: Double) : Comparable<Vector3
         return if (d3 in 0.0..1.0) Vector3d(
             this.x + d0 * d3,
             this.y + d1 * d3,
-            this.z + d2 * d3
+            this.z + d2 * d3,
         )
         else null
     }
@@ -138,8 +139,8 @@ class Vector3d(val x: Double, val y: Double, val z: Double) : Comparable<Vector3
 
     fun signumEquals(other: Vector3d): Boolean {
         return sign(x) == sign(other.x) &&
-                sign(y) == sign(other.y) &&
-                sign(z) == sign(other.z)
+            sign(y) == sign(other.y) &&
+            sign(z) == sign(other.z)
     }
 
     fun sqrt(value: Double): Double = sqrt(value)
@@ -150,7 +151,7 @@ class Vector3d(val x: Double, val y: Double, val z: Double) : Comparable<Vector3
             0, 1, 28, 2, 29, 14, 24, 3,
             30, 22, 20, 15, 25, 17, 4, 8,
             31, 27, 13, 23, 21, 19, 16, 7,
-            26, 12, 18, 6, 11, 5, 10, 9
+            26, 12, 18, 6, 11, 5, 10, 9,
         )
         private val SIZE_BITS_X = 1 + floorLog2(smallestEncompassingPowerOfTwo(30000000))
         private val SIZE_BITS_Z = SIZE_BITS_X

@@ -17,7 +17,7 @@ object AuctionOutbidWarning {
      */
     private val outbidPattern by RepoPattern.pattern(
         "auction.outbid",
-        "§6\\[Auction].*§eoutbid you by.*§e§lCLICK"
+        "§6\\[Auction].*§eoutbid you by.*§e§lCLICK",
     )
 
     @HandleEvent(onlyOnSkyblock = true)

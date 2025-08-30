@@ -34,7 +34,7 @@ class JacobContestConfig {
     @Expose
     @ConfigOption(
         name = "FF for Contest",
-        desc = "Show the minimum needed Farming Fortune for reaching each medal in Jacob's Farming Contest inventory."
+        desc = "Show the minimum needed Farming Fortune for reaching each medal in Jacob's Farming Contest inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

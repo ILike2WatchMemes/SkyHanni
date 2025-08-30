@@ -17,12 +17,13 @@ class BingoNetworksConfig {
     @Accordion
     val bingoNet: BingoNetConfig = BingoNetConfig()
     val useBN get() = bingoNet.useBN
+
     @Expose
     @ConfigOption(
         name = "Enable Bingo Brewers (§c⚠ Closed Source Server§r)",
         desc = "§c§lThe Bingo Brewers Network is a closed Source Project by indigo_polecat. " +
             "SkyHanni has no insight nor control over the Servers. " +
-            "Bingo Brewers does not support all Features and some only partially."
+            "Bingo Brewers does not support all Features and some only partially.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -39,7 +40,7 @@ class BingoNetworksConfig {
     @Expose
     @ConfigOption(name = "Highlight Splash Hub", desc = "Highlight the Splash Hubs in the Hub Selector.")
     @ConfigEditorBoolean
-    var highlightSplashHub : Boolean = true
+    var highlightSplashHub: Boolean = true
 
     @Expose
     @ConfigOption(name = "Show ChChests", desc = "Subscribe to ChChests.")
@@ -59,9 +60,23 @@ class BingoNetworksConfig {
     @ConfigEditorBoolean
     var showBingoChat: Boolean = true
 
+    @Expose
+    @ConfigOption(
+        name = "Show Goal Completions",
+        desc = "Shows a Message in the Chat when someone completes a Goal. (and Bingo Net knows)",
+    )
     var showGoalCompletions: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Show Card Completions",
+        desc = "Shows a Message in the Chat when someone completes a Bingo Card. (and Bingo Net knows)",
+    )
     var showCardCompletions: Boolean = false
 
+    @Expose
+    @ConfigOption(name = "Show Packet Traffic (Debug)", desc = "Show incoming and outgoing Packets in the Chat.")
+    @ConfigEditorBoolean
     var showPacketTraffic = false
 
 
@@ -114,5 +129,5 @@ class BingoNetworksConfig {
     @Expose
     @ConfigOption(name = "Ch Chest Overlay", desc = "Show an Overlay with the Ch Chest Items in the Lobby.")
     @ConfigEditorBoolean
-    var chChestOverlay : Boolean = true
+    var chChestOverlay: Boolean = true
 }

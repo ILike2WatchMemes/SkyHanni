@@ -13,7 +13,7 @@ class OptimalSpeedConfig {
     @ConfigOption(
         name = "Show on HUD",
         desc = "Show the optimal speed for your current tool in the hand.\n" +
-            "(Thanks §bMelonKingDE §7for the default values)."
+            "(Thanks §bMelonKingDE §7for the default values).",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -22,7 +22,7 @@ class OptimalSpeedConfig {
     @Expose
     @ConfigOption(
         name = "Wrong Speed Warning",
-        desc = "Warn via title and chat message when you don't have the optimal speed."
+        desc = "Warn via title and chat message when you don't have the optimal speed.",
     )
     @ConfigEditorBoolean
     var warning: Boolean = false
@@ -35,7 +35,7 @@ class OptimalSpeedConfig {
     @Expose
     @ConfigOption(
         name = "Rancher Boots",
-        desc = "Set the optimal speed in the Rancher Boots overlay by clicking on the presets."
+        desc = "Set the optimal speed in the Rancher Boots overlay by clicking on the presets.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

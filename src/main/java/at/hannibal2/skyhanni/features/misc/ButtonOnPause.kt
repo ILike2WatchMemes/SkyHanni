@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiIngameMenu
+
 //#if MC > 1.21
 //$$ import net.minecraft.client.gui.widget.ButtonWidget
 //$$ import net.minecraft.text.Text

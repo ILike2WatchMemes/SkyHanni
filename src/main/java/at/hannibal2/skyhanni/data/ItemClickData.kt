@@ -14,6 +14,7 @@ import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C07PacketPlayerDigging
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.client.C0APacketAnimation
+
 //#if MC > 1.21
 //$$ import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket
 //$$ import net.minecraft.util.Hand

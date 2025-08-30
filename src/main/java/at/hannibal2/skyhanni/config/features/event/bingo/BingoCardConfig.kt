@@ -18,7 +18,7 @@ class BingoCardConfig {
     @Expose
     @ConfigOption(
         name = "Quick Toggle",
-        desc = "Quickly show/hide the Bingo Card (when enabled above) or the step helper by sneaking with SkyBlock Menu in hand."
+        desc = "Quickly show/hide the Bingo Card (when enabled above) or the step helper by sneaking with SkyBlock Menu in hand.",
     )
     @ConfigEditorBoolean
     var quickToggle: Boolean = true
@@ -27,7 +27,7 @@ class BingoCardConfig {
     @ConfigOption(
         name = "Bingo Steps",
         desc = "Show help with the next step in Bingo instead of the Bingo Card.\n" +
-            "§cThis feature is in early development. Expect bugs and missing goals."
+            "§cThis feature is in early development. Expect bugs and missing goals.",
     )
     @ConfigEditorBoolean
     var stepHelper: Boolean = false
@@ -41,7 +41,7 @@ class BingoCardConfig {
     @ConfigOption(
         name = "Show Guide",
         desc = "Show tips and difficulty for bingo goals inside the Bingo Card inventory.\n" +
-            "These tips are made from inspirations and guides from the community, aiming to help you to complete the bingo card."
+            "These tips are made from inspirations and guides from the community, aiming to help you to complete the bingo card.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -54,7 +54,7 @@ class BingoCardConfig {
     @Expose
     @ConfigOption(
         name = "Next Tip Duration",
-        desc = "Show the duration until the next hidden personal goal gets a tip revealed."
+        desc = "Show the duration until the next hidden personal goal gets a tip revealed.",
     )
     @ConfigEditorBoolean
     val nextTipDuration: Property<Boolean> = Property.of(true)
@@ -62,7 +62,7 @@ class BingoCardConfig {
     @Expose
     @ConfigOption(
         name = "Hide Difficulty When Done",
-        desc = "Remove the background difficulty color in the bingo card inventory when the goal is done."
+        desc = "Remove the background difficulty color in the bingo card inventory when the goal is done.",
     )
     @ConfigEditorBoolean
     var hideDoneDifficulty: Boolean = true
@@ -70,7 +70,7 @@ class BingoCardConfig {
     @Expose
     @ConfigOption(
         name = "Community Percentages",
-        desc = "Send a chat message with the change of community goal percentages after opening the bingo card inventory."
+        desc = "Send a chat message with the change of community goal percentages after opening the bingo card inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

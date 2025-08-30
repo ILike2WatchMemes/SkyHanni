@@ -8,7 +8,7 @@ class VampireSlayerConfig {
     @Expose
     @ConfigOption(
         name = "HP Until Steak",
-        desc = "Show the amount of HP left until the Steak can be used on the Vampire Slayer on top of the boss."
+        desc = "Show the amount of HP left until the Steak can be used on the Vampire Slayer on top of the boss.",
     )
     @ConfigEditorBoolean
     var hpTillSteak: Boolean = false
@@ -16,7 +16,7 @@ class VampireSlayerConfig {
     @Expose
     @ConfigOption(
         name = "Mania Circles",
-        desc = "Show a timer until the boss leaves the invincible Mania Circles state."
+        desc = "Show a timer until the boss leaves the invincible Mania Circles state.",
     )
     @ConfigEditorBoolean
     var maniaCircles: Boolean = false

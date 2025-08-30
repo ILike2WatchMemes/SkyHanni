@@ -10,7 +10,7 @@ import com.google.gson.JsonElement
  * @param data The data of type [T] returned by the Api request, can be null if the request was unsuccessful or if no data was returned.
  * This class is used as a base class for more specific Api responses like [ZipApiResponse] and [JsonApiResponse].
  */
-open class ApiResponse<T> (open val success: Boolean, open val message: String?, open var data: T? = null) {
+open class ApiResponse<T>(open val success: Boolean, open val message: String?, open var data: T? = null) {
 
     /**
      * Asserts that the Api request was successful.
@@ -45,5 +45,5 @@ data class ZipApiResponse(
 data class JsonApiResponse<T : JsonElement>(
     override val success: Boolean,
     override val message: String? = null,
-    override var data: T? = null
+    override var data: T? = null,
 ) : ApiResponse<T>(success, message, data)

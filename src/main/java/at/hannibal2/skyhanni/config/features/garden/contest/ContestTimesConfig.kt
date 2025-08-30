@@ -13,7 +13,7 @@ class ContestTimesConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Show the time and missing FF for every crop inside Jacob's Farming Contest inventory."
+        desc = "Show the time and missing FF for every crop inside Jacob's Farming Contest inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -32,7 +32,7 @@ class ContestTimesConfig {
         @Expose
         @ConfigOption(
             name = "Custom BPS",
-            desc = "Use custom Blocks per Second value in some GUIs instead of the real one."
+            desc = "Use custom Blocks per Second value in some GUIs instead of the real one.",
         )
         @ConfigEditorBoolean
         var enabled: Boolean = true

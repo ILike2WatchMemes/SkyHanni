@@ -61,7 +61,10 @@ object BingoBrewersPackets {
         abstract fun execute(packet: T, client: Client)
 
         fun handleAsUnexpectedPacket() {
-            ChatUtils.chat("Bingo Net: Received unexpected Bingo Brewers packet. Please Report this to BINGO NET! Packet Type: " + this.javaClass.getSimpleName(), prefix = false)
+            ChatUtils.chat(
+                "Bingo Net: Received unexpected Bingo Brewers packet. Please Report this to BINGO NET! Packet Type: " + this.javaClass.getSimpleName(),
+                prefix = false,
+            )
             println(com.google.gson.Gson().toJson(this))
         }
 

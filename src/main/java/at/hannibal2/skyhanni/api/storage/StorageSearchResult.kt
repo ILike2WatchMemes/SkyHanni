@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack
 /**
  * Represents a search result from storage with location and access information
  */
-data class StorageSearchResult constructor(
+data class StorageSearchResult(
     val item: ItemStack,
     val slotIndex: Int,
     val storageName: String,
@@ -51,7 +51,7 @@ data class StorageSearchResult constructor(
             StorageCategory.PRIVATE_ISLAND_CHEST -> "$itemName§f in Private Island Chest at ${location?.toCleanString(" ")}"
         }
     }
-    //TODO: Warp manager that detects all warp locations and allows to warp to them but only if you have the scroll.
+    // TODO: Warp manager that detects all warp locations and allows to warp to them but only if you have the scroll.
 
     /**
      * Attempts to navigate to this storage location
@@ -84,11 +84,11 @@ data class StorageSearchResult constructor(
                 }
                 if (allowServerChange) consumer.invoke()
                 else {
-                    if (HypixelData.skyBlockIsland== IslandType.PRIVATE_ISLAND)
-                    ChatUtils.clickableChat(
-                        "${this.getDisplayName()} Cant access from here. Click to warp to the Private Island.",
-                        consumer,
-                    )
+                    if (HypixelData.skyBlockIsland == IslandType.PRIVATE_ISLAND)
+                        ChatUtils.clickableChat(
+                            "${this.getDisplayName()} Cant access from here. Click to warp to the Private Island.",
+                            consumer,
+                        )
                 }
             }
         }

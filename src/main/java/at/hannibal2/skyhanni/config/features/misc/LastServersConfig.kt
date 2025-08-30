@@ -16,7 +16,7 @@ class LastServersConfig {
     @Expose
     @ConfigOption(
         name = "Notification Time",
-        desc = "Get notified if you rejoin a server within the specified number of seconds."
+        desc = "Get notified if you rejoin a server within the specified number of seconds.",
     )
     @ConfigEditorSlider(minValue = 5f, maxValue = 300f, minStep = 1f)
     var warnTime: Int = 60

@@ -20,14 +20,14 @@ class TabWidgetConfig {
 
     @ConfigOption(
         name = "Not working Info",
-        desc = "If the information isn't shown in the tablist it won't show anything. Use /widget to turn on the information you need."
+        desc = "If the information isn't shown in the tablist it won't show anything. Use /widget to turn on the information you need.",
     )
     @ConfigEditorInfoText
     var warning: String? = null
 
     @ConfigOption(
         name = "Enable Info",
-        desc = "Drag only one new value at time into the list, since the default locations are all the same."
+        desc = "Drag only one new value at time into the list, since the default locations are all the same.",
     )
     @ConfigEditorInfoText
     var warning2: String? = null

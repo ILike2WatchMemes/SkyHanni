@@ -6,6 +6,7 @@ import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 //#if MC < 1.21
 import net.minecraft.util.IChatComponent
+
 //#endif
 
 object GuiChatHook {
@@ -20,7 +21,7 @@ object GuiChatHook {
 
         // Initialise new component
         val newComponent = title.asComponent()
-        newComponent.setChatStyle(chatStyle)
+        newComponent.chatStyle = chatStyle
 
         replacement = newComponent
     }

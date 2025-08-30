@@ -118,7 +118,7 @@ data class ComplexCommand<O : CommandContextAwareObject>(
         return result
     }
 
-    override fun addTabCompletionOptions(sender: ICommandSender, args: Array<String>, pos: BlockPos): List<String>? {
+    override fun addTabCompletionOptions(sender: ICommandSender, args: Array<String>, pos: BlockPos): List<String> {
         val rawArgs = args.toList()
         val isPartial = rawArgs.last().isNotEmpty()
         val newArgs = if (isPartial) rawArgs.dropLast(1) else rawArgs

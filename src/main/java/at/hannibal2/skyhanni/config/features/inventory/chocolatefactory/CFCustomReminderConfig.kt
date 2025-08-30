@@ -12,7 +12,7 @@ class CFCustomReminderConfig {
     @ConfigOption(
         name = "Enabled",
         desc = "Show a custom reminder until you can purchase the next upgrade.\n" +
-            "Click on one item you cant buy to select/deselect it."
+            "Click on one item you cant buy to select/deselect it.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -21,7 +21,7 @@ class CFCustomReminderConfig {
     @Expose
     @ConfigOption(
         name = "Always Custom Reminder",
-        desc = "Always show the display, even outside the chocolate factory."
+        desc = "Always show the display, even outside the chocolate factory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -30,7 +30,7 @@ class CFCustomReminderConfig {
     @Expose
     @ConfigOption(
         name = "Hide No Chocolate Message",
-        desc = "Hide the chat message about not having enough chocolate to buy/purchase something."
+        desc = "Hide the chat message about not having enough chocolate to buy/purchase something.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

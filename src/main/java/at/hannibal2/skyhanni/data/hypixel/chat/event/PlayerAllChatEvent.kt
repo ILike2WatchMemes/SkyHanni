@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data.hypixel.chat.event
 
 import at.hannibal2.skyhanni.utils.ComponentSpan
 import net.minecraft.util.IChatComponent
+
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.compat.toChatFormatting
 //#endif
@@ -19,6 +20,7 @@ class PlayerAllChatEvent(
     val levelColor =
         //#if MC < 1.21
         levelComponent?.sampleStyleAtStart()?.color
+
     //#else
     //$$ levelComponent?.sampleStyleAtStart()?.color?.toChatFormatting()
     //#endif

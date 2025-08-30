@@ -75,7 +75,7 @@ class EstimatedItemValueConfig {
     @Expose
     @ConfigOption(
         name = "Change Price Source",
-        desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC."
+        desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC.",
     )
     @ConfigEditorDropdown
     val priceSource: Property<ItemPriceSource> = Property.of(ItemPriceSource.BAZAAR_INSTANT_SELL)

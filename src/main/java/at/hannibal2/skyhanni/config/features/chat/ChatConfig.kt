@@ -242,13 +242,13 @@ class ChatConfig {
         desc = "Some NPCs have dialogue that you need to answer (stuff like §a[Yes]§r)",
     )
     @Accordion
-    val npcResponseSuggestion : KeyBind = KeyBind()
+    val npcResponseSuggestion: KeyBind = KeyBind()
 
 
     @Expose
     @ConfigOption(
         name = "Contains Command Tab Completion",
-        desc = "Suggestion will be matched based on contains instead of start matching."
+        desc = "Suggestion will be matched based on contains instead of start matching.",
     )
     @ConfigEditorBoolean
     var tabCompletionUseContainsSuggestion: Boolean = false
@@ -256,7 +256,7 @@ class ChatConfig {
     @Expose
     @ConfigOption(
         name = "Ignore Case Command Completion",
-        desc = "Suggestion will be matched based on contains instead of start matching."
+        desc = "Suggestion will be matched based on contains instead of start matching.",
     )
     @ConfigEditorBoolean
     var tabIgnoreCaseSuggestion: Boolean = true

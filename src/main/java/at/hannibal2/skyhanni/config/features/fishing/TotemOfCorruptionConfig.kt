@@ -18,7 +18,7 @@ class TotemOfCorruptionConfig {
         name = "Show Overlay",
         desc = "Show the Totem of Corruption overlay.\n" +
             "Shows the totem, in which effective area you are in, with the longest time left.\n" +
-            "§eThis needs to be enabled for the other options to work."
+            "§eThis needs to be enabled for the other options to work.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -29,7 +29,7 @@ class TotemOfCorruptionConfig {
         name = "Distance Threshold",
         desc = "The minimum distance to the Totem of Corruption for the overlay.\n" +
             "The effective distance of the totem is 16.\n" +
-            "§cLimited by how far you can see the nametags."
+            "§cLimited by how far you can see the nametags.",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 1f)
     var distanceThreshold: Int = 16
@@ -38,7 +38,7 @@ class TotemOfCorruptionConfig {
     @ConfigOption(
         name = "Hide Particles",
         desc = "Hide the particles of the Totem of Corruption.\n" +
-            "§eRequires the Overlay to be active."
+            "§eRequires the Overlay to be active.",
     )
     @ConfigEditorBoolean
     var hideParticles: Boolean = true
@@ -46,7 +46,7 @@ class TotemOfCorruptionConfig {
     @Expose
     @ConfigOption(
         name = "Show Effective Area",
-        desc = "Show the effective area (16 blocks) of the Totem of Corruption."
+        desc = "Show the effective area (16 blocks) of the Totem of Corruption.",
     )
     @ConfigEditorDropdown
     var outlineType: OutlineType = OutlineType.FILLED
@@ -69,7 +69,7 @@ class TotemOfCorruptionConfig {
     @ConfigOption(
         name = "Warn when about to expire",
         desc = "Select the time in seconds when the totem is about to expire to warn you.\n" +
-            "Select 0 to disable."
+            "Select 0 to disable.",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 60f, minStep = 1f)
     var warnWhenAboutToExpire: Int = 5

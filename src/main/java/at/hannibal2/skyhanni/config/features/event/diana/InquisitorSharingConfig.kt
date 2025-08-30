@@ -23,7 +23,7 @@ class InquisitorSharingConfig {
     @Expose
     @ConfigOption(
         name = "Instant Share",
-        desc = "Share the waypoint as soon as you find an Inquisitor. As an alternative, you can share it only via key press."
+        desc = "Share the waypoint as soon as you find an Inquisitor. As an alternative, you can share it only via key press.",
     )
     @ConfigEditorBoolean
     var instantShare: Boolean = true
@@ -46,7 +46,7 @@ class InquisitorSharingConfig {
     @Expose
     @ConfigOption(
         name = "Read Global Chat",
-        desc = "Also read the global chat for detecting inquistiors, not only party chat."
+        desc = "Also read the global chat for detecting inquistiors, not only party chat.",
     )
     @ConfigEditorBoolean
     var globalChat: Boolean = false

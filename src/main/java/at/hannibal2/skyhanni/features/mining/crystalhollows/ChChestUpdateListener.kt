@@ -167,6 +167,7 @@ object ChChestUpdateListener {
         }
     }
 
+    @Suppress("ReturnCount", "CyclomaticComplexMethod")
     fun showChChest(items: Map<ChChestItem, IntRange>): Boolean {
         if (SkyBlockUtils.isBingoProfile) return false
         if ((ProfileStorageData.profileSpecific?.mining?.hotmLevel ?: 0) < 4) return false
@@ -199,7 +200,7 @@ object ChChestUpdateListener {
                 ChatUtils.chatPrompt(
                     "§e[SH-BN] A CH Chest with the following valuable items was found:\n" +
                         " $items\n Press §a%KEY%§r to request a party invite for a warp.",
-                    chChestConfig.chChestChatPromp,
+                    chChestConfig.chChestChatPrompt,
                     {
                         BNConnection.sendPacket(RequestServerWarpPacket(packet.server))
                     },

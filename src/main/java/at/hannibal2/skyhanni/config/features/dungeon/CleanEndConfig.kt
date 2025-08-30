@@ -10,7 +10,7 @@ class CleanEndConfig {
     @ConfigOption(
         name = "Enabled",
         desc = "After the last Dungeon boss has died, all entities and " +
-            "particles are no longer displayed and the music stops playing, but the loot chests are still displayed."
+            "particles are no longer displayed and the music stops playing, but the loot chests are still displayed.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -20,7 +20,7 @@ class CleanEndConfig {
     @ConfigOption(
         name = "Ignore Guardians",
         desc = "Ignore F3 and M3 Guardians from the clean end feature when " +
-            "sneaking. Makes it easier to kill them after the boss dies. Thanks Hypixel."
+            "sneaking. Makes it easier to kill them after the boss dies. Thanks Hypixel.",
     )
     @ConfigEditorBoolean
     var f3IgnoreGuardians: Boolean = false

@@ -24,7 +24,7 @@ class MiningNotificationsConfig {
         MiningNotificationList.SCRAP,
         MiningNotificationList.COLD,
         MiningNotificationList.GOLDEN_GOBLIN,
-        MiningNotificationList.DIAMOND_GOBLIN
+        MiningNotificationList.DIAMOND_GOBLIN,
     )
 
     @Expose
@@ -41,7 +41,7 @@ class MiningNotificationsConfig {
     @ConfigOption(
         name = "Get Ascension Rope",
         desc = "Click on a chat message to get an Ascension Rope when you're at a certain amount of Cold and in the §bMineshaft§7. " +
-            "§cOnly works if you have an Ascension Rope in your sacks."
+            "§cOnly works if you have an Ascension Rope in your sacks.",
     )
     @ConfigEditorBoolean
     var getAscensionRope: Boolean = true
@@ -49,7 +49,7 @@ class MiningNotificationsConfig {
     @Expose
     @ConfigOption(
         name = "Cold Amount to Show Message",
-        desc = "Customise the amount of Cold you need to have to get the Ascension Rope message."
+        desc = "Customise the amount of Cold you need to have to get the Ascension Rope message.",
     )
     @ConfigEditorSlider(minValue = 1f, maxValue = 100f, minStep = 1f)
     var coldAmount: Int = 90

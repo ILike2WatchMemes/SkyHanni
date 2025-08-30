@@ -12,7 +12,7 @@ class RiftTimerConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Show the remaining rift time, max time, percentage, and extra time changes."
+        desc = "Show the remaining rift time, max time, percentage, and extra time changes.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

@@ -18,5 +18,5 @@ class DisconnectPacket
     val waitBeforeReconnect: IntArray,
     val randomExtraDelay: Int,
     val displayReason: String?,
-    val displayMessage: String?
+    val displayMessage: String?,
 ) : AbstractPacket()

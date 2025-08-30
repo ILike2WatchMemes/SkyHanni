@@ -56,7 +56,7 @@ object ChatManager {
         backingMessageHistory,
         postUpdate = { key, value ->
             if (value == null) replacementReasonMap.remove(key)
-        }
+        },
     )
 
     private val replacementReasonMap: MutableMap<IdentityCharacteristics<IChatComponent>, String> = mutableMapOf()

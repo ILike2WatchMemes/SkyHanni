@@ -114,15 +114,18 @@ object BingoBrewersClient {
     }
 
     @HandleEvent
-    fun commandRegistration(event: CommandRegistrationEvent){
-        event.registerBrigadier("bingobrewersreconnect",{
-            category = CommandCategory.BINGO_NET
-            description = "Reload the Bingo Brewers Client"
-            simpleCallback {
-                client?.close()
-                init()
-            }
-        })
+    fun commandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier(
+            "bingobrewersreconnect",
+            {
+                category = CommandCategory.BINGO_NET
+                description = "Reload the Bingo Brewers Client"
+                simpleCallback {
+                    client?.close()
+                    init()
+                }
+            },
+        )
     }
 
 

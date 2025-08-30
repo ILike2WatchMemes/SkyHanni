@@ -12,7 +12,7 @@ class HalloweenBasketConfig {
     @ConfigOption(
         name = "Enabled",
         desc = "Show all Halloween Basket waypoints.\n" +
-            "§eCoordinates may not always be up to date!"
+            "§eCoordinates may not always be up to date!",
     )
     @ConfigEditorBoolean
     @FeatureToggle

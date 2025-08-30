@@ -4,7 +4,7 @@ package de.hype.bingonet.generated.sbenums.minions
  * Enums for suggested values for minion types. Not required up to date but can be tried.
  */
 
-public enum class MinionTypes {
+enum class MinionTypes {
     LAPIS_GENERATOR,
     PIG_GENERATOR,
     FLOWER_GENERATOR,

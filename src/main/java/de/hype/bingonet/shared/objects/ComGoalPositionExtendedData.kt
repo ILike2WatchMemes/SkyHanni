@@ -7,7 +7,7 @@ import java.time.temporal.ChronoUnit
 class ComGoalPositionExtendedData(
     @JvmField val position: ComGoalPosition,
     val mcuuid: java.util.UUID,
-    @JvmField val fromTime: Instant
+    @JvmField val fromTime: Instant,
 ) {
     val referenceTime: Instant?
         get() {

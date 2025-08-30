@@ -25,7 +25,7 @@ object Dungeons {
             HypixelCommands.partyChat("Dungeon Skill Level Up: ${group("newLevel")}")
         }
         if (config.sendImportantCataMilestones) {
-        //TODO add the cata milestone pattern check and post
+            // TODO add the cata milestone pattern check and post
         }
     }
 }

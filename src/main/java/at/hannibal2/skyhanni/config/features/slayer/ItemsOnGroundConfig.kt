@@ -10,7 +10,7 @@ class ItemsOnGroundConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Show the name and price of items laying on the ground. §cOnly in slayer areas!"
+        desc = "Show the name and price of items laying on the ground. §cOnly in slayer areas!",
     )
     @ConfigEditorBoolean
     @FeatureToggle

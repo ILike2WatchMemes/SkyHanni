@@ -236,7 +236,7 @@ object AttributeShardOverlay {
                 storage?.forEach { it.value.amountInBox = 0 }
                 ChatUtils.chat("Reset hunting box shards data")
                 reconstructDisplay()
-            }
+            },
         )
         add(clickable)
     }

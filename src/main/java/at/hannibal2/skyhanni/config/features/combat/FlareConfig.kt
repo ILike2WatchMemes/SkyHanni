@@ -41,7 +41,7 @@ class FlareConfig {
     @Expose
     @ConfigOption(
         name = "Warn when about to expire",
-        desc = "Select the time in seconds when a flare is about to expire to warn you."
+        desc = "Select the time in seconds when a flare is about to expire to warn you.",
     )
     @ConfigEditorSlider(minValue = 1f, maxValue = 60f, minStep = 1f)
     var warnWhenAboutToExpire: Int = 5

@@ -1,13 +1,13 @@
 package de.hype.bingonet.environment.packetconfig
 
+import java.awt.Color
+import java.time.Duration
+import java.time.Instant
 import de.hype.bingonet.shared.json.ColorSerializer
 import de.hype.bingonet.shared.json.DurationSerializer
 import de.hype.bingonet.shared.json.InstantSerializer
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import java.awt.Color
-import java.time.Duration
-import java.time.Instant
 
 object BNGson {
     var ownSerializer: Gson = GsonBuilder().create()

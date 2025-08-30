@@ -15,7 +15,7 @@ class RngMeterConfig {
     @Expose
     @ConfigOption(
         name = "No Drop",
-        desc = "Highlight floors without a drop selected in the Catacombs RNG Meter inventory."
+        desc = "Highlight floors without a drop selected in the Catacombs RNG Meter inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -24,7 +24,7 @@ class RngMeterConfig {
     @Expose
     @ConfigOption(
         name = "Selected Drop",
-        desc = "Highlight the selected drop in the Catacombs or Slayer RNG Meter inventory."
+        desc = "Highlight the selected drop in the Catacombs or Slayer RNG Meter inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

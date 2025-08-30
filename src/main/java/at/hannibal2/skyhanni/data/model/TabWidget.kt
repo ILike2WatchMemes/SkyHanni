@@ -283,7 +283,7 @@ enum class TabWidget(
          * REGEX-TEST: §r§fNo Bait: §r§7None
          */
         // language=RegExp
-        "(?:§.)*No Bait: (?:§.)*(?:None|§r§c(?<traps>#\\d(?:§r§7, §r§c#\\d(?:§r§7, §r§c#\\d)?)?))"
+        "(?:§.)*No Bait: (?:§.)*(?:None|§r§c(?<traps>#\\d(?:§r§7, §r§c#\\d(?:§r§7, §r§c#\\d)?)?))",
     ),
     VISITORS(
         // language=RegExp
@@ -361,7 +361,7 @@ enum class TabWidget(
     ),
     SHARD_TRAPS(
         // language=RegExp
-        "(?:§.)*Shard Traps"
+        "(?:§.)*Shard Traps",
     ),
     STARBORN_TEMPLE(
         // language=RegExp

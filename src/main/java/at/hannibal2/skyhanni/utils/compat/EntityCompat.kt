@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.world.World
 //#if MC < 1.16
 import net.minecraft.entity.monster.EntitySkeleton
+
 //#else
 //$$ import net.minecraft.world.entity.monster.WitherSkeleton
 //$$ import net.minecraft.world.entity.EquipmentSlot

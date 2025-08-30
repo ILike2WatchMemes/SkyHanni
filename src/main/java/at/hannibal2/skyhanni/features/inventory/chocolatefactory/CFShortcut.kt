@@ -31,7 +31,7 @@ object CFShortcut {
             "§8(From SkyHanni)",
             "",
             "§7Click here to run",
-            "§e/chocolatefactory"
+            "§e/chocolatefactory",
         )
     }
 

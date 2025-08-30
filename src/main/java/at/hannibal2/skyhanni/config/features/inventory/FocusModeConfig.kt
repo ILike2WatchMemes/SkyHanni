@@ -12,7 +12,7 @@ class FocusModeConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "In focus mode you only see the name of the item instead of the whole description. §eSet a Toggle key below to use."
+        desc = "In focus mode you only see the name of the item instead of the whole description. §eSet a Toggle key below to use.",
     )
     @SearchTag("compact hide")
     @ConfigEditorBoolean
@@ -27,7 +27,7 @@ class FocusModeConfig {
     @Expose
     @ConfigOption(
         name = "Disable Hint",
-        desc = "Disable the line in item tooltips that shows how to enable or disable this feature via key press."
+        desc = "Disable the line in item tooltips that shows how to enable or disable this feature via key press.",
     )
     @ConfigEditorBoolean
     var disableHint: Boolean = false

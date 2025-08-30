@@ -22,7 +22,7 @@ class QuickModMenuSwitchConfig {
     @Expose
     @ConfigOption(
         name = "Inside Inventory",
-        desc = "Show the mod list while inside the player inventory (no chest inventory)."
+        desc = "Show the mod list while inside the player inventory (no chest inventory).",
     )
     @ConfigEditorBoolean
     var insidePlayerInventory: Boolean = false

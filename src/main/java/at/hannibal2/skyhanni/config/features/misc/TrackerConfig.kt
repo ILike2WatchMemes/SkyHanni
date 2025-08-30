@@ -25,7 +25,7 @@ class TrackerConfig {
     @Expose
     @ConfigOption(
         name = "Change Price Source",
-        desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC."
+        desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC.",
     )
     @ConfigEditorDropdown
     var priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY
@@ -55,7 +55,7 @@ class TrackerConfig {
         @Expose
         @ConfigOption(
             name = "Price in Chat",
-            desc = "Show an extra chat message when you pick up an expensive item. (This contains name, amount and price)"
+            desc = "Show an extra chat message when you pick up an expensive item. (This contains name, amount and price)",
         )
         @ConfigEditorBoolean
         @FeatureToggle
@@ -105,8 +105,8 @@ class TrackerConfig {
         mutableListOf(
             TextPart.AMOUNT,
             TextPart.NAME,
-            TextPart.TOTAL_PRICE
-        )
+            TextPart.TOTAL_PRICE,
+        ),
     )
 
     enum class TextPart(private val displayName: String) {

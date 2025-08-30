@@ -14,7 +14,7 @@ class DungeonsRaceGuideConfig {
     @ConfigOption(
         name = "Enabled",
         desc = "Show a guide for each of the Dungeon Hub races.\n" +
-            "§eCurrently only works with No Return; Nothing at all races."
+            "§eCurrently only works with No Return; Nothing at all races.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

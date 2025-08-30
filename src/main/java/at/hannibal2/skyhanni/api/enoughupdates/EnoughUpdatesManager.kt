@@ -463,7 +463,7 @@ object EnoughUpdatesManager {
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         neuPetsJson = event.getConstant<NeuPetsJson>("pets")
         neuPetNums = event.getConstant<JsonObject>("petnums")
-        neuMinionTypes =  event.getConstant<List<NeuMinionTypeData>>("minions")
+        neuMinionTypes = event.getConstant<List<NeuMinionTypeData>>("minions")
             .associateBy { it.typeId }
         if (itemMap.isNotEmpty()) {
             ChatUtils.chat("Reloaded ${itemMap.size.addSeparators()} items in the NEU repo")
@@ -484,17 +484,17 @@ object EnoughUpdatesManager {
         ChatUtils.chat("  §aNEU Repo Item Status:\n  $status", prefix = false)
     }
 
-    fun getMinionType(minionId: String) : MinionType? {
+    fun getMinionType(minionId: String): MinionType? {
         val minionId = minionId.replace("_\\d+".toRegex(), "")
         return neuMinionTypes?.get(minionId)
     }
 
-    fun getTypeMinions(type: MinionType) : List<MinionData>? {
+    fun getTypeMinions(type: MinionType): List<MinionData> {
         TODO("Not yet implemented")
-        //Scan all items in neu repo including lore to parse the minion data such as base storage and speed for all tiers.
+        // Scan all items in neu repo including lore to parse the minion data such as base storage and speed for all tiers.
     }
 
-    val allSkyblockItemIds : Set<String> by lazy {
-        itemMap.keys.map { it.replace("-",":") }.toHashSet()
+    val allSkyblockItemIds: Set<String> by lazy {
+        itemMap.keys.map { it.replace("-", ":") }.toHashSet()
     }
 }

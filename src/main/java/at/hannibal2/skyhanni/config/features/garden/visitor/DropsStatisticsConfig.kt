@@ -13,7 +13,7 @@ class DropsStatisticsConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Tally statistics about visitors and the rewards you have received from them."
+        desc = "Tally statistics about visitors and the rewards you have received from them.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -36,8 +36,8 @@ class DropsStatisticsConfig {
             DropsStatisticsTextEntry.OVERGROWN_GRASS,
             DropsStatisticsTextEntry.GREEN_BANDANA,
             DropsStatisticsTextEntry.DEDICATION_IV,
-            DropsStatisticsTextEntry.COPPER_DYE
-        )
+            DropsStatisticsTextEntry.COPPER_DYE,
+        ),
     )
 
     /**
@@ -84,7 +84,7 @@ class DropsStatisticsConfig {
     @ConfigOption(
         name = "Display Numbers First",
         desc = "Whether the number or drop name displays first.\n" +
-            "§eNote: Will not update the preview above!"
+            "§eNote: Will not update the preview above!",
     )
     @ConfigEditorBoolean
     val displayNumbersFirst: Property<Boolean> = Property.of(true)
@@ -93,7 +93,7 @@ class DropsStatisticsConfig {
     @ConfigOption(
         name = "Display Icons",
         desc = "Replace the drop names with icons.\n" +
-            "§eNote: Will not update the preview above!"
+            "§eNote: Will not update the preview above!",
     )
     @ConfigEditorBoolean
     val displayIcons: Property<Boolean> = Property.of(false)

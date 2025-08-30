@@ -14,6 +14,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider
 import com.mojang.brigadier.tree.CommandNode
 //#if MC < 1.21
 import net.minecraft.command.ICommand
+
 //#endif
 
 typealias LiteralCommandBuilder = BrigadierBuilder<LiteralArgumentBuilder<Any?>>

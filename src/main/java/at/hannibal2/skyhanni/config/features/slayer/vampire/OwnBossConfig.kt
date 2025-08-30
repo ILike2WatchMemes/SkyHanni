@@ -28,7 +28,7 @@ class OwnBossConfig {
     @Expose
     @ConfigOption(
         name = "Twinclaws Title",
-        desc = "Send a title when Twinclaws is about to happen.\nWorks on others highlighted people boss."
+        desc = "Send a title when Twinclaws is about to happen.\nWorks on others highlighted people boss.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

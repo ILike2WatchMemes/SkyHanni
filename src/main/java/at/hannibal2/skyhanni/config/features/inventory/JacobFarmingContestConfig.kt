@@ -11,7 +11,7 @@ class JacobFarmingContestConfig {
     @Expose
     @ConfigOption(
         name = "Unclaimed Rewards",
-        desc = "Highlight contests with unclaimed rewards in the Jacob inventory."
+        desc = "Highlight contests with unclaimed rewards in the Jacob inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -26,7 +26,7 @@ class JacobFarmingContestConfig {
     @Expose
     @ConfigOption(
         name = "Open On Elite",
-        desc = "Open the contest on §eelitebot.dev§7 when pressing this key in Jacob's menu or the calendar."
+        desc = "Open the contest on §eelitebot.dev§7 when pressing this key in Jacob's menu or the calendar.",
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var openOnElite: Int = Keyboard.KEY_NONE
@@ -35,7 +35,7 @@ class JacobFarmingContestConfig {
     @ConfigOption(
         name = "Medal Icon",
         desc = "Add a symbol that shows what medal you received in this Contest. " +
-            "§eIf you use a texture pack this may cause conflicting icons."
+            "§eIf you use a texture pack this may cause conflicting icons.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -44,7 +44,7 @@ class JacobFarmingContestConfig {
     @Expose
     @ConfigOption(
         name = "Finnegan Icon",
-        desc = "Use a different indicator for when the Contest happens during Mayor Finnegan."
+        desc = "Use a different indicator for when the Contest happens during Mayor Finnegan.",
     )
     @ConfigEditorBoolean
     var finneganIcon: Boolean = true

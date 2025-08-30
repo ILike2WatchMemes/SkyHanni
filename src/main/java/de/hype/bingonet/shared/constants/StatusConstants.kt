@@ -22,17 +22,20 @@ enum class StatusConstants(@JvmField var displayName: String, @JvmField var colo
         return displayName
     }
 
-    fun toEnumString(): String? {
+    fun toEnumString(): String {
         return super.toString()
     }
 
 
     companion object {
         @JvmStatic
+        @Suppress("ComplexCondition")
         fun getSplashStatus(string: String?): StatusConstants {
             for (value in entries) {
-                if (value == DONEGOOD || value == ONGOING || value == OPEN || value == CLOSING || value == CLOSINGSOON || value == LEAVINGSOON || value == CLOSED || value == LEFT) {
-                    continue
+                when (value) {
+                    DONEGOOD, ONGOING, OPEN, CLOSING, CLOSINGSOON, LEAVINGSOON, CLOSED, LEFT -> continue
+                    else -> {
+                    }
                 }
                 if (value.toEnumString().equals(string, ignoreCase = true)) {
                     return value

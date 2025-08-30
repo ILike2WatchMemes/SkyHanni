@@ -36,8 +36,9 @@ enum class PermissionLevel(val displayName: String) {
 }
 
 class PartyCommandsConfig {
+
+    //     @ConfigOption(name = "Users", desc = "Configure permissions for specific user")
     @Expose
-//     @ConfigOption(name = "Users", desc = "Configure permissions for specific user")
     @NoConfigLink
     val users: MutableMap<String, TrustUserConfig> = mutableMapOf()
 
@@ -143,7 +144,7 @@ class PartyCommandsConfig {
     @ConfigOption(
         name = "Ping",
         desc = "Sends current ping into Party Chat if someone types §b!ping§7.\n" +
-                "§cNote: Will not work correctly with the Hypixel Ping API turned off in Dev.",
+            "§cNote: Will not work correctly with the Hypixel Ping API turned off in Dev.",
     )
     var pingCommand: Boolean = false
 

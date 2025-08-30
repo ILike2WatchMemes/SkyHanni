@@ -32,7 +32,7 @@ object SplashManager {
                 splashPool.remove(splash.splashId)
             },
         )
-        SplashManager.display(splash.splashId, source)
+        display(splash.splashId, source)
     }
 
     fun updateSplash(packet: SplashUpdatePacket) {
@@ -47,9 +47,11 @@ object SplashManager {
         }
     }
 
-    fun getSplashInServer(mustBeFromSelf: Boolean,serverId: String? = HypixelData.serverId): DisplaySplash? {
+    fun getSplashInServer(mustBeFromSelf: Boolean, serverId: String? = HypixelData.serverId): DisplaySplash? {
         if (serverId == null) return null
-        return splashPool.values.filter { it.serverID == serverId }.filter { !mustBeFromSelf || it.announcer.equals( PlayerUtils.getName(), ignoreCase = true) }.sortedBy { it.receivedTime }.firstOrNull()
+        return splashPool.values.filter { it.serverID == serverId }
+            .filter { !mustBeFromSelf || it.announcer.equals(PlayerUtils.getName(), ignoreCase = true) }.sortedBy { it.receivedTime }
+            .firstOrNull()
     }
 
     enum class SplashSource {
@@ -60,7 +62,6 @@ object SplashManager {
     fun display(splashId: Int, source: SplashSource) {
         val splash = splashPool.get(splashId)
         if (splash == null) return
-        var tellraw: String
         if (splash.hubSelectorData == null) {
             ChatUtils.chatPrompt(
                 "§d${splash.announcer} is Splashing in a §4PRIVATE§r Lobby.",

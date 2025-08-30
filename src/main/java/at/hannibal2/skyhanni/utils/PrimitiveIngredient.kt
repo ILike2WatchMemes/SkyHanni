@@ -29,20 +29,19 @@ class PrimitiveIngredient(val internalName: NeuInternalName, val count: Double =
 
     override fun toString() = "$internalName x$count"
 
-    fun toSkyblockString() : String {
+    fun toSkyblockString(): String {
         if (internalName == SKYBLOCK_COIN) {
             if (count == 1.0) {
                 return "§61 Coin"
-            }else {
+            } else {
                 return "§6${count.addSeparators()} Coins"
             }
-        }else if (internalName == NeuInternalName.SKYBLOCK_CHOCOLATE) {
+        } else if (internalName == NeuInternalName.SKYBLOCK_CHOCOLATE) {
             return "§6${count.addSeparators()} Chocolate"
-        }
-        else if (internalName == NeuInternalName.SKYBLOCK_COPPER) {
+        } else if (internalName == NeuInternalName.SKYBLOCK_COPPER) {
             return "§c${count.addSeparators()} Copper"
         } else {
-            return internalName.displayName+" §8x64"
+            return internalName.displayName + " §8x64"
         }
     }
 

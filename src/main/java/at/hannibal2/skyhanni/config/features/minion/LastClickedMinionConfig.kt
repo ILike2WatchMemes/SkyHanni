@@ -12,7 +12,7 @@ class LastClickedMinionConfig {
     @Expose
     @ConfigOption(
         name = "Last Minion Display",
-        desc = "Mark the location of the last clicked minion, even through walls."
+        desc = "Mark the location of the last clicked minion, even through walls.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

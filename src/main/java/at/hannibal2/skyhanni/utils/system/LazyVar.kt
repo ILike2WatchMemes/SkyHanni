@@ -12,6 +12,7 @@ class LazyVar<T>(val initializer: () -> T) : ReadWriteProperty<Any?, T> {
     private var _value: T? = null
     override fun getValue(thisRef: Any?, property: KProperty<*>): T =
         _value ?: initializer().also { _value = it }
+
     override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
         _value = value
     }

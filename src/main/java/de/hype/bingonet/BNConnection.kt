@@ -4,11 +4,11 @@ package de.hype.bingonet
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.event.bingo.BingoNetConfig
+import at.hannibal2.skyhanni.config.features.event.bingo.BingoNetSystem
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.effect.EffectApi
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.bingo.bingonet.RegistrationScreen
 import at.hannibal2.skyhanni.features.bingo.bingonet.SplashManager
@@ -86,6 +86,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toKotlinDuration
 
 @SkyHanniModule
+@Suppress("UnusedParameter")
 object BNConnection {
     var messageReceiverThread: Thread? = null
     var messageSenderThread: Thread? = null
@@ -355,7 +356,7 @@ object BNConnection {
 
     suspend fun BNConnection.reconnectToBNServer(
         ignoreIfConnected: Boolean = true,
-        system: BingoNetConfig.BingoNetSystem = bnConfig.system,
+        system: BingoNetSystem = bnConfig.system,
         packetIntercepts: List<InterceptPacketInfo<*>> = emptyList(),
     ) {
         disconnect()
@@ -403,7 +404,7 @@ object BNConnection {
             ChatUtils.clickableChat(
                 "§6BC > §r$prefix ${packet.username}: ${packet.message}",
                 {
-                  ChatUtils.suggestInChat("/bc @${packet.username} ")
+                    ChatUtils.suggestInChat("/bc @${packet.username} ")
                 },
                 "Bingo Cards: ${packet.bingo_cards}",
                 prefix = false,
@@ -475,8 +476,8 @@ object BNConnection {
         if (config.allowBNServerPartyManagement) {
             val isInParty = PartyApi.isInParty()
             if (!isInParty && !(packet.type == PartyConstants.JOIN || packet.type == PartyConstants.ACCEPT || packet.type == PartyConstants.INVITE)) return
-            val leader = PartyApi.isPartyLeader()
-            val moderator = PartyApi.isModerator()
+            PartyApi.isPartyLeader()
+            PartyApi.isModerator()
 
             if (packet.type == PartyConstants.JOIN) {
                 PartyApi.leaveParty()
@@ -627,6 +628,7 @@ object BNConnection {
         }
     }
 
+
     fun onGetWaypointsPacket(packet: GetWaypointsPacket) {
         sendPacket(
             GetWaypointsPacket(
@@ -749,9 +751,6 @@ object BNConnection {
         return bnConfig.useBN
     }
 
-    fun autoInit(event: HypixelJoinEvent){
-        //do nothing but init this file
-    }
 }
 
 fun Position.toLorenz(): LorenzVec {

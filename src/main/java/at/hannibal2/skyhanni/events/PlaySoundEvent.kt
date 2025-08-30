@@ -10,7 +10,7 @@ class PlaySoundEvent(
     val rawSoundName: String,
     override val location: LorenzVec,
     val pitch: Float,
-    val volume: Float
+    val volume: Float,
 ) : CancellableWorldEvent() {
 
     val soundName by lazy { getSoundName(rawSoundName) }

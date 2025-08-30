@@ -24,6 +24,7 @@ import java.util.regex.PatternSyntaxException
 //#if FORGE
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
+
 //#endif
 
 /**

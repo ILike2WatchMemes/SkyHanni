@@ -18,7 +18,7 @@ class CompletedGoalPacket
     var lore: String,
     @JvmField var completionType: CompletionType,
     var progress: Int,
-    @JvmField var shouldBroadcast: Boolean
+    @JvmField var shouldBroadcast: Boolean,
 ) : AbstractPacket() {
     enum class CompletionType {
         CARD,

@@ -10,7 +10,7 @@ class PlayerMessagesConfig {
     @Expose
     @ConfigOption(
         name = "Enable Chat Formatting",
-        desc = "Enable player chat modifications. Required for all settings below."
+        desc = "Enable player chat modifications. Required for all settings below.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -25,7 +25,7 @@ class PlayerMessagesConfig {
         MessagePart.PRIVATE_ISLAND_GUEST,
         MessagePart.PLAYER_NAME,
         MessagePart.GUILD_RANK,
-        MessagePart.EMBLEM
+        MessagePart.EMBLEM,
     )
 
     enum class MessagePart(private val displayName: String) {
@@ -46,7 +46,7 @@ class PlayerMessagesConfig {
     @Expose
     @ConfigOption(
         name = "Hide Level Brackets",
-        desc = "Hide the gray brackets in front of and behind the level numbers."
+        desc = "Hide the gray brackets in front of and behind the level numbers.",
     )
     @ConfigEditorBoolean
     var hideLevelBrackets: Boolean = false
@@ -70,7 +70,7 @@ class PlayerMessagesConfig {
     @Expose
     @ConfigOption(
         name = "Chat Filter",
-        desc = "Scan messages sent by players for blacklisted words and gray out the message if any are found."
+        desc = "Scan messages sent by players for blacklisted words and gray out the message if any are found.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

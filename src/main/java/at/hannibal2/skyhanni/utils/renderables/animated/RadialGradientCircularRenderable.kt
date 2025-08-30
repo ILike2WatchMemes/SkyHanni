@@ -22,7 +22,7 @@ class RadialGradientCircularRenderable private constructor(
     horizontalAlignment: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.CENTER,
     verticalAlignment: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
 ) : CircularRenderable(
-    startColor, radius, smoothness, 100.0, endColor, horizontalAlignment, verticalAlignment
+    startColor, radius, smoothness, 100.0, endColor, horizontalAlignment, verticalAlignment,
 ),
     TimeDependentRenderable {
     override var lastRenderTime: SimpleTimeMark = SimpleTimeMark.now()
@@ -86,7 +86,7 @@ class RadialGradientCircularRenderable private constructor(
             phaseOffSet,
             gradientProgress,
             horizontalAlignment,
-            verticalAlignment
+            verticalAlignment,
         )
     }
 }

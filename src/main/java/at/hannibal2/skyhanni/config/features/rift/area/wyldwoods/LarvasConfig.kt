@@ -11,7 +11,7 @@ class LarvasConfig {
     @Expose
     @ConfigOption(
         name = "Highlight",
-        desc = "Highlight §cLarvas on trees §7while holding a §eLarva Hook §7in the hand."
+        desc = "Highlight §cLarvas on trees §7while holding a §eLarva Hook §7in the hand.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

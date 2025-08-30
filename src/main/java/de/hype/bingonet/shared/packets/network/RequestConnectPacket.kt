@@ -19,5 +19,5 @@ class RequestConnectPacket
     val mcVersion: String,
     val modVersion: String,
     val modName: String,
-    @JvmField val authType: AuthenticationConstants
+    @JvmField val authType: AuthenticationConstants,
 ) : AbstractPacket()

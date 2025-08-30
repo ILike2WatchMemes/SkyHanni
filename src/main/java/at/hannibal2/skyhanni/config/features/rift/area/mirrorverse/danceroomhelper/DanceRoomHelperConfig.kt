@@ -14,7 +14,7 @@ class DanceRoomHelperConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Help to solve the dance room in the Mirrorverse by showing multiple tasks at once."
+        desc = "Help to solve the dance room in the Mirrorverse by showing multiple tasks at once.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -38,7 +38,7 @@ class DanceRoomHelperConfig {
     @Expose
     @ConfigOption(
         name = "Hide Title",
-        desc = "Hide Instructions, \"§aIt's happening!\" §7and \"§aKeep it up!\" §7titles."
+        desc = "Hide Instructions, \"§aIt's happening!\" §7and \"§aKeep it up!\" §7titles.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

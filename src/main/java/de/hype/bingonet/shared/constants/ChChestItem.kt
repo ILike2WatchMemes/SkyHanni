@@ -14,7 +14,7 @@ class ChChestItem(
     }
 
     fun getAnsiName(): String {
-        return Formatting.Companion.covertToDiscordAnsi(displayName)
+        return Formatting.covertToDiscordAnsi(displayName)
     }
 
     fun getAsValueableItem(count: IntRange): ValuableChChestItem? {
@@ -30,14 +30,15 @@ class ChChestItem(
             val itemCountString = results[5]?.value?.split("-")
             val itemCount: IntRange = if (itemCountString == null) 1..1 else if (itemCountString.size == 2) IntRange(
                 itemCountString[0].toInt(),
-                itemCountString[1].toInt()
+                itemCountString[1].toInt(),
             ) else IntRange(itemCountString[0].toInt(), itemCountString[0].toInt())
             return Pair(
                 ChChestItem(
                     results.get(3)?.value!!,
                     Formatting.fromMCCode(results[1]?.value) ?: Formatting.WHITE,
-                    Formatting.fromMCCode(results[5]?.value) ?: Formatting.WHITE
-                ), itemCount
+                    Formatting.fromMCCode(results[5]?.value) ?: Formatting.WHITE,
+                ),
+                itemCount,
             )
         }
     }

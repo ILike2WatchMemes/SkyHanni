@@ -11,7 +11,7 @@ class GardenCommandsConfig {
     @Expose
     @ConfigOption(
         name = "Warp Commands",
-        desc = "Enable commands §e/home§7, §e/barn §7and §e/tp <plot>§7. §cOnly works while in the garden."
+        desc = "Enable commands §e/home§7, §e/barn §7and §e/tp <plot>§7. §cOnly works while in the garden.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -20,7 +20,7 @@ class GardenCommandsConfig {
     @Expose
     @ConfigOption(
         name = "Home Hotkey",
-        desc = "Press this key to teleport you to your Garden home. §cOnly works while in the garden."
+        desc = "Press this key to teleport you to your Garden home. §cOnly works while in the garden.",
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var homeHotkey: Int = Keyboard.KEY_NONE
@@ -28,7 +28,7 @@ class GardenCommandsConfig {
     @Expose
     @ConfigOption(
         name = "Sethome Hotkey",
-        desc = "Press this key to set your Garden home. §cOnly works while in the garden."
+        desc = "Press this key to set your Garden home. §cOnly works while in the garden.",
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var sethomeHotkey: Int = Keyboard.KEY_NONE
@@ -36,7 +36,7 @@ class GardenCommandsConfig {
     @Expose
     @ConfigOption(
         name = "Barn Hotkey",
-        desc = "Press this key to teleport you to the Garden barn. §cOnly works while in the garden."
+        desc = "Press this key to teleport you to the Garden barn. §cOnly works while in the garden.",
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var barnHotkey: Int = Keyboard.KEY_NONE

@@ -69,7 +69,7 @@ class PestFinderConfig {
     @Expose
     @ConfigOption(
         name = "No Pests Title",
-        desc = "Show a Title in case of No pests. Useful if you are using the §eGarden Pest Chat Filter"
+        desc = "Show a Title in case of No pests. Useful if you are using the §eGarden Pest Chat Filter",
     )
     @ConfigEditorBoolean
     var noPestTitle: Boolean = false
@@ -82,7 +82,7 @@ class PestFinderConfig {
     @Expose
     @ConfigOption(
         name = "Always Teleport",
-        desc = "Allow teleporting with the Teleport Hotkey even when you're already in an infested plot."
+        desc = "Allow teleporting with the Teleport Hotkey even when you're already in an infested plot.",
     )
     @ConfigEditorBoolean
     var alwaysTp: Boolean = false
@@ -90,7 +90,7 @@ class PestFinderConfig {
     @Expose
     @ConfigOption(
         name = "Back to Garden",
-        desc = "Make the Teleport Hotkey warp you to Garden if you don't have any pests."
+        desc = "Make the Teleport Hotkey warp you to Garden if you don't have any pests.",
     )
     @ConfigEditorBoolean
     var backToGarden: Boolean = false

@@ -20,7 +20,7 @@ class RenderInformation {
         this.spaceToNext = spaceToNext
     }
 
-    val texturePath: String?
+    val texturePath: String
         get() {
             if (namespace.isEmpty()) return pathToFile
             return "$namespace:$pathToFile"

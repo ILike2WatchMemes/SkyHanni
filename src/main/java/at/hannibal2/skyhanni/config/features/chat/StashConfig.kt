@@ -18,7 +18,7 @@ class StashConfig {
     @ConfigOption(
         name = "§cNotice",
         desc = "Hypixel sends un-detectable empty messages wrapping the stash message. " +
-            "Enable §e§l/sh empty messages §r§7to hide them."
+            "Enable §e§l/sh empty messages §r§7to hide them.",
     )
     @ConfigEditorInfoText
     var notice: String = ""
@@ -32,7 +32,7 @@ class StashConfig {
         @Expose
         @ConfigOption(
             name = "Enabled",
-            desc = "Hide duplicate warnings for previously reported stash counts."
+            desc = "Hide duplicate warnings for previously reported stash counts.",
         )
         @ConfigEditorBoolean
         var enabled: Boolean = true
@@ -40,7 +40,7 @@ class StashConfig {
         @Expose
         @ConfigOption(
             name = "Once Per World",
-            desc = "Show warnings even if the counts are previously reported, once per world change."
+            desc = "Show warnings even if the counts are previously reported, once per world change.",
         )
         @ConfigEditorBoolean
         var worldChangeReset: Boolean = true

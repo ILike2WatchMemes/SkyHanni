@@ -20,7 +20,7 @@ class ApiJson {
         this.path = ArrayList<String>(path)
     }
 
-    val `object`: JsonObject?
+    val obj: JsonObject?
         get() {
             var temp = data
             for (pathPart in path) {
@@ -103,11 +103,11 @@ class ApiJson {
         }
     }
 
-    fun getString(key: String): String? {
+    fun getString(key: String): String {
         return getString(key, "")
     }
 
-    fun getLong(key: String): Long? {
+    fun getLong(key: String): Long {
         return getLong(key, 0L)
     }
 

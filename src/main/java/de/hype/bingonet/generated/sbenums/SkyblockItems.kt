@@ -1,5 +1,6 @@
 package de.hype.bingonet.generated.sbenums
 
+@Suppress("EnumEntryNameCase")
 enum class SkyblockItems(
     val itemId: String,
 ) {

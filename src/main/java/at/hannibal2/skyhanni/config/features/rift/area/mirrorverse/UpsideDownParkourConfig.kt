@@ -13,7 +13,7 @@ class UpsideDownParkourConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Help solve the upside down parkour in the Mirrorverse by showing the correct way."
+        desc = "Help solve the upside down parkour in the Mirrorverse by showing the correct way.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

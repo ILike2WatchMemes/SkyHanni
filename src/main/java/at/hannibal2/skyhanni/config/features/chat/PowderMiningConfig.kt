@@ -21,7 +21,7 @@ class PowderMiningConfig {
         name = "Powder",
         desc = "Hide §dGemstone §7and §aMithril §7Powder rewards under a certain amount.\n" +
             "§a0§7: §aShow all\n" +
-            "§c60000§7: §cHide all"
+            "§c60000§7: §cHide all",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 60000f, minStep = 500f)
     var powderThreshold: Int = 1000
@@ -31,7 +31,7 @@ class PowderMiningConfig {
         name = "Essence",
         desc = "Hide §6Gold §7and §bDiamond §7Essence rewards under a certain amount.\n" +
             "§a0§7: §aShow all\n" +
-            "§c20§7: §cHide all"
+            "§c20§7: §cHide all",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 20f, minStep = 1f)
     var essenceThreshold: Int = 5
@@ -62,7 +62,7 @@ class PowderMiningConfig {
         SimplePowderMiningRewardTypes.JUNGLE_HEART,
         SimplePowderMiningRewardTypes.SLUDGE_JUICE,
         SimplePowderMiningRewardTypes.YOGGIE,
-        SimplePowderMiningRewardTypes.TREASURITE
+        SimplePowderMiningRewardTypes.TREASURITE,
     )
 
     @Expose

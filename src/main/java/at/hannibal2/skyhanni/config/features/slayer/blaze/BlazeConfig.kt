@@ -17,7 +17,7 @@ class BlazeConfig {
     @Expose
     @ConfigOption(
         name = "Fire Pits",
-        desc = "Warning when the fire pit phase starts for the Blaze Slayer tier 3 and 4."
+        desc = "Warning when the fire pit phase starts for the Blaze Slayer tier 3 and 4.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -38,7 +38,7 @@ class BlazeConfig {
     @ConfigOption(
         name = "Pillar Display",
         desc = "Show a big display with a timer when the Fire Pillar is about to explode. " +
-            "Also shows for other player's bosses as well."
+            "Also shows for other player's bosses as well.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

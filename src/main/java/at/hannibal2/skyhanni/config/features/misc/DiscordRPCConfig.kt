@@ -35,7 +35,7 @@ class DiscordRPCConfig {
     @ConfigOption(
         name = "Dynamic Priority",
         desc = "Disable certain dynamic statuses, or change the priority in case " +
-            "two are triggered at the same time (higher up means higher priority)."
+            "two are triggered at the same time (higher up means higher priority).",
     )
     @ConfigEditorDraggableList
     val autoPriority: MutableList<PriorityEntry> = mutableListOf(
@@ -43,7 +43,7 @@ class DiscordRPCConfig {
         PriorityEntry.SLAYER,
         PriorityEntry.STACKING_ENCHANT,
         PriorityEntry.DUNGEONS,
-        PriorityEntry.AFK
+        PriorityEntry.AFK,
     )
 
     enum class PriorityEntry(private val displayName: String) {
@@ -60,7 +60,7 @@ class DiscordRPCConfig {
     @Expose
     @ConfigOption(
         name = "Dynamic Fallback",
-        desc = "What to show when none of your \"Dynamic Priority\" statuses are active."
+        desc = "What to show when none of your \"Dynamic Priority\" statuses are active.",
     )
     @ConfigEditorDropdown
     val auto: Property<LineEntry> = Property.of(LineEntry.NOTHING)

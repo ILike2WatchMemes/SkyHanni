@@ -12,7 +12,7 @@ import net.minecraft.util.BlockPos
 
 class BrigadierCommand(
     root: BaseBrigadierBuilder,
-    private val dispatcher: CommandDispatcher<Any?>
+    private val dispatcher: CommandDispatcher<Any?>,
 ) : CommandBase() {
     private val aliases: List<String> = root.aliases
     private val node: CommandNode<Any?>
@@ -61,7 +61,7 @@ class BrigadierCommand(
     override fun addTabCompletionOptions(
         sender: ICommandSender,
         args: Array<String>,
-        pos: BlockPos
+        pos: BlockPos,
     ): List<String> {
         val input = if (args.isEmpty()) node.name else "${node.name} ${args.joinToString(" ")}"
         return runCatching {

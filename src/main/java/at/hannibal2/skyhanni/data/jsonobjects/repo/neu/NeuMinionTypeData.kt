@@ -10,18 +10,21 @@ class NeuMinionTypeData : MinionType {
     @Expose
     @SerializedName("type_id")
     override val typeId: String
+
     @Expose
     @SerializedName("type")
     override val category: MinionCategory
+
     @Expose
     @SerializedName("requiredactions")
     override val requiredActions: Int
+
     @Expose
     @SerializedName("drops")
     override val drops: Map<BNNEUItem, Double>
 
     private constructor(typeId: String, category: MinionCategory, requiredActions: Int, drops: Map<BNNEUItem, Double>) : super(
-        typeId, category, drops,requiredActions
+        typeId, category, drops, requiredActions,
     ) {
         this.typeId = typeId
         this.category = category

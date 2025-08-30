@@ -427,6 +427,7 @@ object HypixelData {
                 SkyHanniRepoManager.displayRepoStatus(true)
                 EnoughUpdatesRepoManager.displayRepoStatus(true)
             }
+
             wasOnHypixel && !nowOnHypixel -> {
                 if (skyBlock) {
                     skyBlock = false
@@ -611,10 +612,10 @@ object HypixelData {
     }
 
     fun isInMega(): Boolean {
-        return serverId?.startsWith("mega")?:false
+        return serverId?.startsWith("mega") ?: false
     }
 
     fun getRemainingSpace(): Int {
-        return getMaxPlayersForCurrentServer()-getPlayersOnCurrentServer()
+        return getMaxPlayersForCurrentServer() - getPlayersOnCurrentServer()
     }
 }

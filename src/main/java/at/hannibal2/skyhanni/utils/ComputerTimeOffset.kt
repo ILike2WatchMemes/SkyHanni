@@ -91,7 +91,7 @@ object ComputerTimeOffset {
                     "NTP server $ntpServer is not responding ($timeouts failures). Check your connection, " +
                         "try disconnecting from any VPNs/proxies, or click here to change NTP servers.",
                     hover = "Click to open Dev Config",
-                    onClick = { devConfig::ntpServer.jumpToEditor() }
+                    onClick = { devConfig::ntpServer.jumpToEditor() },
                 )
             }
             return@runCatching null

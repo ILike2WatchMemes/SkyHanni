@@ -29,7 +29,7 @@ class CFStrayRabbitWarningConfig {
     @ConfigOption(
         name = "Block Closing",
         desc = "Block closing the Chocolate Factory while there is a stray active.\n" +
-            "§eHold §cShift §eto bypass"
+            "§eHold §cShift §eto bypass",
     )
     @SearchTag("prevent close")
     @ConfigEditorBoolean
@@ -41,7 +41,7 @@ class CFStrayRabbitWarningConfig {
         desc = "The sound that plays for a special rabbit.\n" +
             "§eYou can use custom sounds, put it in the §bskyhanni/sounds §efolder in your resource pack.\n" +
             "§eThen write §bskyhanni:yourfilename\n" +
-            "§cMust be a .ogg file"
+            "§cMust be a .ogg file",
     )
     @ConfigEditorText
     val specialRabbitSound: Property<String> = Property.of("note.pling")

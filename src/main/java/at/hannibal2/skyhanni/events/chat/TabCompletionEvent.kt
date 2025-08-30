@@ -15,10 +15,9 @@ class TabCompletionEvent(
     val ignoreCaseCompletion = SkyHanniMod.feature.chat.tabIgnoreCaseSuggestion
 
     fun addSuggestion(suggestion: String) {
-        if (useContainCompletion){
+        if (useContainCompletion) {
             if (!suggestion.contains(lastWord, ignoreCaseCompletion)) return
-        }
-        else {
+        } else {
             if (!suggestion.startsWith(lastWord, ignoreCaseCompletion)) return
         }
         val adjustedSuggestion = if (PlatformUtils.IS_LEGACY) suggestion else suggestion.removePrefix("/")

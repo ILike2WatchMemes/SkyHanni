@@ -13,7 +13,7 @@ class InGameDateConfig {
     @ConfigOption(
         name = "Enabled",
         desc = "Show the in-game date of SkyBlock (like in Apec, §ebut with mild delays§7).\n" +
-            "(Though this one includes the SkyBlock year!)"
+            "(Though this one includes the SkyBlock year!)",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -26,7 +26,7 @@ class InGameDateConfig {
     @Expose
     @ConfigOption(
         name = "Use Scoreboard for Date",
-        desc = "Uses the scoreboard instead to find the current month, date, and time. Greater \"accuracy\", depending on who's asking."
+        desc = "Uses the scoreboard instead to find the current month, date, and time. Greater \"accuracy\", depending on who's asking.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -41,7 +41,7 @@ class InGameDateConfig {
     @Expose
     @ConfigOption(
         name = "Show Date Ordinal",
-        desc = "Show the date's ordinal suffix. Ex: (1st <-> 1, 22nd <-> 22, 23rd <-> 3, 24th <-> 24, etc.)"
+        desc = "Show the date's ordinal suffix. Ex: (1st <-> 1, 22nd <-> 22, 23rd <-> 3, 24th <-> 24, etc.)",
     )
     @ConfigEditorBoolean
     var includeOrdinal: Boolean = false
@@ -50,7 +50,7 @@ class InGameDateConfig {
     @ConfigOption(
         name = "Refresh Rate",
         desc = "Change the time in seconds you would like to refresh the In-Game Date Display.\n" +
-            "§eNOTE: If \"Use Scoreboard for Date\" is enabled, this setting is ignored."
+            "§eNOTE: If \"Use Scoreboard for Date\" is enabled, this setting is ignored.",
     )
     @ConfigEditorSlider(minValue = 1f, maxValue = 60f, minStep = 1f)
     var refreshSeconds: Int = 30

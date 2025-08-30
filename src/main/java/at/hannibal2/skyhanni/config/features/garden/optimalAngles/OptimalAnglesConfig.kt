@@ -12,7 +12,7 @@ class OptimalAnglesConfig {
     @Expose
     @ConfigOption(
         name = "Squeaky Mousemat",
-        desc = "Set the optimal angles (pitch & yaw) in the Squeaky Mousemat overlay by clicking on the presets."
+        desc = "Set the optimal angles (pitch & yaw) in the Squeaky Mousemat overlay by clicking on the presets.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

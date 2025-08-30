@@ -11,13 +11,16 @@ import at.hannibal2.skyhanni.utils.compat.command
 @SkyHanniModule
 object NPCResponseSuggestion {
     @HandleEvent
-    fun onMessage(event: NpcChatEvent){
+    fun onMessage(event: NpcChatEvent) {
         for (components in event.messageComponent.sampleComponents()) {
-            val command = components.command?:continue
-            if (command.startsWith("chatprompt") && components.formattedText.contains("§a")){
-                ChatUtils.chatPrompt("Press §a%KEY%§e to respond with \"${components.formattedText}\"",SkyHanniMod.feature.chat.npcResponseSuggestion,{
-                    HypixelCommands.chatPrompt(command.substringAfter(" "))
-                })
+            val command = components.command ?: continue
+            if (command.startsWith("chatprompt") && components.formattedText.contains("§a")) {
+                ChatUtils.chatPrompt(
+                    "Press §a%KEY%§e to respond with \"${components.formattedText}\"", SkyHanniMod.feature.chat.npcResponseSuggestion,
+                    {
+                        HypixelCommands.chatPrompt(command.substringAfter(" "))
+                    },
+                )
                 return
             }
         }

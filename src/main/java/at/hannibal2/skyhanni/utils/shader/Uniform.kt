@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.shader
 
 import java.util.Objects
+
 //#if MC > 1.21
 //$$ import org.joml.Matrix4f
 //#endif

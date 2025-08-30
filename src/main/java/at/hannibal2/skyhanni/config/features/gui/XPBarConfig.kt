@@ -18,7 +18,7 @@ class XPBarConfig {
 
     @ConfigOption(
         name = "§cNotice",
-        desc = "This option will be §c§lincompatible §r§7with mods that change the xp bar. Eg: §eApec§7."
+        desc = "This option will be §c§lincompatible §r§7with mods that change the xp bar. Eg: §eApec§7.",
     )
     @OnlyLegacy
     @ConfigEditorInfoText

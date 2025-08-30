@@ -130,6 +130,7 @@ enum class RenderLayer {
     CHAT,
     PLAYER_LIST,
     DEBUG,
+
     // Not a real forge layer but is used on modern Minecraft versions
     EXPERIENCE_NUMBER,
     ;

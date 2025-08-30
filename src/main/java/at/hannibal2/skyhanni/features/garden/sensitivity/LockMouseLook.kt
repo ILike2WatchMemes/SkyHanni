@@ -17,7 +17,7 @@ object LockMouseLook {
     /**
      * REGEX-TEST: §aTeleported you to §r§aPlot
      */
-    private val gardenTeleportPattern by RepoPattern.Companion.pattern(
+    private val gardenTeleportPattern by RepoPattern.pattern(
         "chat.garden.teleport",
         "§aTeleported you to .*",
     )

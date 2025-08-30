@@ -35,13 +35,13 @@ class HoppityCollectionStatsConfig {
         HighlightRabbitTypes.MET,
         HighlightRabbitTypes.NOT_MET,
         HighlightRabbitTypes.SHOP,
-        HighlightRabbitTypes.STRAYS
+        HighlightRabbitTypes.STRAYS,
     )
 
     @Expose
     @ConfigOption(
         name = "Re-color Missing Rabbit Dyes",
-        desc = "Replace the gray dye in Hoppity's Collection with a color for the rarity of the rabbit."
+        desc = "Replace the gray dye in Hoppity's Collection with a color for the rarity of the rabbit.",
     )
     @ConfigEditorBoolean
     var rarityDyeRecolor: Boolean = true
@@ -49,7 +49,7 @@ class HoppityCollectionStatsConfig {
     @Expose
     @ConfigOption(
         name = "Descriptive Milestones",
-        desc = "Show a more detailed description of how to unlock a milestone rabbit in Hoppity's Collection."
+        desc = "Show a more detailed description of how to unlock a milestone rabbit in Hoppity's Collection.",
     )
     @ConfigEditorBoolean
     var descriptiveMilestones: Boolean = true
@@ -57,7 +57,7 @@ class HoppityCollectionStatsConfig {
     @Expose
     @ConfigOption(
         name = "Missing Location Rabbits",
-        desc = "Show the locations you have yet to find enough egg locations for in order to unlock the rabbit for that location."
+        desc = "Show the locations you have yet to find enough egg locations for in order to unlock the rabbit for that location.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -66,7 +66,7 @@ class HoppityCollectionStatsConfig {
     @Expose
     @ConfigOption(
         name = "Missing Resident Rabbits",
-        desc = "Show the islands that you have the most missing resident rabbits on."
+        desc = "Show the islands that you have the most missing resident rabbits on.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -75,7 +75,7 @@ class HoppityCollectionStatsConfig {
     @Expose
     @ConfigOption(
         name = "Missing Hotspot Rabbits",
-        desc = "Show the islands that have the most hotspot rabbits that you are missing."
+        desc = "Show the islands that have the most hotspot rabbits that you are missing.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

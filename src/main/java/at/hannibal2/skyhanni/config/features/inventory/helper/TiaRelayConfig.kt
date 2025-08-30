@@ -9,7 +9,7 @@ class TiaRelayConfig {
     @Expose
     @ConfigOption(
         name = "Sound Puzzle Helper",
-        desc = "Help with solving the sound puzzle for Tia (the 9 Operator Chips to do maintenance for the Abiphone Network)."
+        desc = "Help with solving the sound puzzle for Tia (the 9 Operator Chips to do maintenance for the Abiphone Network).",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -18,7 +18,7 @@ class TiaRelayConfig {
     @Expose
     @ConfigOption(
         name = "Next Waypoint",
-        desc = "Show the next relay waypoint for Tia the Fairy, where maintenance for the Abiphone network needs to be done."
+        desc = "Show the next relay waypoint for Tia the Fairy, where maintenance for the Abiphone network needs to be done.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

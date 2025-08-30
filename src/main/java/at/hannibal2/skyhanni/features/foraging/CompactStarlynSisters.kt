@@ -33,7 +33,7 @@ object CompactStarlynSisters {
      */
     private val startContestResultsPattern by patternGroup.pattern(
         "start-results",
-        "§e\\[NPC] (?<foragingSister>[\\S ]+)§f: §rYou reached the (?<formattingCode>§.)(?:§.)?(?<bracket>\\w+) §fBracket in my contest!"
+        "§e\\[NPC] (?<foragingSister>[\\S ]+)§f: §rYou reached the (?<formattingCode>§.)(?:§.)?(?<bracket>\\w+) §fBracket in my contest!",
     )
 
     /**
@@ -45,7 +45,7 @@ object CompactStarlynSisters {
     @Suppress("MaxLineLength")
     private val pointsEarnedPattern by patternGroup.pattern(
         "points-earned",
-        "§e\\[NPC] (?<foragingSister>[\\S ]+)§f: §rYou earned a total of (?<pointsString>§.(?<pointsInteger>[\\d,]+)) §fpoints!(?<personalBest> That's a new (?:§.)*PERSONAL BEST(?:§.)?!)?"
+        "§e\\[NPC] (?<foragingSister>[\\S ]+)§f: §rYou earned a total of (?<pointsString>§.(?<pointsInteger>[\\d,]+)) §fpoints!(?<personalBest> That's a new (?:§.)*PERSONAL BEST(?:§.)?!)?",
     )
 
     /**
@@ -56,7 +56,7 @@ object CompactStarlynSisters {
     @Suppress("MaxLineLength")
     private val previousBestPattern by patternGroup.pattern(
         "previous-best",
-        "(?:§.)*\\[NPC] (?<foragingSister>[\\S ]+)(?:§.)*: (?:§.)*Your previous Personal Best was (?<previousBest>(?:§.)*(?<prevBestInt>[\\d,]+))(?:§.)*\\."
+        "(?:§.)*\\[NPC] (?<foragingSister>[\\S ]+)(?:§.)*: (?:§.)*Your previous Personal Best was (?<previousBest>(?:§.)*(?<prevBestInt>[\\d,]+))(?:§.)*\\.",
     )
 
     /***
@@ -66,7 +66,7 @@ object CompactStarlynSisters {
     @Suppress("MaxLineLength")
     private val seeMePattern by patternGroup.pattern(
         "claim-rewards",
-        "(?:§.)*\\[NPC] (?<foragingSister>[\\S ]+)(?:§.)*: (?:§.)*Come see me at (?<location>(?:§.)*.+) (?:§.)*to claim your rewards!"
+        "(?:§.)*\\[NPC] (?<foragingSister>[\\S ]+)(?:§.)*: (?:§.)*Come see me at (?<location>(?:§.)*.+) (?:§.)*to claim your rewards!",
     )
 
     /**
@@ -77,7 +77,7 @@ object CompactStarlynSisters {
     @Suppress("MaxLineLength")
     private val duringContestPersonalBestPattern by patternGroup.pattern(
         "collection-personal-best",
-        "(?:§.)*PERSONAL BEST(?:§.)*: You increased your (?<woodTypeDisplay>(?:§.)*(?<woodType>\\w+)) (?:§.)*Collection by (?<duringContestDisplay>(?:§.)*(?<duringContest>[\\d,]+)) (?:§.)*during the contest! That's (?<aLotMore>(?:§.)*(?<byHowMuch>[\\d,]+)) (?:§.)*more than your previous best!"
+        "(?:§.)*PERSONAL BEST(?:§.)*: You increased your (?<woodTypeDisplay>(?:§.)*(?<woodType>\\w+)) (?:§.)*Collection by (?<duringContestDisplay>(?:§.)*(?<duringContest>[\\d,]+)) (?:§.)*during the contest! That's (?<aLotMore>(?:§.)*(?<byHowMuch>[\\d,]+)) (?:§.)*more than your previous best!",
     )
 
     /**
@@ -211,9 +211,11 @@ object CompactStarlynSisters {
                         "§6PB Increase: ${collectionPB.lastPBPreviousBestDifferenceDisplay} " +
                         "${collectionPB.lastPBWoodTypeDisplay} §eLogs"
                     ).asComponent()
-                hoverablePersonalBest.onClick(onClick = {
-                    HypixelCommands.starlynSisters()
-                })
+                hoverablePersonalBest.onClick(
+                    onClick = {
+                        HypixelCommands.starlynSisters()
+                    },
+                )
                 ChatUtils.chat(hoverablePersonalBest)
                 isInPersonalBest = false
                 blockedReason = "STARLYN_COLLECTION"

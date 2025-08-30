@@ -10,6 +10,5 @@ data class SplashLeechReportPacket(
      * Third Boolean: User is Ironman
      */
     val leechers: List<Triple<String, UUID, Boolean>>,
-    val allowIman: Boolean
-) : AbstractPacket() {
-}
+    val allowIman: Boolean,
+) : AbstractPacket()

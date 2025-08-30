@@ -12,7 +12,7 @@ class EnchantParsingConfig {
     @Expose
     @ConfigOption(
         name = "Enable",
-        desc = "Toggle for coloring the enchants. Turn this off if you want to use enchant parsing from other mods."
+        desc = "Toggle for coloring the enchants. Turn this off if you want to use enchant parsing from other mods.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -36,7 +36,7 @@ class EnchantParsingConfig {
     @ConfigOption(
         name = "Perfect Enchantment Color",
         desc = "The color an enchantment will be at max level. " +
-            "§eIf SkyHanni chroma is disabled this will default to §6Gold."
+            "§eIf SkyHanni chroma is disabled this will default to §6Gold.",
     )
     @ConfigEditorDropdown
     val perfectEnchantColor: Property<LorenzColor> = Property.of(LorenzColor.CHROMA)
@@ -77,7 +77,7 @@ class EnchantParsingConfig {
     @Expose
     @ConfigOption(
         name = "Hide Vanilla Enchants",
-        desc = "Hide the regular vanilla enchants usually found in the first 1-2 lines of lore."
+        desc = "Hide the regular vanilla enchants usually found in the first 1-2 lines of lore.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -86,7 +86,7 @@ class EnchantParsingConfig {
     @Expose
     @ConfigOption(
         name = "Hide Enchant Description",
-        desc = "Hide the enchant description after each enchant if available."
+        desc = "Hide the enchant description after each enchant if available.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -96,7 +96,7 @@ class EnchantParsingConfig {
     @ConfigOption(
         name = "Stacking Enchant Progress",
         desc = "Shows the stacking enchant progress at the bottom of the lore. " +
-            "§eRequires Enchant Parsing to be enabled."
+            "§eRequires Enchant Parsing to be enabled.",
     )
     @ConfigEditorBoolean
     var stackingEnchantProgress: Boolean = true

@@ -12,7 +12,7 @@ class FishingHookDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your screen."
+        desc = "Display the Hypixel timer until the fishing hook can be pulled out of the water/lava, only bigger and on your screen.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -21,7 +21,7 @@ class FishingHookDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Custom Alert",
-        desc = "Replaces the default §c§l!!! §7Hypixel alert with your own custom one."
+        desc = "Replaces the default §c§l!!! §7Hypixel alert with your own custom one.",
     )
     @ConfigEditorText
     var customAlertText: String = "&c&l!!!"
@@ -29,7 +29,7 @@ class FishingHookDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Hide Armor Stand",
-        desc = "Hide the original armor stand from Hypixel when the SkyHanni display is enabled."
+        desc = "Hide the original armor stand from Hypixel when the SkyHanni display is enabled.",
     )
     @ConfigEditorBoolean
     var hideArmorStand: Boolean = true

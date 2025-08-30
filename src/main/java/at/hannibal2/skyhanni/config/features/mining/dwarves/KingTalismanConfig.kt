@@ -11,7 +11,7 @@ class KingTalismanConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Show kings you have not talked to yet, and when the next missing king will appear."
+        desc = "Show kings you have not talked to yet, and when the next missing king will appear.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

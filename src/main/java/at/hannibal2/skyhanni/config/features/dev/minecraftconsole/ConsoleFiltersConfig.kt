@@ -24,7 +24,7 @@ class ConsoleFiltersConfig {
     @ConfigOption(
         name = "Filter Scoreboard Errors",
         desc = "Filter error messages with Scoreboard: removeTeam, createTeam, " +
-            "removeObjective and 'scoreboard team already exists'."
+            "removeObjective and 'scoreboard team already exists'.",
     )
     @ConfigEditorBoolean
     var filterScoreboardErrors: Boolean = true
@@ -37,7 +37,7 @@ class ConsoleFiltersConfig {
     @Expose
     @ConfigOption(
         name = "Filter OptiFine",
-        desc = "Filter OptiFine messages CustomItems and ConnectedTextures during loading."
+        desc = "Filter OptiFine messages CustomItems and ConnectedTextures during loading.",
     )
     @ConfigEditorBoolean
     var filterOptiFine: Boolean = true
@@ -45,7 +45,7 @@ class ConsoleFiltersConfig {
     @Expose
     @ConfigOption(
         name = "Filter AsmHelper Transformer",
-        desc = "Filter messages when AsmHelper is Transforming a class during loading."
+        desc = "Filter messages when AsmHelper is Transforming a class during loading.",
     )
     @ConfigEditorBoolean
     var filterAmsHelperTransformer: Boolean = true
@@ -53,7 +53,7 @@ class ConsoleFiltersConfig {
     @Expose
     @ConfigOption(
         name = "Filter Applying AsmWriter",
-        desc = "Filter messages when AsmHelper is applying AsmWriter ModifyWriter."
+        desc = "Filter messages when AsmHelper is applying AsmWriter ModifyWriter.",
     )
     @ConfigEditorBoolean
     var filterAsmHelperApplying: Boolean = true

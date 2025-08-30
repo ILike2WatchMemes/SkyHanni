@@ -23,6 +23,7 @@ import net.minecraft.util.ResourceLocation
 import java.util.Locale
 import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
+
 //#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.registry.Registries

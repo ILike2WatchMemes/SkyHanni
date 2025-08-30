@@ -42,7 +42,7 @@ class SplasherConfig {
     @Accordion
     var leecherDMS: LeecherDMS = LeecherDMS()
 
-    class LeecherDMS{
+    class LeecherDMS {
         @Expose
         @ConfigOption(
             name = "Receive Leecher DMs",

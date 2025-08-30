@@ -26,7 +26,7 @@ open class Message @JvmOverloads constructor(textJson: String, string: String, a
         this.string = string
         this.isActionBar = actionbar
         if (actionbar) this.source = MessageSource.SERVER
-        else this.source = MessageSource.Companion.getMessageSource(this)
+        else this.source = MessageSource.getMessageSource(this)
         if (source == MessageSource.PRIVATE_MESSAGE_SENT) isFromSelf = true
     }
 
@@ -87,9 +87,9 @@ open class Message @JvmOverloads constructor(textJson: String, string: String, a
             System.err.println(
                 "String that caused the problems: Replace: $replace | Replace With: ${
                     StringEscapeUtils.escapeJson(
-                        replaceWith
+                        replaceWith,
                     )
-                } | Test: $json"
+                } | Test: $json",
             )
             e.printStackTrace()
         }

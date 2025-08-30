@@ -11,7 +11,7 @@ class GeyserFishingConfig {
     @Expose
     @ConfigOption(
         name = "Hide Geyser Particles",
-        desc = "Stop the white geyser smoke particles from rendering if your bobber is near the geyser."
+        desc = "Stop the white geyser smoke particles from rendering if your bobber is near the geyser.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

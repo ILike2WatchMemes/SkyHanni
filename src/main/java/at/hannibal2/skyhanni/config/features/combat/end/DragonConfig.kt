@@ -24,7 +24,7 @@ class DragonConfig {
     @ConfigOption(
         name = "Weight HUD",
         desc = "Shows your current dragon weight on the HUD and if hovered shows the breakdown." +
-            " The dragon widget needs to be enabled for this to work."
+            " The dragon widget needs to be enabled for this to work.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

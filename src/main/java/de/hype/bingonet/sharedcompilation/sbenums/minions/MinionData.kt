@@ -1,6 +1,6 @@
 package de.hype.bingonet.sharedcompilation.sbenums.minions
 
-class MinionData constructor(
+class MinionData(
     val displayName: String,
     val itemId: String,
     /**
@@ -25,7 +25,7 @@ class MinionData constructor(
             itemId,
             timeBetweenActions,
             storage,
-            simpleUpgradeCost
+            simpleUpgradeCost,
         )
     }
 

@@ -51,9 +51,14 @@ class NeuRepositoryConfig : AbstractRepoConfig<NeuRepositoryConfig.NeuRepository
         @ConfigEditorText
         override var branch: String = "master"
 
-        @Transient override val defaultUser = "NotEnoughUpdates"
-        @Transient override val defaultRepoName = "NotEnoughUpdates-REPO"
-        @Transient override val defaultBranch = "master"
+        @Transient
+        override val defaultUser = "NotEnoughUpdates"
+
+        @Transient
+        override val defaultRepoName = "NotEnoughUpdates-REPO"
+
+        @Transient
+        override val defaultBranch = "master"
     }
 
     @Expose

@@ -7,7 +7,7 @@ open class MinionType(
     open val typeId: String,
     open val category: MinionCategory,
     open val drops: Map<BNNEUItem, Double>,
-    open val requiredActions: Int
+    open val requiredActions: Int,
 ) {
 
     override fun hashCode(): Int {

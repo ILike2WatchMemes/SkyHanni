@@ -38,7 +38,7 @@ class WantedSearchPacket : ExpectReplyPacket<WantedSearchPacket.WantedSearchPack
         @JvmField var usernames: Set<String>,
         var megaServer: Boolean,
         @JvmField var serverId: String,
-    ) : ExpectReplyPacket.ReplyPacket() {
+    ) : ReplyPacket() {
         var currentPlayerCount: Int = usernames.size
 
     }

@@ -56,7 +56,7 @@ class VisitorConfig {
     @Expose
     @ConfigOption(
         name = "Highlight Status",
-        desc = "Highlight the status for visitors with a text above or with color."
+        desc = "Highlight the status for visitors with a text above or with color.",
     )
     @ConfigEditorDropdown
     var highlightStatus: HighlightMode = HighlightMode.BOTH
@@ -74,7 +74,7 @@ class VisitorConfig {
     @Expose
     @ConfigOption(
         name = "Hypixel Message",
-        desc = "Hide the chat message from Hypixel that a new visitor has arrived at your garden."
+        desc = "Hide the chat message from Hypixel that a new visitor has arrived at your garden.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -83,7 +83,7 @@ class VisitorConfig {
     @Expose
     @ConfigOption(
         name = "Hide Chat",
-        desc = "Hide chat messages from the visitors in the garden. (Except Beth, Maeve, and Spaceman)"
+        desc = "Hide chat messages from the visitors in the garden. (Except Beth, Maeve, and Spaceman)",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -93,7 +93,7 @@ class VisitorConfig {
     @ConfigOption(
         name = "Accept Hotkey",
         desc = "Accept a visitor when you press this keybind while in the visitor GUI.\n" +
-            "§eUseful for getting Ephemeral Gratitudes during the 2023 Halloween event."
+            "§eUseful for getting Ephemeral Gratitudes during the 2023 Halloween event.",
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var acceptHotkey: Int = Keyboard.KEY_NONE
@@ -108,7 +108,7 @@ class VisitorConfig {
     @Expose
     @ConfigOption(
         name = "Block Interacting with Visitors",
-        desc = "Prevent interacting with / unlocking Visitors to allow for Dedication Cycling."
+        desc = "Prevent interacting with / unlocking Visitors to allow for Dedication Cycling.",
     )
     @ConfigEditorDropdown
     var blockInteracting: VisitorBlockBehaviour = VisitorBlockBehaviour.DONT

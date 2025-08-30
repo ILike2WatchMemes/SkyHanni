@@ -145,6 +145,7 @@ object FarmingLaneFeatures {
                     duration = secondsBefore.seconds,
                     weight = 1.1,
                 )
+
                 else -> titleContext.takeIf { it?.alive == true }
             }
             if (lastPlaySound.passedSince() >= sound.repeatDuration.ticks) {

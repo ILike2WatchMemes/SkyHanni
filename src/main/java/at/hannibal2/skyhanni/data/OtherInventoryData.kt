@@ -13,6 +13,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraft.network.play.server.S2EPacketCloseWindow
 import net.minecraft.network.play.server.S2FPacketSetSlot
+
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.test.command.ErrorManager
 //$$ import net.minecraft.screen.ScreenHandlerType

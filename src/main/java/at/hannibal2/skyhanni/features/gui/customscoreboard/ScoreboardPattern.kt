@@ -912,7 +912,7 @@ object ScoreboardPattern {
      */
     val whispersPattern by galateaSB.pattern(
         "whispers",
-        "(?:§f)?Whispers: §3[\\w,.]+.*"
+        "(?:§f)?Whispers: §3[\\w,.]+.*",
     )
 
     /**

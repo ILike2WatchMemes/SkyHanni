@@ -1,4 +1,5 @@
 package at.hannibal2.skyhanni.utils.compat
+
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.Vec3
 

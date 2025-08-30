@@ -41,9 +41,11 @@ enum class CommandCategory(val color: String, val categoryName: String, val desc
         "Shortened Commands",
         "Commands that shorten or improve existing Hypixel commands!",
     ),
-    BINGO_NET("§3",
-    "Bingo Net Commands",
-        "These Commands require you to be connected to the Bingo Net Server.")
+    BINGO_NET(
+        "§3",
+        "Bingo Net Commands",
+        "These Commands require you to be connected to the Bingo Net Server.",
+    )
     ;
 
     companion object {

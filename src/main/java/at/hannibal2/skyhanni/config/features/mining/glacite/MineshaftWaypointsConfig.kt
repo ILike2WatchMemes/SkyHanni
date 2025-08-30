@@ -20,7 +20,7 @@ class MineshaftWaypointsConfig {
     @Expose
     @ConfigOption(
         name = "Ladder Location",
-        desc = "Mark the location of the ladders at the bottom of the entrance with a waypoint."
+        desc = "Mark the location of the ladders at the bottom of the entrance with a waypoint.",
     )
     @ConfigEditorBoolean
     var ladderLocation: Boolean = false

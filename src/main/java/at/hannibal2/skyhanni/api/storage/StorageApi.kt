@@ -36,6 +36,7 @@ import java.util.TreeMap
 import java.util.UUID
 
 @SkyHanniModule
+@Suppress("ReturnCount")
 object StorageApi {
     val toHighlightResults = mutableListOf<StorageSearchResult>()
     var currentInventoryResults: List<StorageSearchResult> = emptyList()
@@ -208,7 +209,7 @@ object StorageApi {
         currentInventoryResults = toHighlightResults.filter { it.storageName == name }
         toHighlightResults.removeAll(currentInventoryResults)
     }
-    //TODO museum (existing?), vault, warderobe, builders wand, bags
+    // TODO museum (existing?), vault, warderobe, builders wand, bags
 
     private var lastChestClicked: LorenzVec? = null
     private var doubleChestCord: LorenzVec? = null
@@ -326,7 +327,11 @@ object StorageApi {
         }
         return null
     }
-    private val unparsePrivateIslandChestPattern by RepoPattern.pattern("storage.privateislandchestunparse","Private Island Chest LorenzVec\\(x=(?<x>-?\\d+(\\.\\d+)?), y=(?<y>-?\\d+(\\.\\d+)?), z=(?<z>-?\\d+(\\.\\d+)?)\\)")
+
+    private val unparsePrivateIslandChestPattern by RepoPattern.pattern(
+        "storage.privateislandchestunparse",
+        "Private Island Chest LorenzVec\\(x=(?<x>-?\\d+(\\.\\d+)?), y=(?<y>-?\\d+(\\.\\d+)?), z=(?<z>-?\\d+(\\.\\d+)?)\\)",
+    )
 
     /**
      * Gets the location from a private island chest storage name
@@ -335,7 +340,7 @@ object StorageApi {
         if (!storageName.startsWith("Private Island Chest")) return null
 
         // Extract coordinates from the storage name
-        return unparsePrivateIslandChestPattern.matchMatcher(storageName){
+        return unparsePrivateIslandChestPattern.matchMatcher(storageName) {
             val x = groupOrNull("x")?.toDoubleOrNull()
             val y = groupOrNull("y")?.toDoubleOrNull()
             val z = groupOrNull("z")?.toDoubleOrNull()
@@ -348,7 +353,7 @@ object StorageApi {
     fun itemBackgroundRender(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (currentInventoryResults.isEmpty()) return
         val offSet = currentInventoryResults.first().category.indexOffSet
-        val slots = currentInventoryResults.map { it.slotIndex+offSet }.toHashSet()
+        val slots = currentInventoryResults.map { it.slotIndex + offSet }.toHashSet()
         InventoryUtils.getItemsInOpenChestWithNull().forEachIndexed { index, slot ->
             if (slots.contains(index)) {
                 slot.highlight(LorenzColor.YELLOW)
@@ -362,15 +367,15 @@ object StorageApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun renderWaypoints(event: SkyHanniRenderWorldEvent){
+    fun renderWaypoints(event: SkyHanniRenderWorldEvent) {
         toHighlightResults.filter { it.isPrivateIslandChest() }.forEach {
-            val location = it.location?:return@forEach
-            event.drawWaypointFilled(location, java.awt.Color.YELLOW,true,false)
+            val location = it.location ?: return@forEach
+            event.drawWaypointFilled(location, java.awt.Color.YELLOW, true, false)
         }
     }
 }
 
 fun List<StorageSearchResult>.outputToChat() {
-       StorageNavigationUtils.makeNavigatableChatList(this, allowServerChange = false)
+    StorageNavigationUtils.makeNavigatableChatList(this, allowServerChange = false)
 }
 

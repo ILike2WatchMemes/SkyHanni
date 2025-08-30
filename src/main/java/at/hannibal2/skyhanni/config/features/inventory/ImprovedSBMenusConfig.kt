@@ -14,7 +14,7 @@ class ImprovedSBMenusConfig {
 
     @ConfigOption(
         name = "§cUse NEU!",
-        desc = "§eThis feature originally comes from NEU, and was ported to SkyHanni for 1.21+. Enable it in /neu if you want to use it."
+        desc = "§eThis feature originally comes from NEU, and was ported to SkyHanni for 1.21+. Enable it in /neu if you want to use it.",
     )
     @ConfigEditorInfoText
     @OnlyLegacy
@@ -30,7 +30,7 @@ class ImprovedSBMenusConfig {
     @Expose
     @ConfigOption(
         name = "Menu Background Style",
-        desc = "Change the background style of SkyBlock menus."
+        desc = "Change the background style of SkyBlock menus.",
     )
     @ConfigEditorDropdown
     @OnlyModern
@@ -39,7 +39,7 @@ class ImprovedSBMenusConfig {
     @Expose
     @ConfigOption(
         name = "Button Background Style",
-        desc = "Change the background style of foreground elements in SkyBlock menus."
+        desc = "Change the background style of foreground elements in SkyBlock menus.",
     )
     @ConfigEditorDropdown
     @OnlyModern

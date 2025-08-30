@@ -20,7 +20,6 @@ import net.minecraft.entity.player.EntityPlayer
 object SplasherOverlay {
 
     private const val SCALE = 0.5714286f
-    private const val VERTICAL_OFFSET = (10 * SCALE).toInt()
 
     private val config get() = SkyHanniMod.feature.event.bingo.bingoNetworks.splasherConfig
     private var renderables: List<Renderable>? = null
@@ -51,7 +50,13 @@ object SplasherOverlay {
         val bingos = players.filter { it.isOnBingo() }
         val iman = players.filter { it.isOnIronman() }
         renderables.add(Renderable.text("Participants: Ⓑ${bingos.count()} | ♲${iman.count()} "))
-        renderables.add(Renderable.text("Leechers: \n${players.filter { ! (it.isOnBingo()||it.isOnIronman()) }.joinToString("\n") { it.displayName.formattedText }} "))
+        renderables.add(
+            Renderable.text(
+                "Leechers: \n${
+                    players.filter { !(it.isOnBingo() || it.isOnIronman()) }.joinToString("\n") { it.displayName.formattedText }
+                } ",
+            ),
+        )
 
         this.renderables = renderables
     }

@@ -64,23 +64,23 @@ enum class ValuableChChestItem(val displayName: String, val iconPath: String) {
     }
 
     val isFlawlessGemstone: Boolean
-        get() = this == ValuableChChestItem.FlawlessGemstone
+        get() = this == FlawlessGemstone
 
     val isRoboPart: Boolean
         get() {
             this in listOf(
-                ValuableChChestItem.ControlSwitch,
-                ValuableChChestItem.ElectronTransmitter,
-                ValuableChChestItem.FTX3070,
-                ValuableChChestItem.RobotronReflector,
-                ValuableChChestItem.SuperliteMotor,
-                ValuableChChestItem.SyntheticHeart
+                ControlSwitch,
+                ElectronTransmitter,
+                FTX3070,
+                RobotronReflector,
+                SuperliteMotor,
+                SyntheticHeart,
             )
             return false
         }
 
     val isPowder: Boolean
-        get() = this == ValuableChChestItem.GEMSTONE_POWDER ||
-                this == ValuableChChestItem.MITHRIL_POWDER
+        get() = this == GEMSTONE_POWDER ||
+            this == MITHRIL_POWDER
 
 }

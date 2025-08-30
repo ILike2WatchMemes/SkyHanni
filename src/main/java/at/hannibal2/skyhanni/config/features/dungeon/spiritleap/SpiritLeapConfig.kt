@@ -33,7 +33,7 @@ class SpiritLeapConfig {
     @Expose
     @ConfigOption(
         name = "Spirit Leap Keybinds",
-        desc = "Set keybinds and show keybind hints for Spirit Leap."
+        desc = "Set keybinds and show keybind hints for Spirit Leap.",
     )
     @Accordion
     var spiritLeapKeybindConfig = SpiritLeapKeybindConfig()

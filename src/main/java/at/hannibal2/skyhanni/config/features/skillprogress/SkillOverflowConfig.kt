@@ -14,7 +14,7 @@ class SkillOverflowConfig {
     @Expose
     @ConfigOption(
         name = "All Skill Display",
-        desc = "Enable the overflow calculation in the all skill progress display."
+        desc = "Enable the overflow calculation in the all skill progress display.",
     )
     @ConfigEditorBoolean
     val enableInAllDisplay: Property<Boolean> = Property.of(false)
@@ -32,7 +32,7 @@ class SkillOverflowConfig {
     @Expose
     @ConfigOption(
         name = "Skill Menu Stack Size",
-        desc = "Enable the overflow calculation when the 'Skill Level' Item Number is enabled."
+        desc = "Enable the overflow calculation when the 'Skill Level' Item Number is enabled.",
     )
     @ConfigEditorBoolean
     var enableInSkillMenuAsStackSize: Boolean = false
@@ -40,7 +40,7 @@ class SkillOverflowConfig {
     @Expose
     @ConfigOption(
         name = "Skill Menu Tooltips",
-        desc = "Enable the overflow calculation in the tooltip of items in skills menu."
+        desc = "Enable the overflow calculation in the tooltip of items in skills menu.",
     )
     @ConfigEditorBoolean
     var enableInSkillMenuTooltip: Boolean = false

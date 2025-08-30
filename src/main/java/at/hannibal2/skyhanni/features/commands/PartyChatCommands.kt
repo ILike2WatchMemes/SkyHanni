@@ -147,7 +147,7 @@ object PartyChatCommands {
             return
         } else if (level == PermissionLevel.INSTANT) {
             command.executable.invoke(event)
-        }else if (level == PermissionLevel.ASK){
+        } else if (level == PermissionLevel.ASK) {
             // TODO ChatPrompt
         }
     }

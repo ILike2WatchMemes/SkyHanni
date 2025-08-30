@@ -13,11 +13,12 @@ open class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventor
     val inventoryId: Int get() = inventory.windowId
     val inventoryName: String get() = inventory.title
     val inventorySize: Int get() = inventory.slotCount
-    val inventoryItems: Map<Int, ItemStack> get() {
-        val items = inventory.items
-        items.entries.removeIf { !it.value.isNotEmpty() }
-        return items
-    }
+    val inventoryItems: Map<Int, ItemStack>
+        get() {
+            val items = inventory.items
+            items.entries.removeIf { !it.value.isNotEmpty() }
+            return items
+        }
     val inventoryItemsWithNull: Map<Int, ItemStack?> by lazy {
         (0 until inventorySize).associateWith { inventoryItems[it] }
     }

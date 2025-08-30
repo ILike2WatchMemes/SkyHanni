@@ -26,7 +26,7 @@ class ReforgeHelperConfig {
     @Expose
     @ConfigOption(
         name = "Show Diff",
-        desc = "Shows the difference of the new reforge to the current one in the selection list."
+        desc = "Shows the difference of the new reforge to the current one in the selection list.",
     )
     @ConfigEditorBoolean
     var showDiff: Boolean = false

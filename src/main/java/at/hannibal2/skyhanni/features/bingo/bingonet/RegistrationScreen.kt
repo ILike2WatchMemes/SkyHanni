@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.bingo.bingonet
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.event.bingo.BingoNetConfig
+import at.hannibal2.skyhanni.config.features.event.bingo.BingoNetSystem
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -34,7 +35,7 @@ class RegistrationScreen(
     private fun title(maxSize: Int) = centeredText("§b§lBingo Net Registration", maxSize)
     private fun description(maxSize: Int) = text(
         "§c⚠ Warning ⚠: The Bingo Net Server is a closed source Project by Hype_the_Time. " +
-                "We as the Sky Hanni Team DO NOT HAVE ACCESS to the Server nor its Code.",
+            "We as the Sky Hanni Team DO NOT HAVE ACCESS to the Server nor its Code.",
         maxSize,
     )
 
@@ -55,7 +56,7 @@ class RegistrationScreen(
 
     private fun discordLabel(maxSize: Int) = text(
         "Due too how Bingo Net works you break parts of the Functionality for you, BUT ALSO FOR OTHERS if you are not on the Discord." +
-                " During Registration you HAVE to be in the Discord!",
+            " During Registration you HAVE to be in the Discord!",
         maxSize,
     )
 
@@ -199,7 +200,7 @@ class RegistrationScreen(
             }
         }
         SkyHanniMod.launchCoroutine {
-            BNConnection.reconnectToBNServer(false, BingoNetConfig.BingoNetSystem.MAIN, listOf(intercept, reponseIntercept))
+            BNConnection.reconnectToBNServer(false, BingoNetSystem.MAIN, listOf(intercept, reponseIntercept))
         }
     }
 
@@ -212,7 +213,7 @@ class RegistrationScreen(
                         ChatUtils.chat("Starting Rich Presence to obtain Discord User ID and Username.")
                         DiscordRPCManager.start(false)
                     }
-                    val user = DiscordRPCManager.getSelfUser()
+                    DiscordRPCManager.getSelfUser()
                 }
                 sleep(5000)
                 val userId = DiscordRPCManager.getDiscordUserId()

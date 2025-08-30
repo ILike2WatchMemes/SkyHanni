@@ -15,6 +15,7 @@ import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S2APacketParticles
 //#if MC < 1.21
 import net.minecraft.network.play.server.S32PacketConfirmTransaction
+
 //#else
 //$$ import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket
 //#endif

@@ -27,7 +27,7 @@ data class BBServiceData(
         @JvmField val price: Int,
         @JvmField val priority: Boolean = false,
         @JvmField val joinTime: Instant = Instant.now(),
-        @JvmField val autoRequeue: Boolean = false
+        @JvmField val autoRequeue: Boolean = false,
     ) {
         override fun equals(other: Any?): Boolean {
             if (other is Participant) return other.user == user

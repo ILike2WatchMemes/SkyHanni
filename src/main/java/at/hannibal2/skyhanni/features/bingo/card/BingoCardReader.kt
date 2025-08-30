@@ -132,7 +132,7 @@ object BingoCardReader {
             }
             return@mapValues it.value
         }
-        //It is censored client side to eliminate any type of sniping #1 accusations using this System.
+        // It is censored client side to eliminate any type of sniping #1 accusations using this System.
         // Data can be used to show contributors count as well as top 100 data to users.
         BNConnection.sendPacket(
             PositionCommunityFeedback(
@@ -154,12 +154,13 @@ object BingoCardReader {
         val old = bingoGoal.communityGoalData
 
         if (!config.communityGoalProgress) return
-        if (old!=null && ((new.position!=null && new.position == old.position)||(new.position==null && new.percentage==old.percentage))) return
+        if (old != null && ((new.position != null && new.position == old.position) || (new.position == null && new.percentage == old.percentage))) return
 
-        val oldFormat = BingoApi.getCommunityPercentageColor(old?.percentage?:1.toDouble())
+        val oldFormat = BingoApi.getCommunityPercentageColor(old?.percentage ?: 1.toDouble())
         val newFormat = BingoApi.getCommunityPercentageColor(new.percentage)
-        val color = if (((new.position ?: 101) > (old?.position ?: 101)) || (new.percentage > (old?.percentage ?: 1.toDouble()))) "§c" else "§a"
-        ChatUtils.chat("$color${bingoGoal.displayName}: $oldFormat${if (old?.position!=null) "(§6#${old.position}$color)" else ""} §b->" + " $newFormat${if (new.position !=null) "(§6#${new.position}$color)" else ""}")
+        val color =
+            if (((new.position ?: 101) > (old?.position ?: 101)) || (new.percentage > (old?.percentage ?: 1.toDouble()))) "§c" else "§a"
+        ChatUtils.chat("$color${bingoGoal.displayName}: $oldFormat${if (old?.position != null) "(§6#${old.position}$color)" else ""} §b->" + " $newFormat${if (new.position != null) "(§6#${new.position}$color)" else ""}")
     }
 
     private fun readCommunityGoalData(lore: List<String>): ComGoalPosition? {
@@ -174,7 +175,7 @@ object BingoCardReader {
                 position = group("position").toInt()
             }
             contributionPattern.matchMatcher(line) {
-                contribution = group("contribution").replace(",","").toDouble().toInt()
+                contribution = group("contribution").replace(",", "").toDouble().toInt()
             }
         }
         if (percentage == null || contribution == null) return null

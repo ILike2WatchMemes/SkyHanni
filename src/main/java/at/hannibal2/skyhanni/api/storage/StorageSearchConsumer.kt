@@ -33,6 +33,7 @@ class StorageSearchConsumer {
         val results = getResults()
         resultHandler?.invoke(results)
     }
+
     /**
      * Executes the search and returns results directly
      */
@@ -55,8 +56,8 @@ class StorageSearchConsumer {
                                 storageName = storageName,
                                 category = category,
                                 page = page,
-                                location = location
-                            )
+                                location = location,
+                            ),
                         )
                     }
                 }
@@ -65,12 +66,13 @@ class StorageSearchConsumer {
 
         return results
     }
+
     /**
      * Executes the search and returns results directly
      */
     fun getResults(): List<StorageSearchResult> {
         val results = getResultsNoHighlight()
-        StorageApi.toHighlightResults+=results
+        StorageApi.toHighlightResults += results
         return results
     }
 

@@ -22,7 +22,7 @@ class SackDisplayConfig {
     @ConfigOption(
         name = "Highlight Full",
         desc = "Highlight items that are full in red.\n" +
-            "§eDoes not need the option above to be enabled."
+            "§eDoes not need the option above to be enabled.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -34,7 +34,7 @@ class SackDisplayConfig {
         desc = "Either show Default, Formatted or Unformatted numbers.\n" +
             "§eDefault: §72,240/2.2k\n" +
             "§eFormatted: §72.2k/2.2k\n" +
-            "§eUnformatted: §72,240/2,200"
+            "§eUnformatted: §72,240/2,200",
     )
     @ConfigEditorDropdown
     var numberFormat: NumberFormatEntry = NumberFormatEntry.FORMATTED
@@ -77,7 +77,7 @@ class SackDisplayConfig {
     @ConfigOption(
         name = "Item To Show",
         desc = "Choose how many items are displayed. (Some sacks have too many items to fit\n" +
-            "in larger GUI scales, like the nether sack.)"
+            "in larger GUI scales, like the nether sack.)",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 45f, minStep = 1f)
     var itemToShow: Int = 15
@@ -97,7 +97,7 @@ class SackDisplayConfig {
         name = "Price Format",
         desc = "Format of the price displayed.\n" +
             "§eFormatted: §7(12k)\n" +
-            "§eUnformatted: §7(12,421)"
+            "§eUnformatted: §7(12,421)",
     )
     @ConfigEditorDropdown
     var priceFormat: PriceFormatEntry = PriceFormatEntry.FORMATTED
@@ -113,7 +113,7 @@ class SackDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Change Price Source",
-        desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC."
+        desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC.",
     )
     @ConfigEditorDropdown
     var priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY

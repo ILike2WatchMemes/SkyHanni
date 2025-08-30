@@ -9,6 +9,7 @@ import org.lwjgl.opengl.GL11
 import net.minecraft.client.renderer.OpenGlHelper
 import net.minecraft.client.resources.IReloadableResourceManager
 import net.minecraft.client.shader.ShaderLinkHelper
+
 //#endif
 
 /**
@@ -89,7 +90,7 @@ abstract class Shader(val vertex: String, val fragment: String) {
                 ErrorManager.logErrorWithData(
                     Exception("Shader linking error."),
                     errorMessage,
-                    "Link Error:\n" to errorLog
+                    "Link Error:\n" to errorLog,
                 )
             } else {
                 ChatUtils.consoleLog("$errorMessage $errorLog")

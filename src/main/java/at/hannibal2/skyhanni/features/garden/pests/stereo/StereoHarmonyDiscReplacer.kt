@@ -21,7 +21,7 @@ object StereoHarmonyDiscReplacer {
     private val config get() = PestApi.config.stereoHarmony
     private val inventoryPattern by PestApi.patternGroup.pattern(
         "stereo.inventory",
-        "Stereo Harmony"
+        "Stereo Harmony",
     )
     private val iconCache: MutableMap<String, ItemStack> = mutableMapOf()
 

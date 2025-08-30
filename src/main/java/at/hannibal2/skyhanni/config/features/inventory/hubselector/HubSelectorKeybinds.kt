@@ -37,8 +37,12 @@ object HubSelectorKeybinds {
     private val config get() = SkyHanniMod.feature.event.bingo.bingoNetworks
     private var lastClick = SimpleTimeMark.farPast()
     private val patternGroup = RepoPattern.group("inventory.hubselector")
+
+    @Transient
     val hubIdToNumberCache: BiMap<String, Int> = HashBiMap.create()
     private var openedCache: Map<Int, HubData>? = null
+
+    @Transient
     var lastUpdate = SimpleTimeMark.farPast()
 
     // TODO Dungeon Hub implementation
@@ -86,7 +90,7 @@ object HubSelectorKeybinds {
         val chest = event.guiContainer as? GuiChest ?: return
 
         val key = config.splashHubWarp.getEffectiveKey()
-        if (!key.isKeyHeld() || lastClick.passedSince()<250.milliseconds) return
+        if (!key.isKeyHeld() || lastClick.passedSince() < 250.milliseconds) return
         lastClick = SimpleTimeMark.now()
         event.cancel()
         // First Score | Second Index
@@ -105,7 +109,7 @@ object HubSelectorKeybinds {
 
                 }
         event.guiContainer.inventorySlots.inventorySlots.forEach { slot ->
-            val data = cache[slot.slotNumber]?:return@forEach
+            val data = cache[slot.slotNumber] ?: return@forEach
             val score = calculateScore(splashPool.get(data.serverId), data)
             if (score != null) {
                 if (bestClick == null) {
@@ -153,7 +157,7 @@ object HubSelectorKeybinds {
     }
 
     fun getHubNumberById(serverId: String, island: Islands): SplashData.HubSelectorData? {
-        if (lastUpdate.plus(30.seconds).isInPast()) return null //Hub Swaps problem etc.
+        if (lastUpdate.plus(30.seconds).isInPast()) return null // Hub Swaps problem etc.
         return SplashData.HubSelectorData(hubIdToNumberCache.get(serverId) ?: return null, island)
     }
 
@@ -164,9 +168,9 @@ object HubSelectorKeybinds {
 
         val splashHubs = SplashManager.splashPool.filter { it.value.status == StatusConstants.WAITING }.map { it.value.serverID }
         val minPlayerCount = SkyHanniMod.feature.event.bingo.bingoNetworks.splasherConfig.lowestPlayerHub.let {
-            if (it){
-                cache.maxBy { it.value.maxPlayerCount-it.value.playerCount }.value.serverId
-            }else{
+            if (it) {
+                cache.maxBy { it.value.maxPlayerCount - it.value.playerCount }.value.serverId
+            } else {
                 null
             }
         }

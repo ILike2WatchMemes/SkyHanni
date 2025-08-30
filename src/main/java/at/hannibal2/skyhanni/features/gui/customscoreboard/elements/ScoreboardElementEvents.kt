@@ -19,8 +19,9 @@ object ScoreboardElementEvents : ScoreboardElement() {
 
     override val configLine = "§7Wide Range of Events\n§7(too much to show all)"
 
-    override val elementPatterns get() =
-        ScoreboardConfigEventElement.entries.filter { it.event.showIsland() }.flatMap { it.event.elementPatterns }
+    override val elementPatterns
+        get() =
+            ScoreboardConfigEventElement.entries.filter { it.event.showIsland() }.flatMap { it.event.elementPatterns }
 
     override fun getLines(): List<ScoreboardLine> = if (showWhen()) getElementsFromAny(getDisplay()) else listOf()
 }

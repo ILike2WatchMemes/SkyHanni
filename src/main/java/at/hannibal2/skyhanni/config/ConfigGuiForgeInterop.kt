@@ -13,7 +13,9 @@ import java.io.IOException
 class ConfigGuiForgeInterop : IModGuiFactory {
 
     @Suppress("EmptyFunctionBlock")
-    override fun initialize(minecraft: Minecraft) {}
+    override fun initialize(minecraft: Minecraft) {
+    }
+
     override fun mainConfigGuiClass() = WrappedSkyHanniConfig::class.java
 
     override fun runtimeGuiCategories(): Set<RuntimeOptionCategoryElement>? = null
