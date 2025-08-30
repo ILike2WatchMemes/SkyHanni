@@ -27,7 +27,6 @@ import java.util.regex.Pattern
 import java.util.TreeMap
 //#if FORGE
 import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
-
 //#else
 //$$ import net.minecraft.client.util.ChatMessages
 //$$ import net.minecraft.text.TextColor

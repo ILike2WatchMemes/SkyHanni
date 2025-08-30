@@ -16,7 +16,6 @@ import java.awt.Color
 //#if MC < 1.21
 import at.hannibal2.skyhanni.utils.compat.Text
 import net.minecraft.util.ChatComponentText
-
 //#endif
 //#if MC > 1.16
 //$$ import net.minecraft.network.chat.MutableComponent
