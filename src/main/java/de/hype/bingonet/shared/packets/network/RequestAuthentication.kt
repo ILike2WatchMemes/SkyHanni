@@ -10,4 +10,5 @@ class RequestAuthentication
 /**
  * @param serverIdSuffix needed for Mojang Auth. "client" + "server" = serverid at mojang.
  * @param serverVersion  the version the server is on.
- */(val serverIdSuffix: String?, val serverVersion: Int) : AbstractPacket()
+ */
+constructor(val serverIdSuffix: String?, val serverVersion: Int) : AbstractPacket()

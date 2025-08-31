@@ -46,7 +46,7 @@ enum class IslandType(private val nameFallback: String) {
         NONE,
         ANY,
         UNKNOWN,
-            -> false
+        -> false
 
         else -> true
     }
@@ -126,7 +126,7 @@ data class IslandData(
     val maxPlayers: Int,
     val boundingBox: AxisAlignedBB?,
 )
-
+@Suppress("CyclomaticComplexMethod")
 fun IslandType.toBNIsland(): Islands? {
     return when (this) {
         IslandType.PRIVATE_ISLAND -> Islands.PRIVATE_ISLAND

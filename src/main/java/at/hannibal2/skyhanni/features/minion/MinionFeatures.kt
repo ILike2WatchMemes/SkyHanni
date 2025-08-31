@@ -244,9 +244,7 @@ object MinionFeatures {
                 if (!entry.value.asString().endsWith("GENERATOR_1")) continue
                 val recipes = NeuItems.getRecipes(entry.value)
                 if (recipes.size != 1) continue
-                if (recipes.first { it.isCraftingRecipe() }.ingredients.any {
-                        it.internalName.asString() == currentItem
-                    }) {
+                if (recipes.first { it.isCraftingRecipe() }.ingredients.any { it.internalName.asString() == currentItem }) {
                     HypixelCommands.viewRecipe(entry.value)
                     return@launchCoroutine
                 }

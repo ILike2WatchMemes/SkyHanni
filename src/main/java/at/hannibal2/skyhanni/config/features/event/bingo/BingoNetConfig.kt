@@ -32,6 +32,7 @@ class BingoNetConfig {
         desc = "API/Legacy Key can be used instead of Mojang Auth. This prevents the possible restart your client message when the Mojang Tokens expired. Leave empty to use Mojang Auth.",
     )
     @ConfigEditorText
+    @Suppress("VariableNaming", "PropertyName")
     var BNApiKey: String = ""
 
 }
@@ -42,6 +43,7 @@ enum class BingoNetSystem {
     ALPHA("Alpha Server", 5012);
 
     private val displayName: String
+    @Suppress("StorageNeedsExpose")
     val port: Int
 
     constructor(displayName: String, port: Int) {

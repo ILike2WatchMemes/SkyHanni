@@ -447,7 +447,7 @@ object PartyApi {
     private fun send(message: String) {
         ChatUtils.sendMessageToServer("/$message")
     }
-
+    @Suppress("FunctionOnlyReturningConstant")
     fun isModerator(): Boolean {
         // TODO add moderator tracking
         // TODO add allinvite tracking

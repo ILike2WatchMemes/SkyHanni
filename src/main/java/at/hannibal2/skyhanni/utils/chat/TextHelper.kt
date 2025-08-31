@@ -1,3 +1,5 @@
+@file:Suppress("UsePropertyAccessSyntax")
+
 package at.hannibal2.skyhanni.utils.chat
 
 import at.hannibal2.skyhanni.utils.ColorUtils
@@ -115,7 +117,7 @@ object TextHelper {
     }
 
     fun createDivider(dividerColor: EnumChatFormatting = EnumChatFormatting.BLUE) = HYPHEN.fitToChat().style {
-        strikethrough = true
+        setStrikethrough(true)
         color = dividerColor
     }
 

@@ -78,6 +78,11 @@ object ChChestMessageAnalyser {
             items[item.first] = before.plus(item.second)
         }
     }
+
+
+    fun IntRange.plus(range: IntRange): IntRange {
+        return IntRange(this.first + range.first, this.last + range.last)
+    }
 }
 
 fun IntRange.plus(range: IntRange): IntRange {

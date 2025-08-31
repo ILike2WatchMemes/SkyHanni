@@ -3,7 +3,6 @@ package de.hype.bingonet
 // import de.hype.bingonet.shared.packets.function.MinionDataResponse.RequestMinionDataPacket
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.event.bingo.BingoNetConfig
 import at.hannibal2.skyhanni.config.features.event.bingo.BingoNetSystem
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PartyApi
@@ -13,6 +12,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.bingo.bingonet.RegistrationScreen
 import at.hannibal2.skyhanni.features.bingo.bingonet.SplashManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -232,22 +232,7 @@ object BNConnection {
             // This should prevent any Issues from Bingo Net from causing an actual Issue. The Set Filter should prevent Error Spam.
             val key = "${e::class.java.name}:${e.message}"
             if (reportedErrors.add(key)) {
-                val errorReport = buildString {
-                    appendLine("Bingo Net Connection Error Report")
-                    appendLine("Received packet: $message")
-                    var current: Throwable? = e
-                    while (current != null) {
-                        appendLine("Exception: ${current::class.java.name}: ${current.localizedMessage}")
-                        appendLine("Stacktrace:")
-                        current.stackTrace.forEach { appendLine("  at $it") }
-                        current = current.cause
-                        if (current != null) appendLine("Caused by:")
-                    }
-                }
-                ChatUtils.clickToClipboard(
-                    "§cBN: Error processing message: ${e.localizedMessage}", errorReport.split("\n"),
-                )
-                e.printStackTrace()
+                ErrorManager.logErrorWithData(e, "Error reading Bingo Net Packet", "packetJson" to message)
             }
         }
     }
@@ -613,8 +598,7 @@ object BNConnection {
             reader = null
             socket = null
         } catch (e: Exception) {
-            if (e.message != null) ChatUtils.chat("§c" + e.message)
-            e.printStackTrace()
+            ErrorManager.logErrorWithData(e, "Connection Error", ignoreErrorCache = true)
         }
     }
 
@@ -673,10 +657,7 @@ object BNConnection {
         if (!data.canUseNetwork) bnConfig.useBN = false
         ChatUtils.chat(
             "§c[Bingo Net] You currently have a Punishment Active. Type: ${data.punishmentType}. Expiration Time: ${
-                (Duration.between(
-                    Instant.now(),
-                    data.expirationDate,
-                ).toKotlinDuration().format(at.hannibal2.skyhanni.utils.TimeUnit.DAY))
+                (Duration.between(Instant.now(), data.expirationDate).toKotlinDuration().format(at.hannibal2.skyhanni.utils.TimeUnit.DAY))
             }",
             prefix = false,
         )

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.event.bingo
 
 import at.hannibal2.skyhanni.config.core.config.KeyBind
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -88,5 +89,6 @@ class ChChestConfig {
 
     @Expose
     @ConfigOption(name = "Request Party Keybind", desc = "Keybind to request a Party Invite when a chchest shown to you.")
+    @Accordion
     val chChestChatPrompt = KeyBind()
 }

@@ -13,7 +13,8 @@ class RequestConnectPacket
  * @param clientApiVersion
  * @param modName
  * @param authType
- */(
+ */
+constructor(
     @JvmField val mcuuid: java.util.UUID,
     @JvmField val key: String,
     val mcVersion: String,

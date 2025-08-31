@@ -10,4 +10,5 @@ class SystemMessagePacket
  * @param message   the Message
  * @param important whether the message is important
  * @param ping      whether the client shall play the ping sound
- */(val message: String, val important: Boolean, val ping: Boolean) : AbstractPacket()
+ */
+constructor(val message: String, val important: Boolean, val ping: Boolean) : AbstractPacket()

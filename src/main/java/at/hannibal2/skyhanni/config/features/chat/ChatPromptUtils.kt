@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
-import com.google.gson.annotations.Expose
 
 @SkyHanniModule
 object ChatPromptUtils {

@@ -13,7 +13,8 @@ class DisconnectPacket
  * @param randomExtraDelay    Max random delay that is added to put less stress on the Server
  * @param displayReason       Reason to be displayed why Client was disconnected
  * @param displayMessage      Message is shown on the client.
- */(
+ */
+constructor(
     val internalReason: InternalReasonConstants?,
     val waitBeforeReconnect: IntArray,
     val randomExtraDelay: Int,

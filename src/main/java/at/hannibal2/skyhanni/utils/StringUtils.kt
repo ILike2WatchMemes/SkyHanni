@@ -1,3 +1,5 @@
+@file:Suppress("UsePropertyAccessSyntax")
+
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
@@ -27,6 +29,7 @@ import java.util.regex.Pattern
 import java.util.TreeMap
 //#if FORGE
 import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
+
 //#else
 //$$ import net.minecraft.client.util.ChatMessages
 //$$ import net.minecraft.text.TextColor
@@ -382,23 +385,23 @@ object StringUtils {
                         val formatting = enumChatFormattingByCode(formattingChar) ?: continue
                         when (formatting) {
                             EnumChatFormatting.OBFUSCATED -> {
-                                colorOverride.obfuscated = true
+                                colorOverride.setObfuscated(true)
                             }
 
                             EnumChatFormatting.BOLD -> {
-                                colorOverride.bold = true
+                                colorOverride.setBold(true)
                             }
 
                             EnumChatFormatting.STRIKETHROUGH -> {
-                                colorOverride.strikethrough = true
+                                colorOverride.setStrikethrough(true)
                             }
 
                             EnumChatFormatting.UNDERLINE -> {
-                                colorOverride.underlined = true
+                                colorOverride.setUnderlined(true)
                             }
 
                             EnumChatFormatting.ITALIC -> {
-                                colorOverride.italic = true
+                                colorOverride.setItalic(true)
                             }
 
                             else -> {

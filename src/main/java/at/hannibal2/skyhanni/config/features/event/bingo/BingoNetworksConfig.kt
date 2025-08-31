@@ -65,6 +65,7 @@ class BingoNetworksConfig {
         name = "Show Goal Completions",
         desc = "Shows a Message in the Chat when someone completes a Goal. (and Bingo Net knows)",
     )
+    @ConfigEditorBoolean
     var showGoalCompletions: Boolean = false
 
     @Expose
@@ -72,6 +73,7 @@ class BingoNetworksConfig {
         name = "Show Card Completions",
         desc = "Shows a Message in the Chat when someone completes a Bingo Card. (and Bingo Net knows)",
     )
+    @ConfigEditorBoolean
     var showCardCompletions: Boolean = false
 
     @Expose

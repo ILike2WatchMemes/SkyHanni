@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.bingo.bingonet
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.event.bingo.BingoNetConfig
 import at.hannibal2.skyhanni.config.features.event.bingo.BingoNetSystem
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager

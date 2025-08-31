@@ -487,6 +487,7 @@ object ChatUtils {
         SkyHanniMod.consoleLog(text)
     }
 
+    @Suppress("UnusedParameter")
     fun suggestInChat(message: String) {
         // TODO
         chat("Chat Suggestion is not implemented yet!")

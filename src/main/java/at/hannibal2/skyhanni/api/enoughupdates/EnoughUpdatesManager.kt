@@ -489,6 +489,7 @@ object EnoughUpdatesManager {
         return neuMinionTypes?.get(minionId)
     }
 
+    @Suppress("UnusedParameter")
     fun getTypeMinions(type: MinionType): List<MinionData> {
         TODO("Not yet implemented")
         // Scan all items in neu repo including lore to parse the minion data such as base storage and speed for all tiers.

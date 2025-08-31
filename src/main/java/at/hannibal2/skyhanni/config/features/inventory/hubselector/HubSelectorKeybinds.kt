@@ -46,20 +46,38 @@ object HubSelectorKeybinds {
     var lastUpdate = SimpleTimeMark.farPast()
 
     // TODO Dungeon Hub implementation
+    /**
+     * REGEX-TEST: Dungeon Hub Selector
+     * REGEX-TEST: SkyBlock Hub Selector
+     */
     private val hubSelectorGuiNamePattern by patternGroup.pattern(
         "gui-name",
         ".*Hub Selector.*",
     )
 
+    /**
+     * REGEX-TEST: §aSkyBlock Hub #24
+     * REGEX-TEST: §aDungeon Hub #1
+     */
     private val itemNamePattern by patternGroup.pattern(
         "item-name",
-        "§.((SkyBlock)|(Dungeon)) Hub #(?<hubNumber>\\d+)",
+        "§.(?<type>(SkyBlock)|(Dungeon)) Hub #(?<hubNumber>\\d+)",
     )
 
+    /**
+     * REGEX-TEST: §7Players: 5/60
+     * REGEX-TEST: §7Players: 0/0
+     * REGEX-TEST: §7Players: 60/60
+     */
     private val playersPattern by patternGroup.pattern(
         "player-count",
         "§7Players: (?<current>\\d+)/(?<max>\\d+)",
     )
+
+    /**
+     * REGEX-TEST: §8Server: mega13D
+     * REGEX-TEST: §8Server: mini63BW
+     */
     private val serverIdPattern by patternGroup.pattern(
         "server-id",
         "§8Server: (?<serverid>.*)",

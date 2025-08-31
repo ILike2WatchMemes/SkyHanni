@@ -143,6 +143,7 @@ object BingoBrewersPackets {
         }
     }
 
+    @Suppress("MemberNameEqualsClassName")
     class PlayerCount {
         var playerCount: Int = 0
         var IGN: String? = null

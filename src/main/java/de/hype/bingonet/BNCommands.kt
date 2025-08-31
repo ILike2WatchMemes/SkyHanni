@@ -1,3 +1,4 @@
+@file:Suppress("NoUnusedImports")
 package de.hype.bingonet
 
 import at.hannibal2.skyhanni.SkyHanniMod
@@ -5,7 +6,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.config.features.event.bingo.BingoNetConfig
 import at.hannibal2.skyhanni.config.features.event.bingo.BingoNetSystem
 import at.hannibal2.skyhanni.config.features.inventory.hubselector.HubSelectorKeybinds
 import at.hannibal2.skyhanni.data.HypixelData

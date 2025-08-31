@@ -2,7 +2,6 @@ package de.hype.bingonet.shared.objects
 
 import com.google.gson.JsonObject
 import de.hype.bingonet.environment.BNEnvironmentUtils
-import org.apache.commons.lang3.StringEscapeUtils
 import java.util.function.Predicate
 
 open class Message @JvmOverloads constructor(textJson: String, string: String, actionbar: Boolean = false) {
@@ -77,22 +76,6 @@ open class Message @JvmOverloads constructor(textJson: String, string: String, a
             this.noRanks = noRanks
         }
         return noRanks
-    }
-
-    @Suppress("DEPRECATION")
-    fun replaceInJson(replace: String, replaceWith: String) {
-        try {
-            this.json = json.replaceFirst(replace.toRegex(), StringEscapeUtils.escapeJson(replaceWith))
-        } catch (e: Exception) {
-            System.err.println(
-                "String that caused the problems: Replace: $replace | Replace With: ${
-                    StringEscapeUtils.escapeJson(
-                        replaceWith,
-                    )
-                } | Test: $json",
-            )
-            e.printStackTrace()
-        }
     }
 
     fun contains(string: String): Boolean {

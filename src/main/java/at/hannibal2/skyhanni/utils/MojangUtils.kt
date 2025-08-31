@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
 import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpGet
@@ -75,7 +76,11 @@ object MojangUtils {
 
             return isValid
         } catch (e: Exception) {
-            e.printStackTrace()
+            ErrorManager.logErrorWithData(
+                e, "Failed to verify Player Join",
+                "player" to username,
+                "serverId" to serverId,
+            )
             return false // An error occurred
         }
     }
