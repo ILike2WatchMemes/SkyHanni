@@ -114,6 +114,9 @@ formatting:
         maxLineLength: 140
     Wrapping:
         maxLineLength: 140
+    Indentation:
+        excludes:
+            - "de.hype.bingonet.*"
 
 complexity:
     CyclomaticComplexMethod: # default threshold of 15, caught almost every complex method
@@ -148,6 +151,9 @@ exceptions:
         active: false
     TooGenericExceptionThrown: # we don't have our own custom exceptions
         active: false
+    PrintStackTrace:
+        excludes:
+            - "de.hype.bingonet.*"
 
 naming:
     ConstructorParameterNaming: # pedantic
