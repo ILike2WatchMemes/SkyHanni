@@ -179,4 +179,10 @@ class DevConfig {
     @Expose
     @Category(name = "Debug Mob", desc = "Every Debug related to the Mob System")
     val mobDebug: DebugMobConfig = DebugMobConfig()
+
+    @Expose
+    @ConfigOption(name = "Ignore Term Signal", desc = "Ignores received term signals. This allows to survive IntelliJ closing.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var ignoreTermSignal: Boolean = false
 }
