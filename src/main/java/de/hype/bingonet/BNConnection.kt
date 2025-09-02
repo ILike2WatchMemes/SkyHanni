@@ -7,13 +7,16 @@ import at.hannibal2.skyhanni.config.features.event.bingo.BingoNetSystem
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.effect.EffectApi
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.features.bingo.bingonet.RegistrationScreen
 import at.hannibal2.skyhanni.features.bingo.bingonet.SplashManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -133,13 +136,17 @@ object BNConnection {
         }
     }
 
-    init {
+    @HandleEvent
+    fun launchHook(event: ConfigLoadEvent) {
         if (bnConfig.useBN) {
             SkyHanniMod.launchCoroutine {
-                reconnectToBNServer()
+                if (!isConnected) connect("hackthetime.de", bnConfig.system.port)
             }
+        } else {
+            disconnect()
         }
     }
+
 
     fun connect(serverIP: kotlin.String = "hackthetime.de", serverPort: Int) {
         try {
@@ -344,8 +351,11 @@ object BNConnection {
         system: BingoNetSystem = bnConfig.system,
         packetIntercepts: List<InterceptPacketInfo<*>> = emptyList(),
     ) {
-        disconnect()
         if (bnConfig.useBN) {
+            if (ignoreIfConnected) {
+                if (isConnected) return
+                disconnect()
+            }
             connect("hackthetime.de", system.port)
         } else {
             ChatUtils.clickableChat(
