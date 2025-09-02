@@ -114,6 +114,7 @@ object BNCommands {
             }
             event.registerBrigadier("bnrequestpottimes") {
                 category = CommandCategory.BINGO_NET
+                description = "For Splashers: Shows a summary of the current remaining God Pot Durations of all mod users."
                 simpleCallback {
                     val packet = SplashTimeRequestPacket()
                     BNConnection.sendPacket(packet)
