@@ -101,7 +101,7 @@ object HubSelectorKeybinds {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onKeyPress(event: GuiKeyPressEvent) {
-        if (HypixelData.joinedWorld.passedSince() <= 2.5.seconds) return
+        if (HypixelData.joinedWorld.passedSince() <= 3.seconds) return
         if (!mainInventory.isInside()) return
         val cache = openedCache ?: return
 
