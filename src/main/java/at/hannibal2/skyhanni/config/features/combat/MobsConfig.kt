@@ -9,6 +9,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class MobsConfig {
+
+
     @Expose
     @ConfigOption(
         name = "Area Boss Highlighter",
@@ -132,4 +134,14 @@ class MobsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var hideNameTagArachneMinis: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Arachne Other Entities (Player / Tara) Hider",
+        desc = "All Entities in a 5 Block radius around an Arachne Boss (or Brood) will be rendered with the" +
+            " entered opacity value. (0 = invisible, 100 = normal)",
+    )
+    @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 1f)
+    val arachneOtherEntitiesOpacity: Int = 100
+
 }
