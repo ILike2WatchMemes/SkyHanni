@@ -6,14 +6,11 @@ The following List does not include Bug Fixes. If empty may be only Bug Fixes.
 
 ## Bingo Net Changes:
 
-- Modified the NEU Repo Location to HacktheTime Fork Repo.
-    - Reset the value or modify the Config under Dev → Neu Repository → Neu Repository Location → Repository User = HacktheTime
-        - The Default is only for new users. Old users have to update it manually!
-  - This was done since the NEU Repo PRs of mine don't get merged in. This also makes it Future Proof for more additions.
+Added /warp arachne chat prompt after death (if deaths comes from arachne) (enabled by default)
 
-- various fixes and minor improvements.
+Added an option to reduce the opacity of players near arachne mobs (disabled by default)
 
-- added /searchitem and /shtagitem commands (CHECK THEM OUT!) Still Beta but extremely useful.
+added contributor bypass for bingo net contributors
 
 ## Static Info for modrinth:
 
