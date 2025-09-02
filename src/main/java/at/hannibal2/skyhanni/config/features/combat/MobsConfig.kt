@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.config.features.combat
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.KeyBind
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class MobsConfig {
@@ -107,6 +109,17 @@ class MobsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var arachneKillTimer: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Arachne Warp On Death Prompt", desc = "Suggest Arachne warp when you die to it.")
+    @FeatureToggle
+    @ConfigEditorBoolean
+    var chatPromptArachneWarpOnDeath: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Arachne Warp On Death Keybind", desc = "They Keybind to activate the warp")
+    @ConfigLink(owner = MobsConfig::class, field = "chatPromptArachneWarpOnDeath")
+    val arachneDeathWarpKeybind: KeyBind = KeyBind()
 
     @Expose
     @ConfigOption(name = "Enderman TP Hider", desc = "Stops the Enderman Teleportation animation.")
