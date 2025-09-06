@@ -31,7 +31,7 @@ class AttributeOverlayConfig {
         name = "Highlight Good Rolls",
         desc = "Highlights Good attribute combinations.\n" +
             "§cNote: These are subjective and ever changing. If you\n" +
-            "§c want to suggest changes, please do so in the discord."
+            "§c want to suggest changes, please do so in the discord.",
     )
     @ConfigEditorBoolean
     var highlightGoodRolls: Boolean = true
@@ -40,7 +40,7 @@ class AttributeOverlayConfig {
     @ConfigOption(
         name = "Highlight Good Attribute",
         desc = "Highlights attributes that are in one of the Good Rolls\n" +
-            "combinations for that item."
+            "combinations for that item.",
     )
     @ConfigEditorBoolean
     var highlightGoodAttributes: Boolean = false
@@ -48,7 +48,7 @@ class AttributeOverlayConfig {
     @Expose
     @ConfigOption(
         name = "Good Rolls Override Level",
-        desc = "Makes it so that Good Rolls are always shown no matter the attribute level."
+        desc = "Makes it so that Good Rolls are always shown no matter the attribute level.",
     )
     @ConfigEditorBoolean
     var goodRollsOverrideLevel: Boolean = true
@@ -56,7 +56,7 @@ class AttributeOverlayConfig {
     @Expose
     @ConfigOption(
         name = "Good Rolls ignore list",
-        desc = "Highlights attributes in good rolls even if they aren't in the attributes list."
+        desc = "Highlights attributes in good rolls even if they aren't in the attributes list.",
     )
     @ConfigEditorBoolean
     var ignoreList: Boolean = false

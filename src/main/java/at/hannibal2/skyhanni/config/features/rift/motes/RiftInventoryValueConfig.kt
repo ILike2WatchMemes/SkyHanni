@@ -20,11 +20,11 @@ class RiftInventoryValueConfig {
     @ConfigOption(
         name = "Number Format Type",
         desc = "Short: 1.2M\n" +
-            "Long: 1,200,000"
+            "Long: 1,200,000",
     )
     @ConfigEditorDropdown
     val formatType: Property<NumberFormatEntry> = Property.of(
-        NumberFormatEntry.SHORT
+        NumberFormatEntry.SHORT,
     )
 
     enum class NumberFormatEntry(private val displayName: String) {

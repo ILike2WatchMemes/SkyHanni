@@ -12,7 +12,7 @@ class YawPitchDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Enable",
-        desc = "Display yaw and pitch while holding a farming tool. Automatically fades out if there is no movement."
+        desc = "Display yaw and pitch while holding a farming tool. Automatically fades out if there is no movement.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -31,7 +31,7 @@ class YawPitchDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Display Timeout",
-        desc = "Duration in seconds for which the overlay is being displayed after moving."
+        desc = "Duration in seconds for which the overlay is being displayed after moving.",
     )
     @ConfigEditorSlider(minValue = 1f, maxValue = 20f, minStep = 1f)
     var timeout: Int = 5

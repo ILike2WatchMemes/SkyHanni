@@ -27,7 +27,7 @@ class NumbersConfig {
     @Expose
     @ConfigOption(
         name = "Composter Upgrades",
-        desc = "Show the number of upgrades in the Composter upgrades inventory."
+        desc = "Show the number of upgrades in the Composter upgrades inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

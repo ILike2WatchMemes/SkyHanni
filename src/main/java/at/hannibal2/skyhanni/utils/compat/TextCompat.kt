@@ -10,6 +10,7 @@ import net.minecraft.util.ResourceLocation
 //#if MC < 1.16
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import net.minecraft.util.ChatComponentText
+
 //#endif
 //#if MC > 1.16
 //$$ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
@@ -292,9 +293,10 @@ fun addDeletableMessageToChat(component: IChatComponent, id: Int) {
 //$$ }
 //#endif
 
-val defaultStyleConstructor: ChatStyle get() =
-    //#if MC < 1.16
-    ChatStyle()
+val defaultStyleConstructor: ChatStyle
+    get() =
+        //#if MC < 1.16
+        ChatStyle()
 //#else
 //$$ Style.EMPTY
 //#endif
@@ -379,11 +381,11 @@ fun IChatComponent.convertToJsonString(): String {
 //$$     return mutableText.append(newText)
 //$$ }
 //#else
-fun at.hannibal2.skyhanni.utils.compat.Text.append(string: String): at.hannibal2.skyhanni.utils.compat.Text {
-    return at.hannibal2.skyhanni.utils.compat.Text.of(this.text + string)
+fun Text.append(string: String): Text {
+    return Text.of(this.text + string)
 }
 
-fun at.hannibal2.skyhanni.utils.compat.Text.append(newText: Text): at.hannibal2.skyhanni.utils.compat.Text {
-    return at.hannibal2.skyhanni.utils.compat.Text.of(this.text + newText.text)
+fun Text.append(newText: Text): Text {
+    return Text.of(this.text + newText.text)
 }
 //#endif

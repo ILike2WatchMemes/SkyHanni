@@ -12,7 +12,7 @@ class TooltipTweaksConfig {
     @Expose
     @ConfigOption(
         name = "Compact Descriptions",
-        desc = "Hide redundant parts of reforge descriptions, generic counter description, and Farmhand perk explanation."
+        desc = "Hide redundant parts of reforge descriptions, generic counter description, and Farmhand perk explanation.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -21,7 +21,7 @@ class TooltipTweaksConfig {
     @Expose
     @ConfigOption(
         name = "Breakdown Hotkey",
-        desc = "When the keybind is pressed, show a breakdown of all fortune sources on a tool."
+        desc = "When the keybind is pressed, show a breakdown of all fortune sources on a tool.",
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
     var fortuneTooltipKeybind: Int = Keyboard.KEY_LSHIFT
@@ -31,7 +31,7 @@ class TooltipTweaksConfig {
         name = "Tooltip Format",
         desc = "Show crop-specific Farming Fortune in tooltip.\n" +
             "§fShow: §7Crop-specific Fortune indicated as §6[+196]\n" +
-            "§fReplace: §7Edits the total Fortune to include crop-specific Fortune."
+            "§fReplace: §7Edits the total Fortune to include crop-specific Fortune.",
     )
     @ConfigEditorDropdown
     var cropTooltipFortune: CropTooltipFortuneEntry = CropTooltipFortuneEntry.SHOW
@@ -48,7 +48,7 @@ class TooltipTweaksConfig {
     @Expose
     @ConfigOption(
         name = "Total Crop Milestone",
-        desc = "Show the progress bar till maxed crop milestone in the crop milestone inventory."
+        desc = "Show the progress bar till maxed crop milestone in the crop milestone inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

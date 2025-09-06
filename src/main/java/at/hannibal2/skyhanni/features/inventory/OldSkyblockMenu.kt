@@ -117,7 +117,7 @@ object OldSkyblockMenu {
                 val format = magicalPower.addSeparators()
                 lore.add(5, "§7Magical Power: §6$format")
                 item.copy().setLore(lore)
-            }
+            },
         ),
         POTION(
             HypixelCommands::potionBag,

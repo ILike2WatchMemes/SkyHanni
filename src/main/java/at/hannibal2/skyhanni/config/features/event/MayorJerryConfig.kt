@@ -10,7 +10,7 @@ class MayorJerryConfig {
     @Expose
     @ConfigOption(
         name = "Highlight Jerries",
-        desc = "Highlight Jerries found from the Jerrypocalypse perk. Highlight color is based on color of the Jerry."
+        desc = "Highlight Jerries found from the Jerrypocalypse perk. Highlight color is based on color of the Jerry.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

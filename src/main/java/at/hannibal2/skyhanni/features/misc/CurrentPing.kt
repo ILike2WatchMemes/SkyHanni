@@ -17,6 +17,7 @@ import net.hypixel.modapi.packet.impl.serverbound.ServerboundPingPacket
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+
 //#if MC >= 1.21
 //$$ import net.minecraft.client.MinecraftClient
 //#endif

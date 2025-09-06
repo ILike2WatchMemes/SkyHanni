@@ -11,7 +11,7 @@ class StackDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Enable",
-        desc = "Display the number of stacks on armor pieces like Crimson, Terror, Aurora etc."
+        desc = "Display the number of stacks on armor pieces like Crimson, Terror, Aurora etc.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

@@ -17,11 +17,11 @@ object SkillExperience {
     private val patternGroup = RepoPattern.group("data.skill")
     private val actionBarPattern by patternGroup.pattern(
         "actionbar",
-        ".*§3\\+.* (?<skill>.*) \\((?<overflow>.*)/(?<needed>.*)\\).*"
+        ".*§3\\+.* (?<skill>.*) \\((?<overflow>.*)/(?<needed>.*)\\).*",
     )
     private val inventoryPattern by patternGroup.pattern(
         "inventory",
-        ".* §e(?<number>.*)§6/.*"
+        ".* §e(?<number>.*)§6/.*",
     )
 
     @HandleEvent
@@ -170,6 +170,6 @@ object SkillExperience {
         6100000,
         6400000,
         6700000,
-        7000000
+        7000000,
     )
 }

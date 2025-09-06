@@ -1,16 +1,20 @@
 package at.hannibal2.skyhanni.config.features.combat
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.KeyBind
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class MobsConfig {
+
+
     @Expose
     @ConfigOption(
         name = "Area Boss Highlighter",
-        desc = "Highlight Golden Ghoul, Old Wolf, Voidling Extremist, Millenia-Aged Blaze and Soul of the Alpha."
+        desc = "Highlight Golden Ghoul, Old Wolf, Voidling Extremist, Millenia-Aged Blaze and Soul of the Alpha.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -43,7 +47,7 @@ class MobsConfig {
     @Expose
     @ConfigOption(
         name = "Special Zealots",
-        desc = "Highlight Special Zealots (the ones that drop Summoning Eyes) in the End."
+        desc = "Highlight Special Zealots (the ones that drop Summoning Eyes) in the End.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -82,7 +86,7 @@ class MobsConfig {
     @ConfigOption(
         name = "Area Boss Timer",
         desc = "Show a timer when Area Bosses respawn.\n" +
-            "§eMay take 20 - 30 seconds to calibrate correctly."
+            "§eMay take 20 - 30 seconds to calibrate correctly.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -92,7 +96,7 @@ class MobsConfig {
     @ConfigOption(
         name = "Arachne Spawn Timer",
         desc = "Show a timer when Arachne fragments or crystals are placed to indicate how long until the boss will spawn. " +
-            "§eTimer may be 1 - 2 seconds off."
+            "§eTimer may be 1 - 2 seconds off.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -102,11 +106,22 @@ class MobsConfig {
     @ConfigOption(
         name = "Arachne Kill Timer",
         desc = "Shows how long it took to kill Arachne after the fight ends. " +
-            "§cDoes not show if you were not in the Sanctuary when it spawned."
+            "§cDoes not show if you were not in the Sanctuary when it spawned.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var arachneKillTimer: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Arachne Warp On Death Prompt", desc = "Suggest Arachne warp when you die to it.")
+    @FeatureToggle
+    @ConfigEditorBoolean
+    var chatPromptArachneWarpOnDeath: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Arachne Warp On Death Keybind", desc = "They Keybind to activate the warp")
+    @ConfigLink(owner = MobsConfig::class, field = "chatPromptArachneWarpOnDeath")
+    val arachneDeathWarpKeybind: KeyBind = KeyBind()
 
     @Expose
     @ConfigOption(name = "Enderman TP Hider", desc = "Stops the Enderman Teleportation animation.")
@@ -119,4 +134,14 @@ class MobsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var hideNameTagArachneMinis: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Arachne Other Entities (Player / Tara) Hider",
+        desc = "All Entities in a 5 Block radius around an Arachne Boss (or Brood) will be rendered with the" +
+            " entered opacity value. (0 = invisible, 100 = normal)",
+    )
+    @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 1f)
+    val arachneOtherEntitiesOpacity: Int = 100
+
 }

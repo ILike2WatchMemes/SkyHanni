@@ -65,14 +65,17 @@ object PestTrapApi {
                 widgetEnabledAndVisible[TabWidget.PEST_TRAPS] = true
                 trapsPlaced = event.lines.firstNotNullOfOrNull { it.getTrapsPlacedOrNull() }
             }
+
             TabWidget.FULL_TRAPS -> {
                 widgetEnabledAndVisible[TabWidget.FULL_TRAPS] = true
                 fullTraps = event.lines.firstNotNullOfOrNull { it.getFullTrapsOrNull() }
             }
+
             TabWidget.NO_BAIT -> {
                 widgetEnabledAndVisible[TabWidget.NO_BAIT] = true
                 noBaitTraps = event.lines.firstNotNullOfOrNull { it.getNoBaitTrapsOrNull() }
             }
+
             else -> return
         }
 

@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 //#if FORGE
 import net.minecraftforge.client.ClientCommandHandler
+
 //#endif
 
 @SkyHanniModule

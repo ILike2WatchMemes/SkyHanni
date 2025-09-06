@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 //#if MC < 1.16
 import at.hannibal2.skyhanni.mixins.transformers.AccessorWorldBorderPacket
 import net.minecraft.network.play.server.S44PacketWorldBorder
+
 //#else
 //$$ import net.minecraft.network.packet.s2c.play.WorldBorderInitializeS2CPacket
 //#endif

@@ -1,13 +1,17 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import de.hype.bingonet.BNConnection
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -16,12 +20,20 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import de.hype.bingonet.shared.packets.function.RequestPartyStatePacket
+import de.hype.bingonet.shared.packets.function.RequestPartyStatePacket.PartyStatePacket
 import kotlin.random.Random
 
 @SkyHanniModule
+@Suppress("LongMethod", "ComplexMethod")
 object PartyApi {
-
+    val hideConfig = SkyHanniMod.feature.misc.hidePartyMessagesConfig
     private val patternGroup = RepoPattern.group("data.party")
+
+    /**
+     * REGEX-TEST: §9-----------------------------------------------------
+     */
+    private val wrapper by patternGroup.pattern("wrapper", "§9-----------------------------------------------------")
 
     /**
      * REGEX-TEST: §eYou have joined §b[MVP§d+§b] Throwpo's §eparty!
@@ -31,12 +43,27 @@ object PartyApi {
         "§eYou have joined (?<name>.*)'s? §eparty!",
     )
 
+    // TODO
+    private val otherDisconnect5MinTimePattern by patternGroup.pattern(
+        "others.disconnect.5min",
+        ".*has disconnected, they have 5 minutes to rejoin before they are removed from the party.",
+    )
+
     /**
      * REGEX-TEST: §b[MVP§d+§b] Throwpo §ejoined the party.
      */
     private val othersJoinedPartyPattern by patternGroup.pattern(
         "others.joined",
         "(?<name>.*) §ejoined the party\\.",
+    )
+
+    // TODO the invited you to their party was created based on what i had in mind. has to be tested still!
+    /**
+     * REGEX-TEST: §b[MVP§d+§b] Throwpo §einvited you to join their Party.
+     */
+    val receivedInvitePattern by patternGroup.pattern(
+        "others.joined",
+        "(?<name>.*) §einvited you to join their Party\\.",
     )
 
     /**
@@ -144,6 +171,7 @@ object PartyApi {
 
     var partyLeader: String? = null
     var prevPartyLeader: String? = null
+    var allInvite: Boolean = false
 
     fun isInParty() = partyMembers.isNotEmpty()
 
@@ -178,6 +206,12 @@ object PartyApi {
     fun onChat(event: SkyHanniChatEvent) {
         val message = event.message.trimWhiteSpace().removeResets()
 
+        wrapper.matchMatcher(message) {
+            if (hideConfig.hideWrapper) {
+                event.blockedReason = "Hide Party Messages: Hide Wrapper"
+            }
+        }
+
         // new member joined
         youJoinedPartyPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
@@ -190,6 +224,9 @@ object PartyApi {
                 partyLeader = PlayerUtils.getName()
             }
             addPlayer(name)
+            if (partyMembers.size >= hideConfig.hideJoinAndLeave) {
+                event.blockedReason = "Hide Party Messages: Hide Join/Leave"
+            }
         }
         othersInThePartyPattern.matchMatcher(message) {
             for (name in group("names").split(", ")) {
@@ -209,18 +246,35 @@ object PartyApi {
         otherLeftPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             removeWithLeader(name)
+            if (partyMembers.size >= hideConfig.hideJoinAndLeave) {
+                event.blockedReason = "Hide Party Messages: Hide Join/Leave"
+            }
         }
         otherKickedPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             removeWithLeader(name)
+            if (partyMembers.size >= hideConfig.hideKicks) {
+                event.blockedReason = "Hide Party Messages: Hide Kicks"
+            }
         }
         otherOfflineKickedPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             removeWithLeader(name)
+            if (partyMembers.size >= hideConfig.hideKicks) {
+                event.blockedReason = "Hide Party Messages: Hide Kicks"
+            }
         }
         otherDisconnectedPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
+            if (partyMembers.size >= hideConfig.hideDisconnects) {
+                event.blockedReason = "Hide Party Messages: Hide Disconnects"
+            }
             partyMembers.remove(name)
+        }
+        otherDisconnect5MinTimePattern.matchMatcher(message) {
+            if (partyMembers.size >= hideConfig.hideDisconnects) {
+                event.blockedReason = "Hide Party Messages: Hide Disconnects"
+            }
         }
         transferOnLeavePattern.matchMatcher(message.removeColor()) {
             val name = group("name").cleanPlayerName()
@@ -283,6 +337,14 @@ object PartyApi {
         partyMembers.clear()
         partyLeader = null
         prevPartyLeader = null
+        allInvite = false
+    }
+
+    fun isPartyLeader() = partyLeader == PlayerUtils.getName()
+
+    fun canInvite(): Boolean {
+        if (!isInParty()) return true
+        return isPartyLeader() || isModerator() || allInvite
     }
 
     @HandleEvent
@@ -315,4 +377,129 @@ object PartyApi {
         }
     }
 
+
+    fun warp(): Boolean {
+        if (!isPartyLeader()) return false
+        send("party warp")
+        return true
+    }
+
+    fun partyTransfer(player: String): Boolean {
+        if (!isPartyLeader()) return false
+        send("party transfer $player")
+        return true
+    }
+
+    fun promote(player: String): Boolean {
+        if (!isPartyLeader()) return false
+        send("party promote $player")
+        return true
+    }
+
+    fun disband(): Boolean {
+        if (!isPartyLeader()) return false
+        send("party disband")
+        return true
+    }
+
+    fun kick(player: String): Boolean {
+        if (!isPartyLeader()) return false
+        send("party kick $player")
+        return true
+    }
+
+    fun kick(player: List<String>): Boolean {
+        if (!isPartyLeader()) return false
+        player.forEach {
+            send("party kick $it")
+        }
+        return true
+    }
+
+    fun kickOffline(): Boolean {
+        if (!isPartyLeader()) return false
+        send("party kickoffline")
+        return true
+    }
+
+    fun allInvite(): Boolean {
+        if (!isPartyLeader()) return false
+        send("party settings allinvite")
+        return true
+    }
+
+
+    fun invite(username: String): Boolean {
+        if (!canInvite()) return false
+        send("party invite $username")
+        return true
+    }
+    // TODO add something that slows down invites if a lot people are supposed to be invited.
+
+    fun invite(usernames: List<String>): Boolean {
+        if (!canInvite()) return false
+        for (chunked in usernames.chunked(5)) {
+            send("party invite ${chunked.joinToString(" ")}")
+        }
+        return true
+    }
+
+    private fun send(message: String) {
+        ChatUtils.sendMessageToServer("/$message")
+    }
+    @Suppress("FunctionOnlyReturningConstant")
+    fun isModerator(): Boolean {
+        // TODO add moderator tracking
+        // TODO add allinvite tracking
+        // WARNING if you add moderator tracking but not allinvite this blocks commands
+        // due to expecting not being able to invite.
+        return true
+    }
+
+    fun leaveParty() {
+        if (!isInParty()) return
+        send("party leave")
+    }
+
+    fun joinParty(user: String): Boolean {
+        if (isInParty()) return false
+        send("party join $user")
+        return true
+    }
+
+    fun acceptParty(user: String): Boolean {
+        if (isInParty()) return false
+        send("party accept $user")
+        return true
+    }
+
+    fun allPartyPlayersInLobby(): Boolean {
+        val playerList: Set<String> = EntityUtils.getPlayerList()
+        return partyMembers.all { playerList.contains(it) }
+    }
+
+    fun onRequestPartyStatePacket(requestPartyStatePacket: RequestPartyStatePacket) {
+        val general = SkyHanniMod.feature.event.bingo.bingoNetworks.allowBNServerPartyManagement
+        val count = if (general) partyMembers.size else 0
+        val response = PartyStatePacket(
+            general,
+            general && isInParty(),
+            !general || allPartyPlayersInLobby(),
+            count,
+            general && isPartyLeader(),
+            general && canInvite(),
+        )
+        BNConnection.sendPacket(requestPartyStatePacket.preparePacketToReplyToThis(response))
+    }
+
+    /**
+     * PC does not need to be refactored in my opinion so take this helper if your looking here for it.
+     */
+    fun partyChat(message: String, prefix: Boolean = false) {
+        HypixelCommands.partyChat(
+            message,
+            prefix,
+        )
+    }
+    // TODO track party invites as part of player count since potential accepts.
 }

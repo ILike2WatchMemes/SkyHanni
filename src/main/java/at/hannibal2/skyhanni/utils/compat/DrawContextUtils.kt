@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import java.nio.FloatBuffer
+
 //#if MC > 1.21
 //$$ import com.mojang.blaze3d.systems.RenderSystem
 //$$ import net.minecraft.client.gui.DrawContext
@@ -18,8 +19,10 @@ object DrawContextUtils {
 
     // GL11.GL_MODELVIEW_MATRIX
     const val GL_MODELVIEW_MATRIX = 2982
+
     // GL11.GL_PROJECTION_MATRIX
     const val GL_PROJECTION_MATRIX = 2983
+
     // GL11.GL_CURRENT_COLOR
     const val GL_CURRENT_COLOR = 2816
 

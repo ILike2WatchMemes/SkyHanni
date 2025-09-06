@@ -35,7 +35,8 @@ object CrimsonIsleReputationHelper {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
-    var factionType get() = ProfileStorageData.profileSpecific?.crimsonIsleFaction
+    var factionType
+        get() = ProfileStorageData.profileSpecific?.crimsonIsleFaction
         set(it) {
             ProfileStorageData.profileSpecific?.crimsonIsleFaction = it
         }

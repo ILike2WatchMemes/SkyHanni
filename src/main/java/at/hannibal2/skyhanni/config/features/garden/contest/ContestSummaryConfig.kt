@@ -9,7 +9,7 @@ class ContestSummaryConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Show the average Blocks Per Second and blocks clicked at the end of a Jacob Farming Contest in chat."
+        desc = "Show the average Blocks Per Second and blocks clicked at the end of a Jacob Farming Contest in chat.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

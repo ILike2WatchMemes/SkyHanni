@@ -9,7 +9,7 @@ class MagicalPowerConfig {
     @Expose
     @ConfigOption(
         name = "Magical Power Display",
-        desc = "Show Magical Power as stack size inside Accessory Bag and Auction House."
+        desc = "Show Magical Power as stack size inside Accessory Bag and Auction House.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

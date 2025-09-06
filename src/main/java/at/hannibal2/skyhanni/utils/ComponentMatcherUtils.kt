@@ -18,6 +18,7 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 //#if MC < 1.21
 import net.minecraft.util.IChatComponent
+
 //#endif
 
 object ComponentMatcherUtils {
@@ -32,7 +33,7 @@ object ComponentMatcherUtils {
             this,
             text,
             0,
-            text.length
+            text.length,
         )
     }
 
@@ -227,8 +228,8 @@ class ComponentSpan internal constructor(
                     Triple(
                         currentComponent,
                         (rawText.length + index).coerceAtLeast(0),
-                        (rawText.length + index + length).coerceAtMost(rawText.length)
-                    )
+                        (rawText.length + index + length).coerceAtMost(rawText.length),
+                    ),
                 )
             }
             lastComponent = currentComponent

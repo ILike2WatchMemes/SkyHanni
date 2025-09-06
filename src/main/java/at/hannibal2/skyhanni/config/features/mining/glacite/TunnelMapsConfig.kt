@@ -17,7 +17,7 @@ class TunnelMapsConfig {
     @Expose
     @ConfigOption(
         name = "Enable",
-        desc = "Enable the tunnel maps, which give you a path to any location you want. Open your inventory to select a destination."
+        desc = "Enable the tunnel maps, which give you a path to any location you want. Open your inventory to select a destination.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -31,7 +31,7 @@ class TunnelMapsConfig {
     @ConfigOption(
         name = "Auto Commission",
         desc = "Take the first collector commission as target when opening the commissions inventory, " +
-            "also works when completing commissions."
+            "also works when completing commissions.",
     )
     @ConfigEditorBoolean
     var autoCommission: Boolean = false
@@ -39,7 +39,7 @@ class TunnelMapsConfig {
     @Expose
     @ConfigOption(
         name = "Campfire Hotkey",
-        desc = "Hotkey to warp to the campfire. If the travel scroll is not unlocked, show a path to the campfire instead."
+        desc = "Hotkey to warp to the campfire. If the travel scroll is not unlocked, show a path to the campfire instead.",
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var campfireKey: Int = Keyboard.KEY_NONE
@@ -47,7 +47,7 @@ class TunnelMapsConfig {
     @Expose
     @ConfigOption(
         name = "Travel Scroll",
-        desc = "Let SkyHanni know that you have unlocked the §eTravel Scroll to Dwarven Base Camp§7."
+        desc = "Let SkyHanni know that you have unlocked the §eTravel Scroll to Dwarven Base Camp§7.",
     )
     @ConfigEditorBoolean
     var travelScroll: Boolean = false
@@ -65,7 +65,7 @@ class TunnelMapsConfig {
     @Expose
     @ConfigOption(
         name = "Dynamic Path Color",
-        desc = "Instead of the selected color use the color of the target as line color."
+        desc = "Instead of the selected color use the color of the target as line color.",
     )
     @ConfigEditorBoolean
     var dynamicPathColor: Boolean = true

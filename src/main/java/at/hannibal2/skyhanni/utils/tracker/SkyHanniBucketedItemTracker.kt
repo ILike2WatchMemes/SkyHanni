@@ -20,7 +20,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
 
     @Deprecated(
         "Use addCoins(bucket, coins, command) instead",
-        ReplaceWith("addCoins(bucket, coins, command)")
+        ReplaceWith("addCoins(bucket, coins, command)"),
     )
     override fun addCoins(amount: Int, command: Boolean) =
         throw UnsupportedOperationException("Use addCoins(bucket, coins, command) instead")

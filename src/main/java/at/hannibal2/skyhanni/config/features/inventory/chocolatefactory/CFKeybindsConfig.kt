@@ -11,7 +11,7 @@ class CFKeybindsConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "In the Chocolate Factory, press buttons with your number row on the keyboard to upgrade the rabbits."
+        desc = "In the Chocolate Factory, press buttons with your number row on the keyboard to upgrade the rabbits.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

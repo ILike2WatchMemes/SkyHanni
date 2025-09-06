@@ -84,6 +84,10 @@ class ProfileSpecificStorage(
     var crimsonIsleFaction: FactionType? = null
 
     // features
+    // - inventory
+    @Expose
+    var itemTags: MutableMap<String, String> = mutableMapOf() // Tag -> UUID mapping
+
     // - combat
     @Expose
     var ghostStorage: GhostStorage = GhostStorage()
@@ -697,6 +701,10 @@ class ProfileSpecificStorage(
     }
 
     class MiningStorage {
+        // TODO add the code for this
+        @Expose
+        val hotmLevel: Int = 4
+
         @Expose
         var kingsTalkedTo: MutableList<String> = mutableListOf()
 

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.bingo.card.goals
 
+import at.hannibal2.skyhanni.features.bingo.card.BingoCardReader.ComGoalPosition
 import com.google.gson.annotations.Expose
 
 class BingoGoal {
@@ -25,9 +26,8 @@ class BingoGoal {
     @Expose
     lateinit var hiddenGoalData: HiddenGoalData
 
-    // TODO rename communityGoalPercentage
     @Expose
-    var communtyGoalPercentage: Double? = null
+    var communityGoalData: ComGoalPosition? = null
 
     override fun toString(): String = displayName
 }

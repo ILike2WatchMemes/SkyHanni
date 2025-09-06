@@ -51,7 +51,7 @@ class AdvancedPlayerListConfig {
     @Expose
     @ConfigOption(
         name = "Hide Level Brackets",
-        desc = "Hide the gray brackets in front of and behind the level numbers."
+        desc = "Hide the gray brackets in front of and behind the level numbers.",
     )
     @ConfigEditorBoolean
     var hideLevelBrackets: Boolean = false
@@ -64,7 +64,7 @@ class AdvancedPlayerListConfig {
     @Expose
     @ConfigOption(
         name = "Bingo Rank Number",
-        desc = "Show the number of the bingo rank next to the icon. Useful if you are not so familiar with bingo."
+        desc = "Show the number of the bingo rank next to the icon. Useful if you are not so familiar with bingo.",
     )
     @ConfigEditorBoolean
     var showBingoRankNumber: Boolean = false
@@ -77,7 +77,7 @@ class AdvancedPlayerListConfig {
     @Expose
     @ConfigOption(
         name = "Mark Special Persons",
-        desc = "Show special icons behind the name of guild members, party members, friends, and marked players."
+        desc = "Show special icons behind the name of guild members, party members, friends, and marked players.",
     )
     @ConfigEditorBoolean
     var markSpecialPersons: Boolean = false

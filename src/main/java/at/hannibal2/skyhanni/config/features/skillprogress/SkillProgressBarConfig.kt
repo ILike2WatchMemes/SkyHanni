@@ -27,7 +27,7 @@ class SkillProgressBarConfig {
     @Expose
     @ConfigOption(
         name = "Chroma",
-        desc = "Use the SBA like chroma effect on the bar.\n§eIf enabled, ignore the Bar Color setting."
+        desc = "Use the SBA like chroma effect on the bar.\n§eIf enabled, ignore the Bar Color setting.",
     )
     @ConfigEditorBoolean
     val useChroma: Property<Boolean> = Property.of(false)
@@ -65,7 +65,7 @@ class SkillProgressBarConfig {
             name = "Width",
             desc = "Modify the width of the bar.\n" +
                 "§eDefault: 182\n" +
-                "§c!!Does not work for now!!"
+                "§c!!Does not work for now!!",
         )
         @ConfigEditorSlider(minStep = 1f, minValue = 16f, maxValue = 1024f)
         var width: Int = 182
@@ -75,7 +75,7 @@ class SkillProgressBarConfig {
             name = "Height",
             desc = "Modify the height of the bar.\n" +
                 "§eDefault: 5\n" +
-                "§c!!Does not work for now!!"
+                "§c!!Does not work for now!!",
         )
         @ConfigEditorSlider(minStep = 1f, minValue = 3f, maxValue = 16f)
         var height: Int = 5

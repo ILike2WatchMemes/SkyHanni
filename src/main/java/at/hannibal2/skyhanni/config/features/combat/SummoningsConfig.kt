@@ -12,7 +12,7 @@ class SummoningsConfig {
     @ConfigOption(
         name = "Summoning Soul Display",
         desc = "Show the name of dropped Summoning Souls laying on the ground.\n" +
-            "§cNot working in Dungeons if Skytils' 'Hide Non-Starred Mobs Nametags' feature is enabled!"
+            "§cNot working in Dungeons if Skytils' 'Hide Non-Starred Mobs Nametags' feature is enabled!",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -43,7 +43,7 @@ class SummoningsConfig {
     @Expose
     @ConfigOption(
         name = "Summon Chat Messages",
-        desc = "Sends a chat message when a summon dies and hides other summon related messages."
+        desc = "Sends a chat message when a summon dies and hides other summon related messages.",
     )
     @ConfigEditorBoolean
     var summonMessages: Boolean = false

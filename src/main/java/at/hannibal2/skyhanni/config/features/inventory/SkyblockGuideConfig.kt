@@ -9,7 +9,7 @@ class SkyblockGuideConfig {
     @Expose
     @ConfigOption(
         name = "Menu Highlight",
-        desc = "Highlight the top level of non-completed task in the SkyBlock guide."
+        desc = "Highlight the top level of non-completed task in the SkyBlock guide.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -18,7 +18,7 @@ class SkyblockGuideConfig {
     @Expose
     @ConfigOption(
         name = "Missing Tasks",
-        desc = "Highlight missing tasks in the SkyBlock Level Guide inventory."
+        desc = "Highlight missing tasks in the SkyBlock Level Guide inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -28,7 +28,7 @@ class SkyblockGuideConfig {
     @ConfigOption(
         name = "Power Stone Guide",
         desc = "Highlight missing power stones, show their total bazaar price, and allows " +
-            " opening the bazaar when clicking on the items in the Power Stone Guide."
+            " opening the bazaar when clicking on the items in the Power Stone Guide.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -73,7 +73,7 @@ class SkyblockGuideConfig {
     @Expose
     @ConfigOption(
         name = "Story Highlight",
-        desc = "Highlight uncompleted storylines, missing fast travel scrolls and non-100% completed harp songs."
+        desc = "Highlight uncompleted storylines, missing fast travel scrolls and non-100% completed harp songs.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -83,7 +83,7 @@ class SkyblockGuideConfig {
     @ConfigOption(
         name = "One Time Completion Highlights",
         desc = "Highlight missing Kuudra defeats, Dungeon floor completions, spooky ranks, " +
-            "bank upgrades, rock/dolphin rarities, undefeated dragons, unobtained dojo belts."
+            "bank upgrades, rock/dolphin rarities, undefeated dragons, unobtained dojo belts.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

@@ -13,7 +13,7 @@ class DragonProfitTrackerConfig {
     @ConfigOption(
         name = "Enabled",
         desc = "Keeps track of everything you pick up while fighting the dragon, " +
-            "keeping track of how much you pay for starting the fight and calculating the overall profit."
+            "keeping track of how much you pay for starting the fight and calculating the overall profit.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -26,7 +26,7 @@ class DragonProfitTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Count Leeched Dragons",
-        desc = "Count Dragons you placed no eyes in towards your total profit."
+        desc = "Count Dragons you placed no eyes in towards your total profit.",
     )
     @FeatureToggle
     @ConfigEditorBoolean

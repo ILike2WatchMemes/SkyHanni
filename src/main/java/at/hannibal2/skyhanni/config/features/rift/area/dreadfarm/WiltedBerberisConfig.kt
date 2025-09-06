@@ -25,7 +25,7 @@ class WiltedBerberisConfig {
     @Expose
     @ConfigOption(
         name = "Mute Others Sounds",
-        desc = "Mute nearby Wilted Berberis sounds while not holding a Wand of Farming or not standing on Farmland blocks."
+        desc = "Mute nearby Wilted Berberis sounds while not holding a Wand of Farming or not standing on Farmland blocks.",
     )
     @ConfigEditorBoolean
     var muteOthersSounds: Boolean = true

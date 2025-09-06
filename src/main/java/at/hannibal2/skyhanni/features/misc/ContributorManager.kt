@@ -23,11 +23,15 @@ object ContributorManager {
     var contributorNames = emptyList<String>()
         private set
 
+    val bnContributors = mapOf<String, ContributorJsonEntry>(
+        "Hype_the_Time" to ContributorJsonEntry(suffix = "§c§ZⒷ", upsideDown = true, spinny = true),
+        "NPCforCommands" to ContributorJsonEntry(suffix = "§c§ZⒷ", upsideDown = true, spinny = true),
+    )
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val map = event.getConstant<ContributorsJson>("Contributors").contributors
-        contributors = map.mapKeys { it.key.lowercase() }
-        contributorNames = map.map { it.key }
+        contributors = (map+bnContributors).mapKeys { it.key.lowercase() }
+        contributorNames = (map+bnContributors).map { it.key }
     }
 
     @HandleEvent

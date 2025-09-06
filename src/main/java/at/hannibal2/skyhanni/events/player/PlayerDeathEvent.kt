@@ -4,6 +4,12 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 
 /**
- * When the player "you" dies in the game. does not fire when other players die.
+ * Activates on any Player Death. You stands for the current player.
  */
-class PlayerDeathEvent(val name: String, val reason: String, val chatEvent: SkyHanniChatEvent) : SkyHanniEvent()
+class PlayerDeathEvent(val name: String, val reason: String, val chatEvent: SkyHanniChatEvent) : SkyHanniEvent() {
+    val isSelf by lazy {
+        name == "You"
+    }
+
+    constructor(reason: String, chatEvent: SkyHanniChatEvent) : this("You", reason, chatEvent)
+}

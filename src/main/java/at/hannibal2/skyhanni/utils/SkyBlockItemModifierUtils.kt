@@ -23,6 +23,7 @@ import net.minecraft.util.ResourceLocation
 import java.util.Locale
 import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
+
 //#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.registry.Registries
@@ -38,6 +39,7 @@ object SkyBlockItemModifierUtils {
     private val drillPartTypes = listOf("drill_part_upgrade_module", "drill_part_engine", "drill_part_fuel_tank")
 
     fun ItemStack.getHotPotatoCount() = getAttributeInt("hot_potato_count")
+    fun ItemStack.getDungeonQuality() = getExtraAttributes()?.getInteger("baseStatBoostPercentage")
 
     fun ItemStack.getWetBookCount() = getAttributeInt("wet_book_count")
 

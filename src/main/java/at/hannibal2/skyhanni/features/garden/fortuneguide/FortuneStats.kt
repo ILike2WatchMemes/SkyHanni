@@ -62,7 +62,7 @@ enum class FortuneStats(
 
         fun getTotal(): Pair<Double, Double> = entries.filter { it.isActive() }.sumOfPair(
             selector = { it.current to it.max },
-            resultConverter = { it }
+            resultConverter = { it },
         )
 
         fun reset() = entries.forEach { it.reset() }

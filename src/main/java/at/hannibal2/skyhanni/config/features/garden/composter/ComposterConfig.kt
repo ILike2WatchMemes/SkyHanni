@@ -16,7 +16,7 @@ class ComposterConfig {
     @Expose
     @ConfigOption(
         name = "Composter Overlay",
-        desc = "Show organic matter, fuel, and profit prices while inside the Composter Inventory."
+        desc = "Show organic matter, fuel, and profit prices while inside the Composter Inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -25,7 +25,7 @@ class ComposterConfig {
     @Expose
     @ConfigOption(
         name = "Change Price Source",
-        desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC."
+        desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC.",
     )
     @ConfigEditorDropdown
     var priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY
@@ -33,7 +33,7 @@ class ComposterConfig {
     @Expose
     @ConfigOption(
         name = "Retrieve From",
-        desc = "Change where to retrieve the materials from in the composter overlay: Bazaar or Sacks."
+        desc = "Change where to retrieve the materials from in the composter overlay: Bazaar or Sacks.",
     )
     @ConfigEditorDropdown
     var retrieveFrom: RetrieveFromEntry = RetrieveFromEntry.SACKS
@@ -41,7 +41,7 @@ class ComposterConfig {
     @Expose
     @ConfigOption(
         name = "Minimum Item Organic Matter",
-        desc = "Change the minimum amount of organic matter items on the organic matter overlay have."
+        desc = "Change the minimum amount of organic matter items on the organic matter overlay have.",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 20_000f, minStep = 1000f)
     val minimumOrganicMatter: Property<Double> = Property.of(1_000.0)
@@ -77,7 +77,7 @@ class ComposterConfig {
     @Expose
     @ConfigOption(
         name = "Composter Warning",
-        desc = "Warn when the Composter gets close to empty, even outside Garden."
+        desc = "Warn when the Composter gets close to empty, even outside Garden.",
     )
     @ConfigEditorBoolean
     var warnAlmostEmpty: Boolean = false
@@ -91,7 +91,7 @@ class ComposterConfig {
     @Expose
     @ConfigOption(
         name = "Round Amount Needed",
-        desc = "Round the amount needed to fill your Composter down so that you don't overspend."
+        desc = "Round the amount needed to fill your Composter down so that you don't overspend.",
     )
     @ConfigEditorBoolean
     var roundDown: Boolean = true
@@ -105,7 +105,7 @@ class ComposterConfig {
     @Expose
     @ConfigOption(
         name = "Inventory Numbers",
-        desc = "Show the amount of Organic Matter, Fuel and Composts Available while inside the Composter Inventory."
+        desc = "Show the amount of Organic Matter, Fuel and Composts Available while inside the Composter Inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

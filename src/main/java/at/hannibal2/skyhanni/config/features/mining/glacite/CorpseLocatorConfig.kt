@@ -15,7 +15,7 @@ class CorpseLocatorConfig {
     @Expose
     @ConfigOption(
         name = "Auto Send Location",
-        desc = "Automatically send the location and type of the corpse in party chat."
+        desc = "Automatically send the location and type of the corpse in party chat.",
     )
     @ConfigEditorBoolean
     var autoSendLocation: Boolean = false

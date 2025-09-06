@@ -15,12 +15,12 @@ enum class CropAccessory(
         "CROPIE_TALISMAN".toInternalName(),
         setOf(CropType.WHEAT, CropType.POTATO, CropType.CARROT),
         10.0,
-        Pair("CROPIE", 256)
+        Pair("CROPIE", 256),
     ),
     SQUASH(
         "SQUASH_RING".toInternalName(),
         setOf(CropType.WHEAT, CropType.POTATO, CropType.CARROT, CropType.COCOA_BEANS, CropType.MELON, CropType.PUMPKIN),
-        20.0, Pair("SQUASH", 128)
+        20.0, Pair("SQUASH", 128),
     ),
     FERMENTO("FERMENTO_ARTIFACT".toInternalName(), CropType.entries.toSet(), 30.0, Pair("CONDENSED_FERMENTO", 8)),
     ;

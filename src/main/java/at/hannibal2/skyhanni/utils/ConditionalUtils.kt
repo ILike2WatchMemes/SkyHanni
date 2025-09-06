@@ -89,7 +89,7 @@ object ConditionalUtils {
 
     private fun collectProperties(
         current: Any,
-        visited: MutableSet<Any>
+        visited: MutableSet<Any>,
     ): List<Property<*>> = buildList {
         if (!visited.add(current)) return@buildList
 
@@ -100,7 +100,7 @@ object ConditionalUtils {
             when (value) {
                 is Property<*> -> add(value)
                 else -> addAll(
-                    collectProperties(value, visited)
+                    collectProperties(value, visited),
                 )
             }
         }

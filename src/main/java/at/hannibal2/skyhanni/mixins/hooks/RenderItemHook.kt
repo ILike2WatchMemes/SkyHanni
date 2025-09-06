@@ -19,7 +19,7 @@ fun renderItemOverlayPost(
         stack,
         xPosition,
         yPosition,
-        text
+        text,
     ).post()
 }
 

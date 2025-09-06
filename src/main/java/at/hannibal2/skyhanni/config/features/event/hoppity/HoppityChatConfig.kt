@@ -34,7 +34,7 @@ class HoppityChatConfig {
         name = "Compact Hitman Threshold",
         desc = "Show a summary message instead of individual messages for Hitman \"Claim All\"-s including this many eggs or more.\n" +
             "§eSet to 29 to disable.\n" +
-            "§cRequires Compact Chat enabled to work."
+            "§cRequires Compact Chat enabled to work.",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 29f, minStep = 1f)
     var compactHitmanThreshold: Int = 29
@@ -42,7 +42,7 @@ class HoppityChatConfig {
     @Expose
     @ConfigOption(
         name = "Show Duplicate Count",
-        desc = "Show the number of previous finds of a duplicate Hoppity rabbit in chat messages."
+        desc = "Show the number of previous finds of a duplicate Hoppity rabbit in chat messages.",
     )
     @ConfigEditorBoolean
     var showDuplicateNumber: Boolean = false
@@ -50,7 +50,7 @@ class HoppityChatConfig {
     @Expose
     @ConfigOption(
         name = "Recolor Time-Towered Chocolate",
-        desc = "Recolor raw chocolate gain from duplicate rabbits while Time Tower is active."
+        desc = "Recolor raw chocolate gain from duplicate rabbits while Time Tower is active.",
     )
     @ConfigEditorBoolean
     var recolorTTChocolate: Boolean = false
@@ -58,7 +58,7 @@ class HoppityChatConfig {
     @Expose
     @ConfigOption(
         name = "Time in Chat",
-        desc = "When the Egglocator can't find an egg, show the time until the next Hoppity event or egg spawn."
+        desc = "When the Egglocator can't find an egg, show the time until the next Hoppity event or egg spawn.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

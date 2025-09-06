@@ -11,7 +11,7 @@ class CrystalHighlighterConfig {
     @Expose
     @ConfigOption(
         name = "Highlight Nucleus Barriers",
-        desc = "Draw visible bounding boxes around the Crystal Nucleus crystal barrier blocks."
+        desc = "Draw visible bounding boxes around the Crystal Nucleus crystal barrier blocks.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

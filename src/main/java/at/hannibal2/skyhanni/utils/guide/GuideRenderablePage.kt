@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 
 abstract class GuideRenderablePage(
     val paddingX: Int = 0,
-    val paddingY: Int = 0
+    val paddingY: Int = 0,
 ) : GuidePage() {
 
     protected var renderable: Renderable? = null

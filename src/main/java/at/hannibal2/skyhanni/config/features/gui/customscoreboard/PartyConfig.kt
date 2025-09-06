@@ -10,7 +10,7 @@ class PartyConfig {
     @Expose
     @ConfigOption(
         name = "Max Party List",
-        desc = "Max number of party members to show in the party list (you are not included)."
+        desc = "Max number of party members to show in the party list (you are not included).",
     )
     @ConfigEditorSlider(minValue = 1f, maxValue = 25f, minStep = 1f)
     val maxPartyList: Property<Int> = Property.of(4)
@@ -19,7 +19,7 @@ class PartyConfig {
     @ConfigOption(
         name = "Show Party Everywhere",
         desc = "Show the party list everywhere.\n" +
-            "If disabled, it will only show in Dungeon Hub, Crimson Isle & Kuudra."
+            "If disabled, it will only show in Dungeon Hub, Crimson Isle & Kuudra.",
     )
     @ConfigEditorBoolean
     var showPartyEverywhere: Boolean = false

@@ -25,7 +25,7 @@ data class NeuItemJson(
     @Expose @SerializedName("clickcommand") val clickCommand: String,
     @Expose @SerializedName("modver") val modVersion: String,
     @Expose val infoType: String,
-    @Expose val info: List<String>
+    @Expose val info: List<String>,
 ) {
     //#if MC < 1.21
     private fun getParsedNBT(): NBTTagCompound {

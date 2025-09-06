@@ -10,7 +10,7 @@ class HideNotClickableConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Hide items that are not clickable in the current inventory: ah, bz, accessory bag, etc."
+        desc = "Hide items that are not clickable in the current inventory: ah, bz, accessory bag, etc.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -29,7 +29,7 @@ class HideNotClickableConfig {
     @Expose
     @ConfigOption(
         name = "Bypass With Key",
-        desc = "Add the ability to bypass not clickable items when holding the control/command key."
+        desc = "Add the ability to bypass not clickable items when holding the control/command key.",
     )
     @ConfigEditorBoolean
     var itemsBypass: Boolean = true

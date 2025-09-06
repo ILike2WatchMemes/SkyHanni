@@ -36,7 +36,7 @@ class PathfindConfig {
     @ConfigOption(
         name = "Chat Update Interval",
         desc = "Change how often the chat message should update the distance.\n" +
-            "§cOnly applies while in Chat feedback mode."
+            "§cOnly applies while in Chat feedback mode.",
     )
     @ConfigEditorDropdown
     @SearchTag("navigation, pathfind")

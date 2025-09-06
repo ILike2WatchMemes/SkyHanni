@@ -186,6 +186,7 @@ object GardenVisitorDropStatistics {
                             addString(countFormat)
                         }
                     }
+
                     false -> list.addString(format(count, reward.displayName, "§b"))
                 }
             }
@@ -282,7 +283,7 @@ object GardenVisitorDropStatistics {
             config.enabled,
             config.textFormat,
             config.displayNumbersFirst,
-            config.displayIcons
+            config.displayIcons,
         ) {
             saveAndUpdate()
         }

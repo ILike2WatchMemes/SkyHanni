@@ -18,7 +18,7 @@ class TitleAndFooterConfig {
         name = "Custom Title",
         desc = "What should be displayed as the title of the scoreboard.\n" +
             "Use && for colors.\n" +
-            "Use \"\\n\" for new line."
+            "Use \"\\n\" for new line.",
     )
     @ConfigEditorText
     var customTitle: String = "&&6&&lSKYBLOCK"
@@ -43,7 +43,7 @@ class TitleAndFooterConfig {
         name = "Custom Footer",
         desc = "What should be displayed as the footer of the scoreboard.\n" +
             "Use && for colors.\n" +
-            "Use \"\\n\" for new line."
+            "Use \"\\n\" for new line.",
     )
     @ConfigEditorText
     var customFooter: String = "&&ewww.hypixel.net"
@@ -53,7 +53,7 @@ class TitleAndFooterConfig {
         name = "Custom Alpha Footer",
         desc = "What should be displayed as the footer of the scoreboard when on the Alpha Server.\n" +
             "Use && for colors.\n" +
-            "Use \"\\n\" for new line."
+            "Use \"\\n\" for new line.",
     )
     @ConfigEditorText
     var customAlphaFooter: String = "&&ealpha.hypixel.net"

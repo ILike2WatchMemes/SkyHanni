@@ -123,10 +123,12 @@ object GriffinBurrowParticleFinder {
         TREASURE(
             { type == EnumParticleTypes.DRIP_LAVA && count == 2 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.35, 0.1, 0.35) },
         ),
+
         //#if MC < 1.16
         FOOTSTEP(
             { type == EnumParticleTypes.FOOTSTEP && count == 1 && speed == 0f && offset.roundTo(2) == LorenzVec(0.05, 0.0, 0.05) },
         ),
+
         //#endif
         ENCHANT(
             {
@@ -217,7 +219,7 @@ object GriffinBurrowParticleFinder {
         var hasEnchant: Boolean = false,
         var type: Int = -1,
         var found: Boolean = false,
-        var burrowTimeToLive: Int = CurrentPing.averagePing.inWholeTicks + 1
+        var burrowTimeToLive: Int = CurrentPing.averagePing.inWholeTicks + 1,
     ) {
 
         fun getType(): BurrowType = when (this.type) {

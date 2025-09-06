@@ -512,4 +512,10 @@ class MiscConfig {
     @FeatureToggle
     @OnlyModern
     var fixDoubleClicks: Boolean = true
+
+
+    @Expose
+    @ConfigOption(name = "Hide Party Messages", desc = "Hides party chat messages.")
+    @Accordion
+    val hidePartyMessagesConfig: HidePartyMessagesConfig = HidePartyMessagesConfig()
 }

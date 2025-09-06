@@ -132,7 +132,7 @@ val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
 }
 
 val includeBackupNeuRepo by tasks.registering(DownloadBackupRepo::class) {
-    this.user = "NotEnoughUpdates"
+    this.user = "HacktheTime"
     this.repo = "NotEnoughUpdates-Repo"
     this.branch = "master"
     this.resourcePath = "assets/skyhanni/neu-repo.zip"
@@ -181,6 +181,10 @@ dependencies {
         "forge"(target.forgeDep!!)
     }
 
+    //Bingo Net / Bingo Brewers
+    shadowImpl("com.esotericsoftware:kryonet:2.22.0-RC1")
+
+
     // Discord RPC client
     shadowImpl("com.github.caoimhebyrne:KDiscordIPC:0.2.3") {
         exclude("org.jetbrains.kotlin")
@@ -196,6 +200,7 @@ dependencies {
     implementation(libs.autoservice.annotations)
 
     val mixinVersion = if (target == ProjectTarget.MAIN) "0.7.11-SNAPSHOT" else "0.8.2"
+
 
     if (!target.isFabric) {
         shadowImpl("org.spongepowered:mixin:$mixinVersion") {

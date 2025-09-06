@@ -27,7 +27,7 @@ class ShoppingListConfig {
     @ConfigOption(
         name = "Bazaar Alley",
         desc = "Show the Visitor Items List while inside the Bazaar Alley in the Hub.\n" +
-            "§eHelps in buying the correct amount when not having a §6Booster Cookie §ebuff active."
+            "§eHelps in buying the correct amount when not having a §6Booster Cookie §ebuff active.",
     )
     @ConfigEditorBoolean
     var inBazaarAlley: Boolean = true
@@ -36,7 +36,7 @@ class ShoppingListConfig {
     @ConfigOption(
         name = "Farming Areas",
         desc = "Show the Visitor Shopping List while on the Farming Islands or inside the Farm in the Hub.\n" +
-            "§eHelps in farming the correct amount, especially when in the early game."
+            "§eHelps in farming the correct amount, especially when in the early game.",
     )
     @ConfigEditorBoolean
     var inFarmingAreas: Boolean = false
@@ -50,7 +50,7 @@ class ShoppingListConfig {
     @ConfigOption(
         name = "Show Sack Count",
         desc = "Show the amount of this item that you already have in your sacks.\n" +
-            "§eOnly updates on sack change messages."
+            "§eOnly updates on sack change messages.",
     )
     @ConfigEditorBoolean
     var showSackCount: Boolean = true
@@ -58,7 +58,7 @@ class ShoppingListConfig {
     @Expose
     @ConfigOption(
         name = "Show Super Craft",
-        desc = "Show super craft button if there are enough materials to make in the sack."
+        desc = "Show super craft button if there are enough materials to make in the sack.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -68,7 +68,7 @@ class ShoppingListConfig {
     @ConfigOption(
         name = "Item Preview",
         desc = "Show the base type for the required items next to new visitors.\n" +
-            "§cNote that some visitors may require any crop."
+            "§cNote that some visitors may require any crop.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

@@ -4,10 +4,11 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import de.hype.bingonet.sharedcompilation.sbenums.BNNEUItem
 import net.minecraft.init.Items
 import kotlin.time.Duration.Companion.minutes
 
-class NeuInternalName private constructor(private val internalName: String) {
+class NeuInternalName private constructor(internalName: String) : BNNEUItem(internalName) {
 
     companion object {
 
@@ -23,6 +24,8 @@ class NeuInternalName private constructor(private val internalName: String) {
         val WISP_POTION = "WISP_POTION".toInternalName()
         val ENCHANTED_HAY_BLOCK = "ENCHANTED_HAY_BLOCK".toInternalName()
         val TIGHTLY_TIED_HAY_BALE = "TIGHTLY_TIED_HAY_BALE".toInternalName()
+        val SKYBLOCK_COPPER = "SKYBLOCK_COPPER".toInternalName()
+        val SKYBLOCK_CHOCOLATE = "SKYBLOCK_CHOCOLATE".toInternalName()
 
         fun String.toInternalName(): NeuInternalName = uppercase().replace(" ", "_").let {
             if (it.contains("§") || it.contains("&") || it.contains("'")) {

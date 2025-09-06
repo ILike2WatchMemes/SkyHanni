@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+
 //#if MC > 1.16
 //$$ import net.minecraft.world.item.DyeItem
 //#endif

@@ -71,6 +71,7 @@ object EnchantParser {
         "enchants.new",
         "(?:§7§l|§d§l|§9|§7)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
     )
+
     /**
      * REGEX-TEST: Respiration
      * REGEX-TEST: Efficiency V
@@ -176,7 +177,7 @@ object EnchantParser {
                     "SkyHanni's enchant parsing breaks with Aaron's Mod's 'Rainbow Max Enchants'",
                     config::colorParsing,
                     "turn off Aaron's Mod's Rainbow Max Enchants",
-                    { removeAaronMaxEnchant() }
+                    { removeAaronMaxEnchant() },
                 )
             }
             if (config.hideEnchantDescriptions.get()) {
@@ -184,7 +185,7 @@ object EnchantParser {
                     "SkyHanni's hide enchant descriptions breaks with Aaron's Mod's 'Rainbow Max Enchants'",
                     config::hideEnchantDescriptions,
                     "turn off Aaron's Mod's Rainbow Max Enchants",
-                    { removeAaronMaxEnchant() }
+                    { removeAaronMaxEnchant() },
                 )
             }
         }

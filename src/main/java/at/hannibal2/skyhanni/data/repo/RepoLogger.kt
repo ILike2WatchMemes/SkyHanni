@@ -12,6 +12,7 @@ class RepoLogger(private val loggingPrefix: String) {
     fun logError(error: String): Nothing = ErrorManager.skyHanniError("$loggingPrefix $error")
     fun logErrorWithData(cause: Throwable, error: String): Boolean =
         ErrorManager.logErrorWithData(cause, "$loggingPrefix $error")
+
     fun logErrorStateWithData(
         userMessage: String,
         internalMessage: String,

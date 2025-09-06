@@ -58,7 +58,7 @@ object EndermanSlayerFeatures {
 
         if (entity is EntityEnderman && showBeacon() && hasBeaconInHand(entity) && entity.canBeSeen(
                 viewDistance = 15.0,
-                ignoreFrustum = true
+                ignoreFrustum = true,
             )
         ) {
             endermenWithBeacons.add(entity)

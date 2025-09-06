@@ -16,6 +16,7 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.util.ResourceLocation
 import java.awt.Color
 import kotlin.math.max
+
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.render.RoundedShapeDrawer
 //$$ import org.joml.Matrix3x2f
@@ -31,7 +32,7 @@ object ShaderRenderUtils {
         this.toColor().red.toFloat() / 255f,
         this.toColor().green.toFloat() / 255f,
         this.toColor().blue.toFloat() / 255f,
-        this.alpha.toFloat() / 255f
+        this.alpha.toFloat() / 255f,
     )
 
     /**
@@ -250,7 +251,7 @@ object ShaderRenderUtils {
         radius: Int = 10,
         smoothness: Float = 1f,
         angle1: Float = 7.0f,
-        angle2: Float = 7.0f
+        angle2: Float = 7.0f,
     ) {
         // todo all of these diameters might need to be calced from radiusIn instead of radius?
         val radiusIn = radius * GuiScreenUtils.scaleFactor

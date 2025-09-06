@@ -255,7 +255,7 @@ object IslandAreas {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.inWorld) return
-        for ((node, distance) in nodes) {
+        for ((node, _) in nodes) {
             val name = node.name ?: continue
             if (name == currentArea) continue
             if (name == "no_area") continue

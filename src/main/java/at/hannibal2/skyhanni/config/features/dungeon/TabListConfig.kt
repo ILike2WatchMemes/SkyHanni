@@ -9,7 +9,7 @@ class TabListConfig {
     @Expose
     @ConfigOption(
         name = "Colored Class Level",
-        desc = "Color class levels in tab list. (Also hides rank colors and emblems, because who needs that in Dungeons anyway?)"
+        desc = "Color class levels in tab list. (Also hides rank colors and emblems, because who needs that in Dungeons anyway?)",
     )
     @ConfigEditorBoolean
     @FeatureToggle

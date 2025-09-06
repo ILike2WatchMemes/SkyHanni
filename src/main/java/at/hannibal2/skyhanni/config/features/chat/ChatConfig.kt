@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.chat
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.KeyBind
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -8,12 +9,14 @@ import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import org.lwjgl.input.Keyboard
 
 class ChatConfig {
+
     @Expose
     @ConfigOption(name = "Peek Chat", desc = "Hold this key to keep the chat open.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_Z)
@@ -214,4 +217,47 @@ class ChatConfig {
     )
     @ConfigEditorBoolean
     var hideClickableHint: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Default Chat Prompt Keybind",
+        desc = "Some clickable messages have a Keybind you can use to execute their Code instead of having to click. " +
+            "All other Keybind can be configured to be different," +
+            " but this one will be the default if no custom one is set for the related feature.",
+    )
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_R)
+    val defaultChatPrompt: Int = Keyboard.KEY_R
+
+    @Expose
+    @ConfigOption(
+        name = "Chat Prompt Expiration Multiplier",
+        desc = "A Multiplier for the duration for which a Chat Prompt is valid for.",
+    )
+    @ConfigEditorSlider(minValue = 0.5f, maxValue = 10f, minStep = 0.1f)
+    val chatPromptExpirationMultiplier: Double = 1.0
+
+    @Expose
+    @ConfigOption(
+        name = "Answer Suggested NPC Response Chat Prompts",
+        desc = "Some NPCs have dialogue that you need to answer (stuff like §a[Yes]§r)",
+    )
+    @Accordion
+    val npcResponseSuggestion: KeyBind = KeyBind()
+
+
+    @Expose
+    @ConfigOption(
+        name = "Contains Command Tab Completion",
+        desc = "Suggestion will be matched based on contains instead of start matching.",
+    )
+    @ConfigEditorBoolean
+    var tabCompletionUseContainsSuggestion: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Ignore Case Command Completion",
+        desc = "Suggestion will be matched based on contains instead of start matching.",
+    )
+    @ConfigEditorBoolean
+    var tabIgnoreCaseSuggestion: Boolean = true
 }

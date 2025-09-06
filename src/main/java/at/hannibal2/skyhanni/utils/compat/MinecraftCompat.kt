@@ -27,4 +27,5 @@ object MinecraftCompat {
     //#else
     //$$ val showDebugHud get(): Boolean = MinecraftClient.getInstance().debugHud.shouldShowDebugHud()
     //#endif
+
 }

@@ -19,6 +19,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import at.hannibal2.skyhanni.data.model.TextInput
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import org.lwjgl.input.Mouse
+
 //#else
 //$$ import net.minecraft.client.util.InputUtil
 //#endif

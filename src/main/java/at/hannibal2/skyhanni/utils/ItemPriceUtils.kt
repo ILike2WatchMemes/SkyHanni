@@ -167,7 +167,7 @@ object ItemPriceUtils {
     private val lbinStatic = ApiStaticGetPath(
         "https://moulberry.codes/lowestbin.json.gz",
         "NEU Lowest Bin",
-        tryForceGzip = true
+        tryForceGzip = true,
     )
 
     fun NeuInternalName.getPriceName(amount: Number, pricePer: Double = getPrice()): String {

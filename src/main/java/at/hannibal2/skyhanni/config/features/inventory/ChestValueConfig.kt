@@ -29,7 +29,7 @@ class ChestValueConfig {
     @Expose
     @ConfigOption(
         name = "Enable during Item Value",
-        desc = "Show this display even if the Estimated Item Value is visible."
+        desc = "Show this display even if the Estimated Item Value is visible.",
     )
     @ConfigEditorBoolean
     var showDuringEstimatedItemValue: Boolean = false
@@ -47,7 +47,7 @@ class ChestValueConfig {
     @Expose
     @ConfigOption(
         name = "Name Length",
-        desc = "Reduce item name length to gain extra space on screen.\n§cCalculated in pixels!"
+        desc = "Reduce item name length to gain extra space on screen.\n§cCalculated in pixels!",
     )
     @ConfigEditorSlider(minStep = 1f, minValue = 100f, maxValue = 150f)
     var nameLength: Int = 100
@@ -55,7 +55,7 @@ class ChestValueConfig {
     @Expose
     @ConfigOption(
         name = "Highlight Slot",
-        desc = "Highlight slot where the item is when you hover over it in the display."
+        desc = "Highlight slot where the item is when you hover over it in the display.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -91,7 +91,7 @@ class ChestValueConfig {
     @ConfigOption(
         name = "Item To Show",
         desc = "Choose how many items are displayed.\n" +
-            "All items in the chest are still counted for the total value."
+            "All items in the chest are still counted for the total value.",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 54f, minStep = 1f)
     var itemToShow: Int = 15
@@ -100,7 +100,7 @@ class ChestValueConfig {
     @ConfigOption(
         name = "Hide below",
         desc = "Hide items with value below configured amount.\n" +
-            "Items are still counted for the total value."
+            "Items are still counted for the total value.",
     )
     @ConfigEditorSlider(minValue = 50000f, maxValue = 10000000f, minStep = 50000f)
     var hideBelow: Int = 100000

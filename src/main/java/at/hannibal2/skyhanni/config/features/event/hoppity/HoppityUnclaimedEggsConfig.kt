@@ -13,7 +13,7 @@ class HoppityUnclaimedEggsConfig {
     @Expose
     @ConfigOption(
         name = "Show Unclaimed Eggs",
-        desc = "Display which eggs haven't been found in the last SkyBlock day."
+        desc = "Display which eggs haven't been found in the last SkyBlock day.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -40,7 +40,7 @@ class HoppityUnclaimedEggsConfig {
     @ConfigOption(
         name = "Show Collected Locations",
         desc = "Show the number of found egg locations on this island.\n" +
-            "§eThis is not retroactive and may not be fully synced with Hypixel's count."
+            "§eThis is not retroactive and may not be fully synced with Hypixel's count.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -49,7 +49,7 @@ class HoppityUnclaimedEggsConfig {
     @Expose
     @ConfigOption(
         name = "Show While Busy",
-        desc = "Show while \"busy\" (in a farming contest, doing Kuudra, in the rift, etc)."
+        desc = "Show while \"busy\" (in a farming contest, doing Kuudra, in the rift, etc).",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -70,7 +70,7 @@ class HoppityUnclaimedEggsConfig {
     @Expose
     @ConfigOption(
         name = "Warn While Busy",
-        desc = "Warn while \"busy\" (in a farming contest, doing Kuudra, in the rift, etc)."
+        desc = "Warn while \"busy\" (in a farming contest, doing Kuudra, in the rift, etc).",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -79,7 +79,7 @@ class HoppityUnclaimedEggsConfig {
     @Expose
     @ConfigOption(
         name = "Click to Warp",
-        desc = "Make the eggs ready chat message & unclaimed timer display clickable to warp you to an island."
+        desc = "Make the eggs ready chat message & unclaimed timer display clickable to warp you to an island.",
     )
     @ConfigEditorBoolean
     var warpClickEnabled: Boolean = false

@@ -5,6 +5,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.util.EnumFacing
+
 //#if MC > 1.16
 //$$ import net.minecraft.client.Minecraft
 //#endif

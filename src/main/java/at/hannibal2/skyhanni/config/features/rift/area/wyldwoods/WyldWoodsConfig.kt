@@ -11,7 +11,7 @@ class WyldWoodsConfig {
     @ConfigOption(
         name = "Shy Crux Warning",
         desc = "Show a warning when a Shy Crux is going to steal your time. " +
-            "Useful if you play without volume."
+            "Useful if you play without volume.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

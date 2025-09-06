@@ -14,7 +14,7 @@ class GuideTab(
     val tip: Renderable,
     val isVertical: Boolean = false,
     var lastTab: GuideGui.tabWrapper,
-    val onClick: (GuideTab) -> Unit
+    val onClick: (GuideTab) -> Unit,
 ) {
 
     fun fakeClick() = click()
@@ -51,7 +51,7 @@ class GuideTab(
             override val verticalAlign: VerticalAlignment = VerticalAlignment.TOP
 
             val itemRender = Renderable.item(
-                item, 1.0, horizontalAlign = HorizontalAlignment.CENTER, verticalAlign = VerticalAlignment.CENTER
+                item, 1.0, horizontalAlign = HorizontalAlignment.CENTER, verticalAlign = VerticalAlignment.CENTER,
             )
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
@@ -63,7 +63,7 @@ class GuideTab(
         onLeftClick = {
             click()
             SoundUtils.playClickSound()
-        }
+        },
     )
 
     fun render(mouseOffsetX: Int, mouseOffsetY: Int) {

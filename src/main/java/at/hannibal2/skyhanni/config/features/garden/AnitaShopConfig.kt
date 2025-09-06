@@ -12,7 +12,7 @@ class AnitaShopConfig {
     @ConfigOption(
         name = "Medal Prices",
         desc = "Help to identify profitable items to buy at the Anita item shop and " +
-            "potential profit from selling the item in the Auction House."
+            "potential profit from selling the item in the Auction House.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

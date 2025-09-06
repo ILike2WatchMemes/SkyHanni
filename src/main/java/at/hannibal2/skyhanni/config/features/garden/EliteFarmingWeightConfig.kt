@@ -16,7 +16,7 @@ class EliteFarmingWeightConfig {
         name = "Display",
         desc = "Display your farming weight on screen.\n" +
             "The calculation and API is provided by The Elite SkyBlock farmers.\n" +
-            "See §eelitebot.dev/info §7for more info."
+            "See §eelitebot.dev/info §7for more info.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -30,7 +30,7 @@ class EliteFarmingWeightConfig {
     @ConfigOption(
         name = "Leaderboard Ranking",
         desc = "Show your position in the farming weight leaderboard. " +
-            "Only if your farming weight is high enough! Updates periodically."
+            "Only if your farming weight is high enough! Updates periodically.",
     )
     @ConfigEditorBoolean
     var leaderboard: Boolean = true
@@ -42,7 +42,7 @@ class EliteFarmingWeightConfig {
 
     enum class EliteFarmingWeightLBType(
         private val displayName: String,
-        val leaderboardName: String = displayName
+        val leaderboardName: String = displayName,
     ) {
         DEFAULT("All-Time", leaderboardName = ""),
         MONTHLY("Monthly"),
@@ -55,7 +55,7 @@ class EliteFarmingWeightConfig {
     @ConfigOption(
         name = "Overtake ETA",
         desc = "Show a timer estimating when you'll move up a spot in the leaderboard! " +
-            "Will show an ETA to placement weight required if you're not on the leaderboard yet."
+            "Will show an ETA to placement weight required if you're not on the leaderboard yet.",
     )
     @ConfigEditorBoolean
     var overtakeETA: Boolean = false
@@ -63,7 +63,7 @@ class EliteFarmingWeightConfig {
     @Expose
     @ConfigOption(
         name = "Show LB Change",
-        desc = "Show the change of your position in the farming weight leaderboard while you were offline."
+        desc = "Show the change of your position in the farming weight leaderboard while you were offline.",
     )
     @ConfigEditorBoolean
     var showLbChange: Boolean = false
@@ -77,7 +77,7 @@ class EliteFarmingWeightConfig {
     @ConfigOption(
         name = "Use ETA Goal",
         desc = "Use the ETA Goal number instead of the next upcoming rank. Useful when your rank is in the " +
-            "ten thousands and you don't want to see small ETAs."
+            "ten thousands and you don't want to see small ETAs.",
     )
     @ConfigEditorBoolean
     val useEtaGoalRank: Property<Boolean> = Property.of(true)
@@ -85,7 +85,7 @@ class EliteFarmingWeightConfig {
     @Expose
     @ConfigOption(
         name = "ETA Goal",
-        desc = "Override the Overtake ETA to show when you'll reach the specified rank (if not there yet). (Default: \"10,000\")"
+        desc = "Override the Overtake ETA to show when you'll reach the specified rank (if not there yet). (Default: \"10,000\")",
     )
     @ConfigEditorText
     val etaGoalRank: Property<String> = Property.of("10000")

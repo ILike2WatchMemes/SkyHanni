@@ -211,7 +211,7 @@ object IslandExceptions {
 
         baseEntity is EntityZombie &&
             armorStand?.isDefaultValue() == true &&
-            MobUtils.getNextEntity(baseEntity, 4)?.name?.startsWith("§e") == true ->
+            getNextEntity(baseEntity, 4)?.name?.startsWith("§e") == true ->
             petCareHandler(baseEntity)
 
         baseEntity is EntityZombie && armorStand != null && !armorStand.isDefaultValue() -> null // Impossible Rat

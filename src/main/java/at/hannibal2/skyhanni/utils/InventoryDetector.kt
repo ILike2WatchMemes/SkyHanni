@@ -27,7 +27,7 @@ class InventoryDetector(
         closeInventory: (InventoryCloseEvent) -> Unit = {},
     ) : this(
         openInventory,
-        checkInventoryName = { name -> pattern.matches(name) }
+        checkInventoryName = { name -> pattern.matches(name) },
     )
 
     init {

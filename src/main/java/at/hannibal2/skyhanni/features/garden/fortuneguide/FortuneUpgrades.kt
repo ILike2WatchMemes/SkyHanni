@@ -109,6 +109,7 @@ object FortuneUpgrades {
                 "squeaky" -> {
                     reforgeItem(item, FarmingReforge.ROOTED, genericUpgrades)
                 }
+
                 "blooming" -> {
                     reforgeItem(item, FarmingReforge.SQUEAKY, genericUpgrades)
                 }

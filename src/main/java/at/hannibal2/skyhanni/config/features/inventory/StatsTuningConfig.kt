@@ -15,7 +15,7 @@ class StatsTuningConfig {
     @Expose
     @ConfigOption(
         name = "Tuning Points",
-        desc = "Show the amount of selected Tuning Points in the Stats Tuning inventory."
+        desc = "Show the amount of selected Tuning Points in the Stats Tuning inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

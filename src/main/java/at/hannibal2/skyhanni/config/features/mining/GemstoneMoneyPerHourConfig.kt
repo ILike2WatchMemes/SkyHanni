@@ -45,7 +45,7 @@ class GemstoneMoneyPerHourConfig {
     @ConfigOption(
         name = "Pause Time",
         desc = "Whether the timer should pause instead of resetting.\n" +
-            "§eNote: It will still reset when you enter a non-mining island."
+            "§eNote: It will still reset when you enter a non-mining island.",
     )
     @ConfigEditorBoolean
     var shouldPause: Boolean = true

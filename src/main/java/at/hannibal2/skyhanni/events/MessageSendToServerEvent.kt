@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.system.ModInstance
 class MessageSendToServerEvent(
     val message: String,
     val splitMessage: List<String>,
-    val originatingModContainer: ModInstance?
+    val originatingModContainer: ModInstance?,
 ) : CancellableSkyHanniEvent() {
     val isCommand by lazy { message.startsWith("/") }
 }

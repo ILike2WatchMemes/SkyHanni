@@ -30,11 +30,11 @@ object ComposterApi {
         val fractionRemaining = nextCompostTime / timePerCompost
 
         val remainingTimeByOrganicMatter = getDurationUntilEndOfResource(
-            getOrganicMatter(), fractionRemaining, organicMatterRequiredPer(null), timePerCompost
+            getOrganicMatter(), fractionRemaining, organicMatterRequiredPer(null), timePerCompost,
         )
 
         val remainingTimeByFuel = getDurationUntilEndOfResource(
-            getFuel(), fractionRemaining, fuelRequiredPer(null), timePerCompost
+            getFuel(), fractionRemaining, fuelRequiredPer(null), timePerCompost,
         )
 
         return nextCompostTime + minOf(remainingTimeByOrganicMatter, remainingTimeByFuel)

@@ -15,7 +15,7 @@ class PageScrollingConfig {
     @Expose
     @ConfigOption(
         name = "Bypass Key",
-        desc = "When the key is held allows you to scroll even though you are over an item."
+        desc = "When the key is held allows you to scroll even though you are over an item.",
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
     var bypassKey: Int = Keyboard.KEY_LSHIFT
@@ -24,7 +24,7 @@ class PageScrollingConfig {
     @ConfigOption(
         name = "Invert Bypass",
         desc = "Inverts the behaviour of the bypass key. With this option the" +
-            " bypass key blocks scrolling over items instead of allowing it."
+            " bypass key blocks scrolling over items instead of allowing it.",
     )
     @ConfigEditorBoolean
     var invertBypass: Boolean = false

@@ -10,7 +10,7 @@ class ChatMessagesConfig {
     @Expose
     @ConfigOption(
         name = "Trophy Counter",
-        desc = "Count Trophy messages from chat and tells you how many you have found."
+        desc = "Count Trophy messages from chat and tells you how many you have found.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -21,7 +21,7 @@ class ChatMessagesConfig {
         name = "Trophy Counter Design",
         desc = "§fStyle 1: §72. §6§lGOLD §5Moldfin\n" +
             "§fStyle 2: §bYou caught a §5Moldfin §6§lGOLD§b. §7(2)\n" +
-            "§fStyle 3: §bYou caught your 2nd §6§lGOLD §5Moldfin§b."
+            "§fStyle 3: §bYou caught your 2nd §6§lGOLD §5Moldfin§b.",
     )
     @ConfigEditorDropdown
     var design: DesignFormat = DesignFormat.STYLE_1
@@ -38,7 +38,7 @@ class ChatMessagesConfig {
     @Expose
     @ConfigOption(
         name = "Show Total Amount",
-        desc = "Show total amount of all rarities at the end of the chat message."
+        desc = "Show total amount of all rarities at the end of the chat message.",
     )
     @ConfigEditorBoolean
     var totalAmount: Boolean = false
@@ -46,7 +46,7 @@ class ChatMessagesConfig {
     @Expose
     @ConfigOption(
         name = "Trophy Fish Info",
-        desc = "Show information and stats about a Trophy Fish when hovering over a catch message in chat."
+        desc = "Show information and stats about a Trophy Fish when hovering over a catch message in chat.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

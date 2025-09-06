@@ -138,9 +138,10 @@ object GitHubUtils {
         @Expose val payload: String? = null,
         @Expose @field:SerializedName("verified_at") private val verifiedAtString: String? = null,
     ) {
-        val verifiedAt: SimpleTimeMark? get() = verifiedAtString?.let {
-            Instant.parse(it).toEpochMilli().asTimeMark()
-        }
+        val verifiedAt: SimpleTimeMark?
+            get() = verifiedAtString?.let {
+                Instant.parse(it).toEpochMilli().asTimeMark()
+            }
     }
 
     data class CommitStats(

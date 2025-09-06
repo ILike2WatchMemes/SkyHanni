@@ -285,12 +285,18 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
 }
 
 class BlockingMoulConfigProcessor : MoulConfigProcessor<Features>(SkyHanniMod.feature) {
+    @Suppress("ReturnCount")
     override fun createOptionGui(
         processedOption: ProcessedOption,
         field: Field,
         option: ConfigOption,
     ): GuiOptionEditor? {
-        val default = super.createOptionGui(processedOption, field, option) ?: return null
+        val default: GuiOptionEditor
+        try {
+            default = super.createOptionGui(processedOption, field, option) ?: return null
+        } catch (e: Exception) {
+            throw Exception("field: ${field.name} appearing class: ${field.declaringClass.simpleName}", e)
+        }
         if (processedOption !is ProcessedOptionImpl) return default
         var extraPath = ""
         val categoryParent = processedOption.category.parentCategoryId

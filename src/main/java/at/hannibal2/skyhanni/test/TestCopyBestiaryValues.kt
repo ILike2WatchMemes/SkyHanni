@@ -45,7 +45,7 @@ object TestCopyBestiaryValues {
 
     private val bestiaryTypePattern by RepoPattern.pattern(
         "test.bestiary.type",
-        "\\[Lv(?<lvl>.*)] (?<text>.*)"
+        "\\[Lv(?<lvl>.*)] (?<text>.*)",
     )
 
     @HandleEvent(priority = HandleEvent.LOW)

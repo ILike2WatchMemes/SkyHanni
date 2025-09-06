@@ -10,6 +10,7 @@ import java.net.URI
 import java.nio.file.Files
 import java.nio.file.attribute.BasicFileAttributes
 import kotlin.time.Duration
+
 //#if MC > 1.21
 //$$ import net.minecraft.util.Util
 //#endif

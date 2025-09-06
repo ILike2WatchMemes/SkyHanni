@@ -15,7 +15,7 @@ class HideAshfangConfig {
     @Expose
     @ConfigOption(
         name = "Hide Full Names",
-        desc = "Hide the names of full health blazes around Ashfang §e(only useful when highlight blazes is enabled)"
+        desc = "Hide the names of full health blazes around Ashfang §e(only useful when highlight blazes is enabled)",
     )
     @ConfigEditorBoolean
     @FeatureToggle

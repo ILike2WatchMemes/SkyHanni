@@ -223,7 +223,7 @@ object ErrorManager {
         val rawMessage = message.removeColor()
         val shVersion = SkyHanniMod.VERSION
         val mcVersion = PlatformUtils.MC_VERSION
-        val label = "SkyHanni $shVersion $mcVersion"
+        val label = "SkyHanni (Bingo Net) $shVersion $mcVersion"
         errorMessages[randomId] = "```\n$label: $rawMessage\n \n$stackTrace\n$extraDataString```"
         fullErrorMessages[randomId] =
             "```\n$label: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n$extraDataString```"

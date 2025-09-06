@@ -427,6 +427,7 @@ object HypixelData {
                 SkyHanniRepoManager.displayRepoStatus(true)
                 EnoughUpdatesRepoManager.displayRepoStatus(true)
             }
+
             wasOnHypixel && !nowOnHypixel -> {
                 if (skyBlock) {
                     skyBlock = false
@@ -608,5 +609,13 @@ object HypixelData {
     private fun countPlayersOnIsland(event: WidgetUpdateEvent) {
         if (event.isClear()) return
         playerAmountOnIsland = playerAmountOnIslandPattern.allMatches(event.lines).size
+    }
+
+    fun isInMega(): Boolean {
+        return serverId?.startsWith("mega") ?: false
+    }
+
+    fun getRemainingSpace(): Int {
+        return getMaxPlayersForCurrentServer() - getPlayersOnCurrentServer()
     }
 }

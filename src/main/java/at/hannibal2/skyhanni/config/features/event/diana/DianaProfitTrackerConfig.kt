@@ -12,7 +12,7 @@ class DianaProfitTrackerConfig {
     @ConfigOption(
         name = "Enabled",
         desc = "Count all items you pick up while doing Diana, " +
-            "keeping track of how often you dig burrows, and calculating money earned per burrow."
+            "keeping track of how often you dig burrows, and calculating money earned per burrow.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

@@ -25,14 +25,21 @@ data class EliteItemResponse(
 )
 
 // <editor-fold desc="Helpers to parse to SH formats">
-enum class SoulboundType { NONE, SOLO, COOP }
+enum class SoulboundType {
+    NONE,
+    SOLO,
+    COOP
+}
 
 data class EliteSkin(
     @Expose val value: String,
     @Expose val signature: String,
 )
 
-enum class SlotCostType { COINS, ITEM }
+enum class SlotCostType {
+    COINS,
+    ITEM
+}
 
 @KSerializable
 data class EliteGemstoneSlotCost(
@@ -62,14 +69,22 @@ data class EliteGemstoneSlot(
 }
 
 enum class EliteRequirementType {
-    CHOCOLATE_FACTORY, COLLECTION,
-    CRIMSON_ISLE_REPUTATION, DUNGEON_SKILL,
-    DUNGEON_TIER, EASTER_RABBIT,
-    GARDEN_LEVEL, HEART_OF_THE_MOUNTAIN,
-    KUUDRA_COMPLETION, MELODY_HAIR,
-    ONE_OF, PROFILE_AGE,
-    SKILL, SLAYER,
-    TARGET_PRACTICE, TROPHY_FISHING,
+    CHOCOLATE_FACTORY,
+    COLLECTION,
+    CRIMSON_ISLE_REPUTATION,
+    DUNGEON_SKILL,
+    DUNGEON_TIER,
+    EASTER_RABBIT,
+    GARDEN_LEVEL,
+    HEART_OF_THE_MOUNTAIN,
+    KUUDRA_COMPLETION,
+    MELODY_HAIR,
+    ONE_OF,
+    PROFILE_AGE,
+    SKILL,
+    SLAYER,
+    TARGET_PRACTICE,
+    TROPHY_FISHING,
 }
 
 @KSerializable
@@ -129,7 +144,10 @@ data class EliteItemCatacombRequirement(
     @Expose val level: Int,
 )
 
-enum class UpgradeCostType { ESSENCE, ITEM }
+enum class UpgradeCostType {
+    ESSENCE,
+    ITEM
+}
 
 @KSerializable
 @Suppress("unused")
@@ -145,7 +163,12 @@ data class EliteItemUpgradeCost(
     private val item: NeuInternalName? = itemId ?: essenceType
 }
 
-enum class EliteMuseumType { ARMOR_SETS, WEAPONS, RARITIES }
+enum class EliteMuseumType {
+    ARMOR_SETS,
+    WEAPONS,
+    RARITIES
+}
+
 enum class EliteMuseumGameStage {
     STARTER,
     AMATEUR,
@@ -171,7 +194,10 @@ data class EliteMuseumData(
     val parentIdentifier: String? = parent?.entries?.first()?.value
 }
 
-enum class EliteItemOrigin { RIFT, BINGO }
+enum class EliteItemOrigin {
+    RIFT,
+    BINGO
+}
 // </editor-fold>
 
 @KSerializable
@@ -233,6 +259,7 @@ data class EliteItem(
     @Expose @SerializedName("lose_motes_value_on_transfer") val loseMotesValueOnTransfer: Boolean? = null,
 ) {
     val internalName: NeuInternalName = id
+
     // Example of why we need this:
     // "description": "%%gray%%%%italic%%A perfectly fine tooth, besides its radiant brightness..."
     val description: String? = dirtyDescription?.let {

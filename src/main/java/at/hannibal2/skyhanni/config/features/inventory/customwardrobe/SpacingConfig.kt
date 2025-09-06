@@ -61,7 +61,7 @@ class SpacingConfig : Resettable() {
     @Expose
     @ConfigOption(
         name = "Slots & Buttons Spacing",
-        desc = "How much vertical space there is between wardrobe slots and the buttons."
+        desc = "How much vertical space there is between wardrobe slots and the buttons.",
     )
     @ConfigEditorSlider(minValue = 1f, maxValue = 40f, minStep = 1f)
     val buttonSlotsVerticalSpacing: Property<Int> = Property.of(10)

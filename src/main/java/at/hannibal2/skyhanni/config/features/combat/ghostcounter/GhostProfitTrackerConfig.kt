@@ -26,12 +26,12 @@ class GhostProfitTrackerConfig {
         GhostTrackerLines.MAX_KILL_COMBO,
         GhostTrackerLines.COMBAT_XP_GAINED,
         GhostTrackerLines.AVERAGE_MAGIC_FIND,
-        GhostTrackerLines.BESTIARY_KILLS
+        GhostTrackerLines.BESTIARY_KILLS,
     )
 
     @ConfigOption(
         name = "Max Bestiary",
-        desc = "§7This feature will currently not work properly when having max Ghost Bestiary."
+        desc = "§7This feature will currently not work properly when having max Ghost Bestiary.",
     )
     @ConfigEditorInfoText(infoTitle = "Warning")
     var useless: String? = null

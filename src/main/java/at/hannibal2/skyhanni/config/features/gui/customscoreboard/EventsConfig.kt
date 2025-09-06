@@ -26,7 +26,7 @@ class EventsConfig {
     @Expose
     @ConfigOption(
         name = "Show all active events",
-        desc = "Show all active events in the scoreboard instead of the one with the highest priority."
+        desc = "Show all active events in the scoreboard instead of the one with the highest priority.",
     )
     @ConfigEditorBoolean
     var showAllActiveEvents: Boolean = true

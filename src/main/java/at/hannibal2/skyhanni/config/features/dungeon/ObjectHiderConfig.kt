@@ -45,7 +45,7 @@ class ObjectHiderConfig {
     @Expose
     @ConfigOption(
         name = "Hide Healer Orbs",
-        desc = "Hide the damage, ability damage and defensive orbs that spawn when the Healer kills mobs."
+        desc = "Hide the damage, ability damage and defensive orbs that spawn when the Healer kills mobs.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -60,7 +60,7 @@ class ObjectHiderConfig {
     @Expose
     @ConfigOption(
         name = "Hide Soulweaver Skulls",
-        desc = "Hide the annoying soulweaver skulls that float around you if you have the soulweaver gloves equipped."
+        desc = "Hide the annoying soulweaver skulls that float around you if you have the soulweaver gloves equipped.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

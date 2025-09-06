@@ -14,8 +14,10 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
+import org.lwjgl.input.Keyboard
 
 class InventoryConfig {
     @Expose
@@ -358,4 +360,12 @@ class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var savePrivateIslandChests: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Bulk Quick Move Keybind",
+        desc = "While holding this key you quick move all items you are hovering over. (Aka Quick Move)",
+    )
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_TAB)
+    var bulkMoveKeybind: Int = Keyboard.KEY_TAB
 }

@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class CenturyConfig {
     @ConfigOption(
         name = "Enable Active Player Timer",
-        desc = "Show a HUD telling you how much longer you have to wait to be eligible for another free ticket."
+        desc = "Show a HUD telling you how much longer you have to wait to be eligible for another free ticket.",
     )
     @Expose
     @ConfigEditorBoolean

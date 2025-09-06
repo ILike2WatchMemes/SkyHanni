@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 //#if MC < 1.21
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
 import net.minecraft.network.play.server.S0FPacketSpawnMob
+
 //#endif
 
 @SkyHanniModule

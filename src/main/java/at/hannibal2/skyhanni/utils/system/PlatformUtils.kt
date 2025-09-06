@@ -10,6 +10,7 @@ import kotlin.time.Duration.Companion.INFINITE
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.common.Loader
+
 //#elseif FORGE
 //$$ import net.minecraftforge.fml.loading.FMLEnvironment
 //#else
@@ -25,6 +26,7 @@ object PlatformUtils {
 
     //#if MC < 1.21
     val MC_VERSION: String = VersionConstants.MC_VERSION
+
     //#else
     //$$ val MC_VERSION: String = net.minecraft.SharedConstants.getGameVersion().name
     //#endif

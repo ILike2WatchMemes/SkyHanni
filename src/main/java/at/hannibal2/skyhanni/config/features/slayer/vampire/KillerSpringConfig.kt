@@ -24,7 +24,7 @@ class KillerSpringConfig {
     @Expose
     @ConfigOption(
         name = "Show Lines",
-        desc = "Draw lines that start from the head of the boss and end on the Killer Spring tower."
+        desc = "Draw lines that start from the head of the boss and end on the Killer Spring tower.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

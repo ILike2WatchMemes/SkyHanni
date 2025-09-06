@@ -9,7 +9,7 @@ class RareCatchesConfig {
     @Expose
     @ConfigOption(
         name = "Alert (Own Sea Creatures)",
-        desc = "Show an alert on screen when you catch a rare sea creature."
+        desc = "Show an alert on screen when you catch a rare sea creature.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -18,7 +18,7 @@ class RareCatchesConfig {
     @Expose
     @ConfigOption(
         name = "Alert (Other Sea Creatures)",
-        desc = "Show an alert on screen when other players nearby catch a rare sea creature."
+        desc = "Show an alert on screen when other players nearby catch a rare sea creature.",
     )
     @ConfigEditorBoolean
     var alertOtherCatches: Boolean = false
@@ -26,7 +26,7 @@ class RareCatchesConfig {
     @Expose
     @ConfigOption(
         name = "Announce to Party",
-        desc = "Send a message to your party when you catch a rare sea creature."
+        desc = "Send a message to your party when you catch a rare sea creature.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

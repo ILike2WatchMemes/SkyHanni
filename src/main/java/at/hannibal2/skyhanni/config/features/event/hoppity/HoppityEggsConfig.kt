@@ -102,7 +102,7 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Modify Egg Sounds",
-        desc = "Mute or revert the note block sounds when opening an egg."
+        desc = "Mute or revert the note block sounds when opening an egg.",
     )
     @ConfigEditorDropdown
     @OnlyModern

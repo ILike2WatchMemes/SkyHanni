@@ -17,7 +17,7 @@ import kotlin.ranges.contains
 
 @SkyHanniModule
 object TrackSoundsCommand : TrackCommand<PlaySoundEvent, String>(
-    commonName = "sound"
+    commonName = "sound",
 ) {
     override val config get() = SkyHanniMod.feature.dev.debug.trackSound
 

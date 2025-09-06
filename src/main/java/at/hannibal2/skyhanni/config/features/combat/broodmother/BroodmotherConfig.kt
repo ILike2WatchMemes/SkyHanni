@@ -15,7 +15,7 @@ class BroodmotherConfig {
     @ConfigOption(
         name = "Countdown",
         desc = "Display a countdown until the Broodmother will spawn.\n" +
-            "§cCountdown will not show unless the time until spawn has been established, and may be off by a few seconds."
+            "§cCountdown will not show unless the time until spawn has been established, and may be off by a few seconds.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -42,18 +42,18 @@ class BroodmotherConfig {
     @ConfigOption(
         name = "Chat Messages",
         desc = "Send a chat message when the Broodmother enters these stages.\n" +
-            "§cThe 'Alive!' and 'Imminent' stages are overridden by the \"Spawn Alert\" and \"Imminent Warning\" features."
+            "§cThe 'Alive!' and 'Imminent' stages are overridden by the \"Spawn Alert\" and \"Imminent Warning\" features.",
     )
     @ConfigEditorDraggableList
     val stages: MutableList<StageEntry> = mutableListOf(
         StageEntry.SLAIN,
-        StageEntry.ALIVE
+        StageEntry.ALIVE,
     )
 
     @Expose
     @ConfigOption(
         name = "Stage on Server Join",
-        desc = "Send a chat message with the Broodmother's current stage upon joining the Spider's Den."
+        desc = "Send a chat message with the Broodmother's current stage upon joining the Spider's Den.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -62,7 +62,7 @@ class BroodmotherConfig {
     @Expose
     @ConfigOption(
         name = "Hide own kills",
-        desc = "Disable the chat message for the §eSlain §rstage if at the Spider Mound."
+        desc = "Disable the chat message for the §eSlain §rstage if at the Spider Mound.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

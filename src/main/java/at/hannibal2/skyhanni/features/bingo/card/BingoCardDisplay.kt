@@ -132,7 +132,7 @@ object BingoCardDisplay {
             config.bingoCardPos.renderRenderables(displayCache, posLabel = "Bingo Card")
         } else if (displayMode == 1) {
             val helpRenderable = Renderable.vertical(
-                BingoNextStepHelper.currentHelp.map { Renderable.text(it) }
+                BingoNextStepHelper.currentHelp.map { Renderable.text(it) },
             )
             config.bingoCardPos.renderRenderable(helpRenderable, posLabel = "Bingo Card")
         }
@@ -180,8 +180,8 @@ object BingoCardDisplay {
         addString(" ")
     }
 
-    private fun percentageFormat(it: BingoGoal) = it.communtyGoalPercentage?.let {
-        " " + BingoApi.getCommunityPercentageColor(it)
+    private fun percentageFormat(it: BingoGoal) = it.communityGoalData?.let {
+        " " + BingoApi.getCommunityPercentageColor(it.percentage)
     }.orEmpty()
 
     private fun MutableList<Renderable>.addPersonalGoals() {
@@ -266,6 +266,7 @@ object BingoCardDisplay {
     }
 
     private var lastSneak = false
+
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "bingo", "event.bingo")

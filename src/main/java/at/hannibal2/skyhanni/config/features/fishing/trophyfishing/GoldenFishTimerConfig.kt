@@ -34,7 +34,7 @@ class GoldenFishTimerConfig {
     @Expose
     @ConfigOption(
         name = "Nametag",
-        desc = "Show a nametag on the Golden Fish showing how weak it is and when it will despawn."
+        desc = "Show a nametag on the Golden Fish showing how weak it is and when it will despawn.",
     )
     @ConfigEditorBoolean
     var nametag: Boolean = true
@@ -47,7 +47,7 @@ class GoldenFishTimerConfig {
     @Expose
     @ConfigOption(
         name = "Throw Rod Warning",
-        desc = "Show a warning when you are close to the time limit of throwing your rod."
+        desc = "Show a warning when you are close to the time limit of throwing your rod.",
     )
     @ConfigEditorBoolean
     var throwRodWarning: Boolean = false

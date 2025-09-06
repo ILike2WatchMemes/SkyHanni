@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import net.minecraft.util.EnumParticleTypes
+
 //#if MC > 1.21
 //$$ import net.minecraft.particle.ParticleType
 //$$ import net.minecraft.registry.Registries
@@ -29,11 +30,11 @@ class ReceiveParticleEvent(
     override fun toString(): String {
         return "ReceiveParticleEvent(type='$type', location=${location.roundTo(1)}, count=$count, speed=$speed, offset=${
             offset.roundTo(
-                1
+                1,
             )
         }, longDistance=$longDistance, particleArgs=${particleArgs.contentToString()}, distanceToPlayer=${
             distanceToPlayer.roundTo(
-                1
+                1,
             )
         })"
     }

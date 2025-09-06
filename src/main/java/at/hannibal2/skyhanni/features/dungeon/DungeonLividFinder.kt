@@ -31,8 +31,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.getBlockColor
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isWool
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat
-import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.activePotionEffect
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
@@ -179,7 +177,7 @@ object DungeonLividFinder {
         }
     }
 
-    private fun isCurrentlyBlind() = (MinecraftCompat.localPlayerOrNull?.activePotionEffect(EffectsCompat.BLINDNESS)?.duration ?: 0) > 10
+    private fun isCurrentlyBlind() = (EffectsCompat.getPlayerEffect(EffectsCompat.BLINDNESS)?.duration ?: 0) > 10
 
     private fun EntityOtherPlayerMP.isLividColor(color: LorenzColor): Boolean {
         val chatColor = color.getChatColor()

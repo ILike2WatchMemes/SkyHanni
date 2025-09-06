@@ -18,7 +18,7 @@ class MayorConfig {
     @Expose
     @ConfigOption(
         name = "Show Extra Mayor",
-        desc = "Show the Perkpocalypse Mayor without their perks and the minister with their perk."
+        desc = "Show the Perkpocalypse Mayor without their perks and the minister with their perk.",
     )
     @ConfigEditorBoolean
     var showExtraMayor: Boolean = true

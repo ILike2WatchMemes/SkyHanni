@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.GetFromSackApi
+import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.utils.ChatUtils.debug
 import at.hannibal2.skyhanni.utils.ChatUtils.sendMessageToServer
 
@@ -121,36 +122,49 @@ object HypixelCommands {
         send("ec $position")
     }
 
+    @Deprecated("Use the PartyApi methods instead", ReplaceWith("PartyApi.acceptParty(player)"))
     fun partyAccept(player: String) {
-        send("party accept $player")
+        PartyApi.acceptParty(player)
     }
 
+    @Deprecated("Use the PartyApi methods instead", ReplaceWith("PartyApi.warp()"))
     fun partyWarp() {
-        send("party warp")
+        PartyApi.warp()
     }
 
+    @Deprecated("Use the PartyApi methods instead", ReplaceWith("PartyApi.partyTransfer(player)"))
     fun partyTransfer(player: String) {
-        send("party transfer $player")
+        PartyApi.partyTransfer(player)
     }
 
+    @Deprecated("Use the PartyApi methods instead", ReplaceWith("PartyApi.disband()"))
     fun partyDisband() {
-        send("party disband")
+        PartyApi.disband()
     }
 
+    @Deprecated("Use the PartyApi methods instead", ReplaceWith("PartyApi.kick(player)"))
     fun partyKick(player: String) {
-        send("party kick $player")
+        PartyApi.kick(player)
     }
 
+    @Deprecated("Use the PartyApi methods instead", ReplaceWith("PartyApi.kickOffline()"))
     fun partyKickOffline() {
-        send("party kickoffline")
+        PartyApi.kickOffline()
     }
 
+    @Deprecated("Use the PartyApi methods instead", ReplaceWith("PartyApi.allInvite()"))
     fun partyAllInvite() {
-        send("party settings allinvite")
+        PartyApi.allInvite()
     }
 
+    @Deprecated("Use the PartyApi methods instead", ReplaceWith("PartyApi.promote(player)"))
     fun partyPromote(player: String) {
-        send("party promote $player")
+        PartyApi.promote(player)
+    }
+
+    @Deprecated("Use the PartyApi methods instead", ReplaceWith("PartyApi.invite(player)"))
+    fun partyInvite(player: String) {
+        PartyApi.invite(player)
     }
 
     fun partyChat(message: String, prefix: Boolean = false) {
@@ -158,10 +172,6 @@ object HypixelCommands {
             false -> send("pc $message")
             true -> send("pc [SkyHanni] $message")
         }
-    }
-
-    fun partyInvite(player: String) {
-        send("party $player")
     }
 
     fun allChat(message: String) {

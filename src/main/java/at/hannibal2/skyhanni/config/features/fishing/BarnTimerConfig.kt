@@ -15,7 +15,7 @@ class BarnTimerConfig {
     @Expose
     @ConfigOption(
         name = "Barn Fishing Timer",
-        desc = "Show the time and amount of own sea creatures nearby while barn fishing."
+        desc = "Show the time and amount of own sea creatures nearby while barn fishing.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -24,7 +24,7 @@ class BarnTimerConfig {
     @Expose
     @ConfigOption(
         name = "Show Anywhere",
-        desc = "Show the Barn Fishing Timer whenever you fish up a sea creature, regardless of location."
+        desc = "Show the Barn Fishing Timer whenever you fish up a sea creature, regardless of location.",
     )
     @ConfigEditorBoolean
     var showAnywhere: Boolean = false
@@ -47,7 +47,7 @@ class BarnTimerConfig {
     @Expose
     @ConfigOption(
         name = "Stranded Fishing",
-        desc = "Show the Barn Fishing Timer on all the different islands that Stranded players can visit."
+        desc = "Show the Barn Fishing Timer on all the different islands that Stranded players can visit.",
     )
     @ConfigEditorBoolean
     val forStranded: Property<Boolean> = Property.of(true)
@@ -55,7 +55,7 @@ class BarnTimerConfig {
     @Expose
     @ConfigOption(
         name = "Worm Cap Alert",
-        desc = "Alerts you with title and sound if you hit the Worm Sea Creature limit of 20."
+        desc = "Alerts you with title and sound if you hit the Worm Sea Creature limit of 20.",
     )
     @ConfigEditorBoolean
     var wormLimitAlert: Boolean = true

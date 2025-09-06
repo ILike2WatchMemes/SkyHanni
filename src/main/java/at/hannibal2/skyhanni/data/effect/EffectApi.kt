@@ -21,11 +21,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -108,7 +110,7 @@ object EffectApi {
      */
     private val tabEffectPattern by RepoPattern.pattern(
         "tab.effects",
-        " *(?:§.)*(?<effect>§.[\\w\\-' ]+ (?<tier>[IVXLC]+)) ?(?:§.|[: ])+(?<time>[dhms0-9 ]+)(?:§.)*"
+        " *(?:§.)*(?<effect>§.[\\w\\-' ]+ (?<tier>[IVXLC]+)) ?(?:§.|[: ])+(?<time>[dhms0-9 ]+)(?:§.)*",
     )
 
     /**
@@ -118,7 +120,7 @@ object EffectApi {
      */
     private val saltTabPattern by RepoPattern.pattern(
         "tab.salts",
-        " (?<effect>(?:§.)*[\\w\\-' ]+(?:§.)*)*: *(?:§.)*(?<time>[dhms0-9 ]+)"
+        " (?<effect>(?:§.)*[\\w\\-' ]+(?:§.)*)*: *(?:§.)*(?<time>[dhms0-9 ]+)",
     )
     // </editor-fold>
 
@@ -147,7 +149,7 @@ object EffectApi {
 
         val modifiedMessage = event.message.replace(
             " Press TAB or type /effects to view your active effects!",
-            ""
+            "",
         )
 
         when (modifiedMessage) {
@@ -156,51 +158,61 @@ object EffectApi {
                 changeType = EffectDurationChangeType.ADD // These stack when you consume them
                 duration = 1.hours
             }
+
             "§a§lBUFF! §fYou have gained §r§2Mushed Glowy Tonic I§r§f!" -> {
                 effect = NonGodPotEffect.GLOWY
                 changeType = EffectDurationChangeType.SET
                 duration = 1.hours
             }
+
             "§a§lBUFF! §fYou splashed yourself with §r§bWisp's Ice-Flavored Water I§r§f!" -> {
                 effect = NonGodPotEffect.WISP
                 changeType = EffectDurationChangeType.SET
                 duration = 5.minutes
             }
+
             "§eYou consumed a §r§fGreat Spook Potion§r§e!" -> {
                 effect = NonGodPotEffect.GREAT_SPOOK
                 changeType = EffectDurationChangeType.SET
                 duration = 24.hours
             }
+
             "§a§lBUFF! §fYou have gained §r§6Harvest Harbinger V§r§f!" -> {
                 effect = NonGodPotEffect.HARVEST_HARBINGER
                 changeType = EffectDurationChangeType.SET
                 duration = 25.minutes
             }
+
             "§a§lYUM! §r§2Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
                 effect = NonGodPotEffect.PEST_REPELLENT
                 changeType = EffectDurationChangeType.SET
                 duration = 1.hours
             }
+
             "§a§lYUM! §r§2Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
                 effect = NonGodPotEffect.PEST_REPELLENT_MAX
                 changeType = EffectDurationChangeType.SET
                 duration = 1.hours
             }
+
             "§e[NPC] §6King Yolkar§f: §rThis egg will help me stomach my pain." -> {
                 effect = NonGodPotEffect.GOBLIN
                 changeType = EffectDurationChangeType.SET
                 duration = 20.minutes
             }
+
             "§cThe Goblin King's §r§afoul stench §r§chas dissipated!" -> {
                 effect = NonGodPotEffect.GOBLIN
                 changeType = EffectDurationChangeType.REMOVE
                 duration = null
             }
+
             "§a§lBUFF! §fYou have gained §r§eDouce Pluie de Stinky Cheese I§r§f!" -> {
                 effect = NonGodPotEffect.DOUCE_PLUIE_DE_STINKY_CHEESE
                 changeType = EffectDurationChangeType.SET
                 duration = 1.hours
             }
+
             else -> return
         }
 
@@ -314,5 +326,9 @@ object EffectApi {
                 EffectDurationChangeEvent(effect, EffectDurationChangeType.SET, duration).post()
             }
         }
+    }
+
+    fun getGodSplashDuration(): Duration {
+        return ((EffectsCompat.getPlayerEffect(EffectsCompat.STRENGTH)?.duration ?: 0) / 20).seconds
     }
 }

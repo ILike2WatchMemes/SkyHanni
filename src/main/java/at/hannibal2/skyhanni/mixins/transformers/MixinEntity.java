@@ -19,7 +19,7 @@ public abstract class MixinEntity {
         return EntityData.getDisplayName((Entity) (Object) this, value);
     }
 
-    //from neu
+    // from neu
     // Fixes an issue in vanilla code when working with null worlds
     @Inject(method = "getBrightnessForRender", at = @At("HEAD"), cancellable = true)
     public void onGetBrightnessForRender(float p_getBrightnessForRender_1_, CallbackInfoReturnable<Integer> cir) {

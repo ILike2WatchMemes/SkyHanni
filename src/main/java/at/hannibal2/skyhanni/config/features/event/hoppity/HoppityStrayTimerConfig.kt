@@ -24,7 +24,7 @@ class HoppityStrayTimerConfig {
     @ConfigOption(
         name = "Block Closing",
         desc = "Block closing the Chocolate Factory while the timer is active.\n" +
-            "§eHold §cShift §eto bypass"
+            "§eHold §cShift §eto bypass",
     )
     @SearchTag("prevent close")
     @ConfigEditorBoolean

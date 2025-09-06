@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import net.minecraft.util.EnumParticleTypes
+
 //#if MC > 1.21
 //$$ import net.minecraft.util.Identifier
 //#endif

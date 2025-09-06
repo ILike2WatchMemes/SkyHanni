@@ -12,7 +12,7 @@ class SkillETADisplayConfig {
     @ConfigOption(
         name = "Enabled",
         desc = "Show a display of your current active skill " +
-            "with the XP/hour rate, ETA to the next level and current session time."
+            "with the XP/hour rate, ETA to the next level and current session time.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

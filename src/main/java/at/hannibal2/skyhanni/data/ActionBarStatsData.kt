@@ -11,23 +11,23 @@ import org.intellij.lang.annotations.Language
 enum class ActionBarStatsData(@Language("RegExp") rawPattern: String) {
     HEALTH(
         // language=RegExp
-        "§[c6](?<health>[\\d,]+)/[\\d,]+❤.*"
+        "§[c6](?<health>[\\d,]+)/[\\d,]+❤.*",
     ),
     DEFENSE(
         // language=RegExp
-        ".*§a(?<defense>[\\d,]+)§a❈.*"
+        ".*§a(?<defense>[\\d,]+)§a❈.*",
     ),
     MANA(
         // language=RegExp
-        ".*§b(?<mana>[\\d,]+)/[\\d,]+✎.*"
+        ".*§b(?<mana>[\\d,]+)/[\\d,]+✎.*",
     ),
     RIFT_TIME(
         // language=RegExp
-        "§[a7](?<riftTime>[\\dms ]+)ф.*"
+        "§[a7](?<riftTime>[\\dms ]+)ф.*",
     ),
     SKYBLOCK_XP(
         // language=RegExp
-        ".*(§b\\+\\d+ SkyBlock XP §.\\([^()]+\\)§b \\(\\d+/\\d+\\)).*"
+        ".*(§b\\+\\d+ SkyBlock XP §.\\([^()]+\\)§b \\(\\d+/\\d+\\)).*",
     ),
     ;
 

@@ -28,7 +28,7 @@ data class EliteContestsResponse(
 data class EliteContestsRequest(
     val list: List<EliteFarmingContest>,
 ) : Map<Long, List<String>> by list.associate(
-    transform = { it.startTime.toMillis() / 1000 to it.crops.map { crop -> crop.cropName } }
+    transform = { it.startTime.toMillis() / 1000 to it.crops.map { crop -> crop.cropName } },
 ) {
     fun getBody(): String = ConfigManager.gson.toJson(this as Map<Long, List<String>>)
 }

@@ -40,7 +40,7 @@ fun File.writeJson(json: JsonElement, gson: Gson = ConfigManager.gson): Boolean 
         OutputStreamWriter(
             FileOutputStream(this),
             StandardCharsets.UTF_8,
-        )
+        ),
     ).use { it.write(gson.toJson(json)) }
     true
 }.getOrElse { return false }

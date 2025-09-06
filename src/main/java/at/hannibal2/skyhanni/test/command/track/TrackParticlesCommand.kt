@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 //#if MC < 1.21
 import net.minecraft.util.EnumParticleTypes
+
 //#else
 //$$ import at.hannibal2.skyhanni.utils.ParticleUtils
 //$$ import net.minecraft.registry.Registries

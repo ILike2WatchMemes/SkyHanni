@@ -19,6 +19,11 @@ object PlayerDeathManager {
         "§c ☠ §r§7§r§.(?<name>.+)§r§7 (?<reason>.+)",
     )
 
+    private val selfDeathMessagePattern by RepoPattern.pattern(
+        "chat.player.selfdeath",
+        "§c ☠ §r§7You (?<reason>.+)",
+    )
+
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         val message = event.message
@@ -26,6 +31,10 @@ object PlayerDeathManager {
             val name = group("name")
             val reason = group("reason").removeColor()
             PlayerDeathEvent(name, reason, event).post()
+        }
+        selfDeathMessagePattern.matchMatcher(message) {
+            val reason = group("reason").removeColor()
+            PlayerDeathEvent(reason, event).post()
         }
     }
 }

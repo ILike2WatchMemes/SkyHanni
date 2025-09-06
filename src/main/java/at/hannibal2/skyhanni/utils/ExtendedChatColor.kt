@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.compat.Text
 import java.awt.Color
+
 //#if MC > 1.21
 //$$ import net.minecraft.text.MutableText
 //#endif

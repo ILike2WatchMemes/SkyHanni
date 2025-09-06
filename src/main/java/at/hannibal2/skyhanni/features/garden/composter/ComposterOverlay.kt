@@ -422,7 +422,7 @@ object ComposterOverlay {
 
         val testOffset = if (testOffsetRec > map.size) {
             ChatUtils.userError("Invalid Composter Overlay Offset! $testOffset cannot be greater than ${map.size}!")
-            ComposterOverlay.testOffset = 0
+            testOffset = 0
             0
         } else testOffsetRec
 

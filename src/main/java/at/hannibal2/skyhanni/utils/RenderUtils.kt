@@ -23,6 +23,7 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 //#if MC < 1.21
 import net.minecraft.client.renderer.GLAllocation
+
 //#else
 //$$ import com.mojang.blaze3d.systems.RenderSystem
 //$$ import org.lwjgl.BufferUtils

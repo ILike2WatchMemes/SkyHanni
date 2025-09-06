@@ -25,7 +25,7 @@ object TestCopyRngMeterValues {
      */
     private val slayerPattern by patternGroup.pattern(
         "slayer",
-        "§7§7Slayer XP: §d.*§5/§d(?<xp>.*)"
+        "§7§7Slayer XP: §d.*§5/§d(?<xp>.*)",
     )
 
     /**
@@ -33,7 +33,7 @@ object TestCopyRngMeterValues {
      */
     private val dungeonPattern by patternGroup.pattern(
         "dungeon",
-        "§7§7Dungeon Score: §d.*§5/§d(?<xp>.*)"
+        "§7§7Dungeon Score: §d.*§5/§d(?<xp>.*)",
     )
 
     @HandleEvent

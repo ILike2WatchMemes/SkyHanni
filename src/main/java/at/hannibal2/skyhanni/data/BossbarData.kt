@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.BossbarUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 //#if MC < 1.21
 import net.minecraft.entity.boss.BossStatus
+
 //#else
 //$$ import at.hannibal2.skyhanni.test.command.ErrorManager
 //$$ import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat

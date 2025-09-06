@@ -28,6 +28,7 @@ import net.minecraftforge.fml.relauncher.SideOnly
 import kotlin.time.Duration.Companion.seconds
 //#if MC < 1.16
 import net.minecraft.world.WorldSettings
+
 //#else
 //$$ import net.minecraft.world.level.GameType
 //#endif
@@ -122,7 +123,7 @@ object TabListData {
             )
                 .compare(
                     if (team1 != null) team1.registeredName else "",
-                    if (team2 != null) team2.registeredName else ""
+                    if (team2 != null) team2.registeredName else "",
                 )
                 .compare(o1.gameProfile.name, o2.gameProfile.name).result()
         }

@@ -95,7 +95,7 @@ object ForagingTrackerLegacy {
      */
     val openCloseRewardPattern by patternGroup.pattern(
         "open-close-reward",
-        "§2§l▬{64}"
+        "§2§l▬{64}",
     )
 
     /**
@@ -103,7 +103,7 @@ object ForagingTrackerLegacy {
      */
     val giftHeaderPattern by patternGroup.pattern(
         "header",
-        " *(?:§.)+TREE GIFT"
+        " *(?:§.)+TREE GIFT",
     )
 
     /**
@@ -113,7 +113,7 @@ object ForagingTrackerLegacy {
      */
     val percentageContributedPattern by patternGroup.pattern(
         "contribution-percentage",
-        " *(?:§.)+You helped cut (?<percentColor>§.)+(?<percentage>[\\d.]+)% (?:§.)+of the (?:§.)+(?<type>.*) Tree(?:§.)+\\."
+        " *(?:§.)+You helped cut (?<percentColor>§.)+(?<percentage>[\\d.]+)% (?:§.)+of the (?:§.)+(?<type>.*) Tree(?:§.)+\\.",
     )
 
     /**
@@ -122,7 +122,7 @@ object ForagingTrackerLegacy {
      */
     val rewardsGainedPattern by patternGroup.pattern(
         "rewards-gained",
-        "(?:§.)* *(?:§.)+\\+(?<count>[\\d,]+) rewards gained!(?: (?:§.)+\\(hover\\))?"
+        "(?:§.)* *(?:§.)+\\+(?<count>[\\d,]+) rewards gained!(?: (?:§.)+\\(hover\\))?",
     )
 
     /**
@@ -152,7 +152,7 @@ object ForagingTrackerLegacy {
      */
     val hoverRewardPattern by patternGroup.pattern(
         "hover-reward",
-        "(?:§.)*(?<item>.*) (?:§.)*§8x?(?:(?<amount>[\\d,-]+)|\\((?:§.)*(?<percentage>[\\d.]+)%(?:§.)*\\))"
+        "(?:§.)*(?<item>.*) (?:§.)*§8x?(?:(?<amount>[\\d,-]+)|\\((?:§.)*(?<percentage>[\\d.]+)%(?:§.)*\\))",
     )
 
     /**
@@ -160,7 +160,7 @@ object ForagingTrackerLegacy {
      */
     val bonusGiftSeparatorPattern by patternGroup.pattern(
         "bonus-gift.separator",
-        " *(?:§.)+BONUS GIFT"
+        " *(?:§.)+BONUS GIFT",
     )
 
     /**
@@ -176,7 +176,7 @@ object ForagingTrackerLegacy {
      */
     val bonusGiftRewardPattern by patternGroup.pattern(
         "bonus-gift.reward",
-        " *(?:§.)*§r(?<item>.*) §r§8\\((?:§.)+(?<percentage>[\\d.]+)%(?:§.)+\\)"
+        " *(?:§.)*§r(?<item>.*) §r§8\\((?:§.)+(?<percentage>[\\d.]+)%(?:§.)+\\)",
     )
 
     /**
@@ -185,7 +185,7 @@ object ForagingTrackerLegacy {
      */
     val enchantedBookPattern by patternGroup.pattern(
         "bonus-gift.enchanted-book",
-        "(?:§.)+Enchanted Book \\((?:§.)+(?<book>.*) (?<tier>[IVCLX])(?:§.)+\\)"
+        "(?:§.)+Enchanted Book \\((?:§.)+(?<book>.*) (?<tier>[IVCLX])(?:§.)+\\)",
     )
 
     /**
@@ -196,7 +196,7 @@ object ForagingTrackerLegacy {
      */
     val logInternalNamePattern by patternGroup.pattern(
         "log-internal-name",
-        "(?<enchanted>ENCHANTED_)?(?<treeType>.*)_LOG"
+        "(?<enchanted>ENCHANTED_)?(?<treeType>.*)_LOG",
     )
     // </editor-fold>
 }

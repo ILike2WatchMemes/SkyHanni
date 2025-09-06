@@ -51,7 +51,7 @@ class BackgroundConfig {
     @ConfigOption(
         name = "Pack Creator",
         desc = "Click here to open the background creator. " +
-            "You can use this website to add your own image into as your Scoreboard Background."
+            "You can use this website to add your own image into as your Scoreboard Background.",
     )
     @ConfigEditorButton(buttonText = "Create")
     val runnable: Runnable = Runnable { openBrowser("https://j10a1n15.github.io/j10a1n15/pages/background.html") }

@@ -11,6 +11,7 @@ import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.UnsupportedFlavorException
 import kotlin.time.Duration.Companion.milliseconds
+
 //#if MC > 1.21
 //$$ import net.minecraft.client.MinecraftClient
 //#endif

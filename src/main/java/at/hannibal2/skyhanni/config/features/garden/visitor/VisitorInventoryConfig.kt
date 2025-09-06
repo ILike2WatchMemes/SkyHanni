@@ -9,7 +9,7 @@ class VisitorInventoryConfig {
     @Expose
     @ConfigOption(
         name = "Visitor Price",
-        desc = "Show the Bazaar price of the items required for the visitors, like in NEU."
+        desc = "Show the Bazaar price of the items required for the visitors, like in NEU.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -18,7 +18,7 @@ class VisitorInventoryConfig {
     @Expose
     @ConfigOption(
         name = "Amount and Time",
-        desc = "Show the exact item amount and the remaining time when farmed manually. Especially useful for Ironman."
+        desc = "Show the exact item amount and the remaining time when farmed manually. Especially useful for Ironman.",
     )
     @ConfigEditorBoolean
     var exactAmountAndTime: Boolean = true

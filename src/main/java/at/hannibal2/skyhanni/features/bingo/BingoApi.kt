@@ -37,7 +37,7 @@ object BingoApi {
      */
     private val detectionPattern by RepoPattern.pattern(
         "bingo.detection.scoreboard",
-        " §.Ⓑ §.Bingo"
+        " §.Ⓑ §.Bingo",
     )
 
     @HandleEvent
@@ -59,7 +59,7 @@ object BingoApi {
                 add("  guide: '${goal.guide}'")
                 add("  done: '${goal.done}'")
                 add("  highlight: '${goal.highlight}'")
-                add("  communityGoalPercentage: '${goal.communtyGoalPercentage}'")
+                add("  communityGoalPercentage: '${goal.communityGoalData}'")
                 val hiddenGoalData = goal.hiddenGoalData
                 add("  hiddenGoalData")
                 add("    unknownTip: '${hiddenGoalData.unknownTip}'")
@@ -102,7 +102,7 @@ object BingoApi {
 
     private fun getStartOfMonthInMillis() = OffsetDateTime.of(
         TimeUtils.getCurrentLocalDate().plusDays(5).withDayOfMonth(1),
-        LocalTime.MIDNIGHT, ZoneOffset.UTC
+        LocalTime.MIDNIGHT, ZoneOffset.UTC,
     ).toEpochSecond()
 
     fun getCommunityPercentageColor(percentage: Double): String = when {

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.compat
 import net.minecraft.scoreboard.Score
 import net.minecraft.scoreboard.ScoreObjective
 import net.minecraft.scoreboard.Scoreboard
+
 //#if MC > 1.21
 //$$ import net.minecraft.scoreboard.ScoreboardDisplaySlot
 //$$ import net.minecraft.text.Text

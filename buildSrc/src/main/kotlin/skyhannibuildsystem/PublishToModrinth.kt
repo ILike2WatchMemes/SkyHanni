@@ -22,9 +22,8 @@ import java.time.Duration
 abstract class PublishToModrinth : DefaultTask() {
 
     @get:Internal
-    val jarDirectory: Provider<Directory>? = project.rootProject.layout.buildDirectory.dir("downloadedJars")
+    val jarDirectory: Provider<Directory>? = project.rootProject.layout.buildDirectory.dir("libs")
 
-    private lateinit var changelog: String
     private lateinit var versionNumber: String
     private lateinit var modrinthToken: String
 
@@ -42,9 +41,57 @@ abstract class PublishToModrinth : DefaultTask() {
     }
 
     private fun initVariables() {
-        changelog = project.findProperty("changelog") as String
-        versionNumber = project.findProperty("modVersion") as String
-        modrinthToken = project.findProperty("modrinthToken") as String
+        // Try multiple sources for properties
+        versionNumber = getProperty("modVersion")
+            ?: readVersionFromFile()
+                ?: throw IllegalArgumentException("Property 'modVersion' not found. Please provide it via -PmodVersion=x.x.x or ensure PROJECT_VERSION file exists")
+
+        modrinthToken = getProperty("modrinthToken")
+            ?: throw IllegalArgumentException("Property 'modrinthToken' not found. Please provide it via -PmodrinthToken=your_token or in private.properties")
+    }
+
+    private fun readVersionFromFile(): String? {
+        val versionFile = project.rootProject.file("buildTools/PROJECT_VERSION")
+        return if (versionFile.exists()) {
+            versionFile.readText().trim()
+        } else null
+    }
+
+    private fun getProperty(name: String): String? {
+        // 1. Try command line property (-P flag)
+        project.findProperty(name)?.toString()?.let { return it }
+
+        // 2. Try private.properties file in .gradle directory
+        val privatePropsFile = project.rootProject.file(".gradle/private.properties")
+        if (privatePropsFile.exists()) {
+            val props = java.util.Properties()
+            privatePropsFile.inputStream().use { props.load(it) }
+            props.getProperty(name)?.let { return it }
+        }
+
+        // 3. Try gradle.properties
+        project.rootProject.file("gradle.properties").takeIf { it.exists() }?.let { file ->
+            val props = java.util.Properties()
+            file.inputStream().use { props.load(it) }
+            props.getProperty(name)?.let { return it }
+        }
+
+        // 4. Try environment variable
+        System.getenv(name.uppercase().replace(".", "_"))?.let { return it }
+
+        return null
+    }
+
+    private fun readChangelogFromFile(): String {
+        val changelogFile = project.rootProject.file("docs/CHANGELOG.md")
+        if (!changelogFile.exists()) {
+            throw IllegalArgumentException("Changelog file not found at: ${changelogFile.absolutePath}")
+        }
+
+        val content = changelogFile.readText()
+        // Extract the latest version's changelog (everything until the next ## Version or end of file)
+        val lines = content.lines()
+        return lines.joinToString("\n").trim()
     }
 
     private val jarNamePattern = "SkyHanni-(?<modVersion>[\\d.]+)-mc(?<mcVersion>[\\d.]+)\\.jar".toPattern()
@@ -89,7 +136,7 @@ abstract class PublishToModrinth : DefaultTask() {
         val modrinthJson = JsonObject()
         modrinthJson.addProperty("name", versionName)
         modrinthJson.addProperty("version_number", versionNumber)
-        modrinthJson.addProperty("changelog", changelog)
+        modrinthJson.addProperty("changelog", readChangelogFromFile())
         modrinthJson.add("dependencies", dependencies)
         modrinthJson.add("game_versions", gameVersions)
         modrinthJson.addProperty("version_type", versionType)
@@ -97,7 +144,7 @@ abstract class PublishToModrinth : DefaultTask() {
         modrinthJson.addProperty("featured", featured)
         modrinthJson.addProperty("status", status)
         modrinthJson.addProperty("requested_status", requestedStatus)
-        modrinthJson.addProperty("project_id", ModrinthDependency.SKYHANNI.projectId)
+        modrinthJson.addProperty("project_id", ModrinthDependency.BINGO_NET.projectId)
         modrinthJson.add("file_parts", fileParts)
         modrinthJson.addProperty("primary_file", fileName)
 

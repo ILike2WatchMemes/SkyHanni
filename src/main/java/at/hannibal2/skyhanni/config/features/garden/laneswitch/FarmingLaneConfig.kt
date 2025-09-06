@@ -37,7 +37,7 @@ class FarmingLaneConfig {
     @Expose
     @ConfigOption(
         name = "Soul Sand Warning",
-        desc = "Show an informational note on distance display while on soul sand, that speed calculations are inaccurate"
+        desc = "Show an informational note on distance display while on soul sand, that speed calculations are inaccurate",
     )
     @ConfigEditorBoolean
     @OnlyLegacy

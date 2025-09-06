@@ -20,7 +20,7 @@ class MaxwellConfig {
     @ConfigOption(
         name = "Tuning Amount",
         desc = "Only show the first # tunings.\n" +
-            "§cDoes not work with Compact Tuning."
+            "§cDoes not work with Compact Tuning.",
     )
     @ConfigEditorSlider(minValue = 1f, maxValue = 8f, minStep = 1f)
     var tuningAmount: Int = 2

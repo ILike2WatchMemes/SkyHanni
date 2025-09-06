@@ -15,7 +15,7 @@ class TeleportPadConfig {
     @Expose
     @ConfigOption(
         name = "Inventory Numbers",
-        desc = "Show the number of the teleport pads inside the 'Change Destination' inventory as stack size."
+        desc = "Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

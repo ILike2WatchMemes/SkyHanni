@@ -17,9 +17,10 @@ import net.minecraft.entity.player.EntityPlayer
 @SkyHanniModule
 object MobUtils {
 
-    private val defaultArmorStandName get() =
-        //#if MC < 1.21
-        I18n.format("entity.ArmorStand.name")
+    private val defaultArmorStandName
+        get() =
+            //#if MC < 1.21
+            I18n.format("entity.ArmorStand.name")
     //#else
     //$$ I18n.translate("entity.minecraft.armor_stand")
     //#endif
@@ -89,7 +90,7 @@ object MobUtils {
         val possibleEntities = MobData.entityToMob.filterKeys {
             it !is EntityArmorStand &&
                 it.entityBoundingBox.rayIntersects(
-                    pos, look
+                    pos, look,
                 )
         }.values
         if (possibleEntities.isEmpty()) return null

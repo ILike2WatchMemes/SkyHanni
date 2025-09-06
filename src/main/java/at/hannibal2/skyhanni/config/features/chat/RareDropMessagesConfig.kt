@@ -10,7 +10,7 @@ class RareDropMessagesConfig {
     @ConfigOption(
         name = "Pet Drop Rarity",
         desc = "Shows what rarity the pet drop is in the pet drop message.\n" +
-            "§6§lPET DROP! §5§lEPIC §5Slug §6(§6+1300☘)"
+            "§6§lPET DROP! §5§lEPIC §5Slug §6(§6+1300☘)",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -19,7 +19,7 @@ class RareDropMessagesConfig {
     @Expose
     @ConfigOption(
         name = "Enchanted Book Name",
-        desc = "Shows what enchantment the dropped enchanted book is."
+        desc = "Shows what enchantment the dropped enchanted book is.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -28,7 +28,7 @@ class RareDropMessagesConfig {
     @Expose
     @ConfigOption(
         name = "Missing Enchanted Book Message",
-        desc = "Sends a custom Rare Drop message if you get an enchanted book without a message in chat."
+        desc = "Sends a custom Rare Drop message if you get an enchanted book without a message in chat.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

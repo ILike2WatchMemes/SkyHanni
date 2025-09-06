@@ -13,7 +13,7 @@ class FarmingFortuneConfig {
     @Expose
     @ConfigOption(
         name = "FF Display",
-        desc = "Display the true Farming Fortune for the current crop, including all crop-specific and hidden bonuses."
+        desc = "Display the true Farming Fortune for the current crop, including all crop-specific and hidden bonuses.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -31,7 +31,7 @@ class FarmingFortuneConfig {
 
     @ConfigOption(
         name = "Farming Fortune Guide",
-        desc = "Open a guide that breaks down your Farming Fortune.\n§eCommand: /ff"
+        desc = "Open a guide that breaks down your Farming Fortune.\n§eCommand: /ff",
     )
     @ConfigEditorButton(buttonText = "Open")
     val open: Runnable = Runnable(FFGuideGui::onCommand)

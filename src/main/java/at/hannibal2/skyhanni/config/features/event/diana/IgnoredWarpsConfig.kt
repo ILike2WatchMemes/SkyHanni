@@ -13,7 +13,7 @@ class IgnoredWarpsConfig {
     @Expose
     @ConfigOption(
         name = "Wizard",
-        desc = "Ignore the Wizard Tower warp point (because it is easy to fall into the Rift portal)."
+        desc = "Ignore the Wizard Tower warp point (because it is easy to fall into the Rift portal).",
     )
     @ConfigEditorBoolean
     var wizard: Boolean = false

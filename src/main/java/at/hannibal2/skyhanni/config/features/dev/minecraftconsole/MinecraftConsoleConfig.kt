@@ -14,7 +14,7 @@ class MinecraftConsoleConfig {
     @Expose
     @ConfigOption(
         name = "Unfiltered Debug File",
-        desc = "Print the debug information into log files instead of into the console for unfiltered console messages."
+        desc = "Print the debug information into log files instead of into the console for unfiltered console messages.",
     )
     @ConfigEditorBoolean
     var logUnfilteredFile: Boolean = false
@@ -22,7 +22,7 @@ class MinecraftConsoleConfig {
     @Expose
     @ConfigOption(
         name = "Outside SkyBlock",
-        desc = "Print the debug information for unfiltered console messages outside SkyBlock too."
+        desc = "Print the debug information for unfiltered console messages outside SkyBlock too.",
     )
     @ConfigEditorBoolean
     var printUnfilteredDebugsOutsideSkyBlock: Boolean = false

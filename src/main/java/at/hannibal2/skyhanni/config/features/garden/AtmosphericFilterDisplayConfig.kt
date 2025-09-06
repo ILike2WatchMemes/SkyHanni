@@ -12,7 +12,7 @@ class AtmosphericFilterDisplayConfig {
     @ConfigOption(
         name = "Enabled",
         desc = "Toggle the Atmospheric Filter display to show the currently active buff.\n" +
-            "§eNote: For an optimal experience, please have the Atmospheric Filter accessory active."
+            "§eNote: For an optimal experience, please have the Atmospheric Filter accessory active.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -21,7 +21,7 @@ class AtmosphericFilterDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Only Show Buff",
-        desc = "Show only the currently active buff without the currently active season."
+        desc = "Show only the currently active buff without the currently active season.",
     )
     @ConfigEditorBoolean
     var onlyBuff: Boolean = false

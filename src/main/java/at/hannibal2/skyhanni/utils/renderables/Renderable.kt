@@ -45,6 +45,7 @@ import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import kotlin.math.max
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 //#if TODO
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
@@ -53,6 +54,7 @@ import at.hannibal2.skyhanni.utils.shader.ShaderManager
 //#endif
 //#if MC < 1.21
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
+
 //#else
 //$$ import net.minecraft.client.gui.screen.ingame.InventoryScreen.drawEntity
 //$$ import at.hannibal2.skyhanni.utils.compat.RenderCompat
@@ -626,7 +628,7 @@ interface Renderable {
                     //#if MC < 1.21
                     GuiRenderUtils.drawTexturedRect(
                         mouseOffsetX, mouseOffsetY, width, height, uMin, uMax, vMin, vMax, createResourceLocation(texture.path),
-                        alpha = 1f, filter = GL11.GL_NEAREST
+                        alpha = 1f, filter = GL11.GL_NEAREST,
                     )
                     //#else
                     //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
@@ -645,7 +647,7 @@ interface Renderable {
                         GuiRenderUtils.drawTexturedRect(
                             mouseOffsetX, mouseOffsetY, progress, height, uMin, uMin + (progress * scale),
                             vMin + (height * scale), vMin + (2 * height * scale), createResourceLocation(texture.path),
-                            alpha = 1f, filter = GL11.GL_NEAREST
+                            alpha = 1f, filter = GL11.GL_NEAREST,
                         )
                         //#else
                         //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
@@ -662,7 +664,7 @@ interface Renderable {
                         GuiRenderUtils.drawTexturedRect(
                             mouseOffsetX, mouseOffsetY, progress, height, uMin, uMin + (progress * scale),
                             vMin + (height * scale), vMin + (2 * height * scale), createResourceLocation(texture.path),
-                            alpha = 1f, filter = GL11.GL_NEAREST
+                            alpha = 1f, filter = GL11.GL_NEAREST,
                         )
                         //#else
                         //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
@@ -702,7 +704,7 @@ interface Renderable {
             hoveredColor: (Color) -> Color = { it.darker(0.5) },
             onClick: (Boolean) -> Unit,
             onHover: (Boolean) -> Unit = {},
-            button: Int = KeyboardManager.LEFT_MOUSE,
+            button: Int = LEFT_MOUSE,
             bypassChecks: Boolean = false,
             condition: (Boolean) -> Boolean = { true },
             startState: Boolean = false,
@@ -745,7 +747,7 @@ interface Renderable {
             content: Renderable,
             onClick: (Boolean) -> Unit,
             onHover: (Boolean) -> Unit = {},
-            button: Int = KeyboardManager.LEFT_MOUSE,
+            button: Int = LEFT_MOUSE,
             bypassChecks: Boolean = false,
             condition: (Boolean) -> Boolean = { true },
             startState: Boolean = false,
@@ -1306,6 +1308,64 @@ interface Renderable {
                 //$$ DrawContextUtils.translate(35f, 125f, 0f)
                 //#endif
                 DrawContextUtils.translate(0f, 0f, -100f)
+            }
+        }
+
+        fun textBox(
+            prefix: String,
+            input: TextInput,
+            /**
+             * Does not limit the input, just where it visuals breaks
+             */
+            maxWidth: Int,
+            scale: Double = 1.0,
+            color: Color = Color.WHITE,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true },
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : StringRenderable(prefix, scale, color, horizontalAlign, verticalAlign) {
+            override val text get() = prefix + input.editText()
+
+            override val width = maxWidth
+            override val height = (9 * scale).toInt() + 6 // Add padding for the box
+
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                // Draw dark background box
+                val boxColor = if (isHovered(mouseOffsetX, mouseOffsetY)) {
+                    0xFF404040.toInt() // Lighter when hovered
+                } else {
+                    0xFF202020.toInt() // Dark background
+                }
+                GuiRenderUtils.drawRect(0, 0, width, height, boxColor)
+
+                // Draw border
+                val borderColor = if (input.isActive) {
+                    0xFF00AAFF.toInt() // Blue when active
+                } else if (isHovered(mouseOffsetX, mouseOffsetY)) {
+                    0xFF888888.toInt() // Light gray when hovered
+                } else {
+                    0xFF555555.toInt() // Dark gray normally
+                }
+                GuiRenderUtils.drawRect(0, 0, width, 1, borderColor) // Top
+                GuiRenderUtils.drawRect(0, height - 1, width, height, borderColor) // Bottom
+                GuiRenderUtils.drawRect(0, 0, 1, height, borderColor) // Left
+                GuiRenderUtils.drawRect(width - 1, 0, width, height, borderColor) // Right
+
+                if (isHovered(mouseOffsetX, mouseOffsetY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                    input.makeActive()
+                    input.handle()
+                    if (RIGHT_MOUSE.isKeyClicked()) {
+                        input.clear()
+                    }
+                } else {
+                    input.disable()
+                }
+
+                // Render text with some padding
+                DrawContextUtils.translate(3f, 3f, 0f)
+                super.render(mouseOffsetX - 3, mouseOffsetY - 3)
+                DrawContextUtils.translate(-3f, -3f, 0f)
             }
         }
     }

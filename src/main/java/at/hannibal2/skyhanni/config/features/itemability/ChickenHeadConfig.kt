@@ -11,7 +11,7 @@ class ChickenHeadConfig {
     @Expose
     @ConfigOption(
         name = "Chicken Head Timer",
-        desc = "Show the cooldown until the next time you can lay an egg with the Chicken Head."
+        desc = "Show the cooldown until the next time you can lay an egg with the Chicken Head.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

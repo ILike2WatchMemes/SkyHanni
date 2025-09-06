@@ -66,6 +66,7 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
             else InternalGsonTypes.resolve(type.type, type.rawType, kType.javaType)
 
             val token = TypeToken.get(javaTypeForAdapter)
+
             @Suppress("UNCHECKED_CAST")
             val adapter = gson.getAdapter(token) as TypeAdapter<Any?>
             ParameterInfo(param, adapter, name, field)

@@ -28,6 +28,7 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+
 //#if MC > 1.21
 //$$ import com.mojang.blaze3d.systems.RenderSystem
 //#endif

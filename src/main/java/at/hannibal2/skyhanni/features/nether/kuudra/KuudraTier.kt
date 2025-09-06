@@ -27,9 +27,17 @@ enum class KuudraTier(val displayName: String) {
     val tierNumber: Int get() = intTierNumber
     val displayItem: NeuInternalName get() = intDisplayItem
 
-    private fun setTierNumber(tierNumber: Int) { this.intTierNumber = tierNumber }
-    private fun setLocation(location: LorenzVec?) { this.intLocation = location }
-    private fun setDisplayItem(displayItem: NeuInternalName) { this.intDisplayItem = displayItem }
+    private fun setTierNumber(tierNumber: Int) {
+        this.intTierNumber = tierNumber
+    }
+
+    private fun setLocation(location: LorenzVec?) {
+        this.intLocation = location
+    }
+
+    private fun setDisplayItem(displayItem: NeuInternalName) {
+        this.intDisplayItem = displayItem
+    }
 
     fun getTieredDisplayName() = "Tier $intTierNumber ($displayName)"
 
@@ -43,7 +51,7 @@ enum class KuudraTier(val displayName: String) {
          */
         private val kuudraQuestPattern by patternGroup.pattern(
             "quest.identifier",
-            "Kill Kuudra (?<tier>\\w+) Tier"
+            "Kill Kuudra (?<tier>\\w+) Tier",
         )
 
         fun getQuestOrNull(

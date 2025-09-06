@@ -9,7 +9,7 @@ class DungeonChestConfig {
     @Expose
     @ConfigOption(
         name = "Show Used Kismet",
-        desc = "Add a visual highlight for used Kismet Feathers to the Croesus inventory."
+        desc = "Add a visual highlight for used Kismet Feathers to the Croesus inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -24,7 +24,7 @@ class DungeonChestConfig {
     @Expose
     @ConfigOption(
         name = "Croesus Limit Warning",
-        desc = "Give a warning when you are close to being past Croesus limit."
+        desc = "Give a warning when you are close to being past Croesus limit.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

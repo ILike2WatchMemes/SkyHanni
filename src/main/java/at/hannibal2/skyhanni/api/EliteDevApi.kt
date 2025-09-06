@@ -93,13 +93,13 @@ object EliteDevApi {
     private const val RESOURCE_API_URL = "$ELITEBOT_API_URL/resources"
 
     // <editor-fold desc="Upcoming Contests">
-    suspend fun fetchUpcomingContests(): List<EliteFarmingContest>? {
+    suspend fun fetchUpcomingContests(): List<EliteFarmingContest> {
         val apiResponse = ApiUtils.getTypedJsonResponse<JsonObject>(contestStatic.toGet())
         val (_, apiData) = apiResponse.assertSuccessWithData() ?: ErrorManager.skyHanniError(
             "Failed to fetch upcoming contests. Please report this error if it continues to occur",
             "apiResponse" to apiResponse,
         )
-        val contestResponse = ConfigManager.Companion.gson.fromJson<EliteContestsResponse>(apiData)
+        val contestResponse = ConfigManager.gson.fromJson<EliteContestsResponse>(apiData)
         return contestResponse.responseContests
     }
 
@@ -146,7 +146,7 @@ object EliteDevApi {
         null
     }
 
-    suspend fun fetchApiWeights(): EliteWeightsJson? {
+    suspend fun fetchApiWeights(): EliteWeightsJson {
         val apiWeightsResponse = ApiUtils.getTypedJsonResponse<JsonObject>(apiWeightsStatic.toGet())
         val (_, apiData) = apiWeightsResponse.assertSuccessWithData() ?: ErrorManager.skyHanniError(
             "Error getting crop weights from elitebot.dev",
@@ -162,7 +162,7 @@ object EliteDevApi {
         lbType: EliteLeaderboardType,
         upcomingCount: Int? = null,
         atRank: Int? = null,
-    ): EliteLeaderboard? {
+    ): EliteLeaderboard {
         require(profileId.isNotBlank()) { "Profile ID cannot be blank" }
         val uuid = PlayerUtils.getUuid()
 

@@ -13,7 +13,7 @@ class CompactTabListConfig {
     @SearchTag("tablist")
     @ConfigOption(
         name = "Enabled",
-        desc = "Compact the tab list to make it look much nicer like SBA did."
+        desc = "Compact the tab list to make it look much nicer like SBA did.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -23,7 +23,7 @@ class CompactTabListConfig {
     @ConfigOption(
         name = "Toggle Tab",
         desc = "Use the tab key to toggle the tab list, not show tab list while the key is pressed. " +
-            "Similar to Patcher's feature."
+            "Similar to Patcher's feature.",
     )
     @ConfigEditorBoolean
     var toggleTab: Boolean = false
@@ -31,7 +31,7 @@ class CompactTabListConfig {
     @Expose
     @ConfigOption(
         name = "Hide Hypixel Adverts",
-        desc = "Hide text advertising the Hypixel server or store in the tablist."
+        desc = "Hide text advertising the Hypixel server or store in the tablist.",
     )
     @ConfigEditorBoolean
     var hideAdverts: Boolean = false

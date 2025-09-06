@@ -21,7 +21,7 @@ class FishingProfitTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Show When Pickup",
-        desc = "Show the fishing tracker for a couple of seconds after catching something even while moving."
+        desc = "Show the fishing tracker for a couple of seconds after catching something even while moving.",
     )
     @ConfigEditorBoolean
     var showWhenPickup: Boolean = true

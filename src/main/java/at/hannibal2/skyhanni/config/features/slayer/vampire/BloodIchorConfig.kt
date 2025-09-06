@@ -28,7 +28,7 @@ class BloodIchorConfig {
     @Expose
     @ConfigOption(
         name = "Show Lines",
-        desc = "Draw lines that start from the head of the boss and end on the Blood Ichor."
+        desc = "Draw lines that start from the head of the boss and end on the Blood Ichor.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

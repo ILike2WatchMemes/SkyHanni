@@ -61,7 +61,7 @@ class ItemPickupLogConfig {
     val displayLayout: MutableList<ItemPickupLog.DisplayLayout> = mutableListOf(
         ItemPickupLog.DisplayLayout.CHANGE_AMOUNT,
         ItemPickupLog.DisplayLayout.ICON,
-        ItemPickupLog.DisplayLayout.ITEM_NAME
+        ItemPickupLog.DisplayLayout.ITEM_NAME,
     )
 
     @Expose

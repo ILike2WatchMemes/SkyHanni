@@ -26,13 +26,13 @@ object HotxPatterns {
      */
     val rotatingPerkPattern by patternGroup.pattern(
         "perk.generic",
-        "(?:§eNew buff§r§r§r: §r§f|§8 ■ §7)(?<perk>.*)"
+        "(?:§eNew buff§r§r§r: §r§f|§8 ■ §7)(?<perk>.*)",
     )
 
     // The line that appears before the "current" perk effect in the item tooltip.
     val itemPreEffectPattern by patternGroup.pattern(
         "perk.item.before",
-        "§aYour Current Effect"
+        "§aYour Current Effect",
     )
 
     fun Enum<*>.asPatternId(): String = name.lowercase().replace("_", ".")

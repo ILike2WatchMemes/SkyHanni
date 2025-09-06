@@ -36,6 +36,7 @@ import net.minecraft.tileentity.TileEntity
 //$$ import net.minecraft.entity.EquipmentSlot
 //#else
 import net.minecraft.entity.SharedMonsterAttributes
+
 //#endif
 
 @SkyHanniModule
@@ -59,6 +60,10 @@ object EntityUtils {
             }
         }
         return list
+    }
+
+    fun getPlayerList(): Set<String> {
+        return getPlayerEntities().map { it.name }.toHashSet()
     }
 
     @Deprecated("Use Mob Detection Instead")
@@ -239,4 +244,12 @@ object EntityUtils {
     //#else
     //$$ get() = this.getAttributeBaseValue(EntityAttributes.MAX_HEALTH).toInt()
     //#endif
+
+    fun EntityPlayer.isOnBingo(): Boolean {
+        return this.displayName.formattedText.endsWith("Ⓑ§r")
+    }
+
+    fun EntityPlayer.isOnIronman(): Boolean {
+        return this.displayName.formattedText.endsWith("♲§r")
+    }
 }

@@ -35,7 +35,7 @@ object LowHealthAlert {
             TitleManager.sendTitle(
                 "§c$username §ais low",
                 "§c$health❤",
-                1.seconds
+                1.seconds,
             )?.let {
                 lastAlert = it
             }

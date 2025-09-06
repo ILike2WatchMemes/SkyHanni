@@ -22,7 +22,7 @@ class PartyFinderConfig {
     @Expose
     @ConfigOption(
         name = "Mark Paid Carries",
-        desc = "Highlight paid carries with a red background to make them easier to find/skip."
+        desc = "Highlight paid carries with a red background to make them easier to find/skip.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -31,7 +31,7 @@ class PartyFinderConfig {
     @Expose
     @ConfigOption(
         name = "Mark Perm/VC Parties",
-        desc = "Highlight perm parties and parties that require a VC with a purple background to make them easier to find/skip."
+        desc = "Highlight perm parties and parties that require a VC with a purple background to make them easier to find/skip.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -40,7 +40,7 @@ class PartyFinderConfig {
     @Expose
     @ConfigOption(
         name = "Mark Low Levels",
-        desc = "Highlight groups with players at or below the specified class level to make them easier to find/skip."
+        desc = "Highlight groups with players at or below the specified class level to make them easier to find/skip.",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 50f, minStep = 1f)
     var markBelowClassLevel: Int = 0
@@ -54,7 +54,7 @@ class PartyFinderConfig {
     @Expose
     @ConfigOption(
         name = "Mark Missing Class",
-        desc = "Highlight groups that don't currently have any members of your selected dungeon class."
+        desc = "Highlight groups that don't currently have any members of your selected dungeon class.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

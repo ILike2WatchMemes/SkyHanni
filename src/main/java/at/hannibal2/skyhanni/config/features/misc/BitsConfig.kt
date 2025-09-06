@@ -10,7 +10,7 @@ class BitsConfig {
     @Expose
     @ConfigOption(
         name = "Bulk Buy Cookie Time",
-        desc = "Corrects the time for cookies if bought in bulk on the buy item."
+        desc = "Corrects the time for cookies if bought in bulk on the buy item.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

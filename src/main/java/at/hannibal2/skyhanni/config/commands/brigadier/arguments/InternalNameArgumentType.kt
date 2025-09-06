@@ -37,8 +37,7 @@ sealed class InternalNameArgumentType(
         val input = if (isGreedy) reader.readGreedyString().escapeDoubleQuote()
         else reader.readOptionalDoubleQuotedString()
 
-        val result = BrigadierUtils.parseItem(input, isValidItem = ::isValidItem)
-        return when (result) {
+        return when (val result = BrigadierUtils.parseItem(input, isValidItem = ::isValidItem)) {
             is NeuInternalName -> result
             ParsingFail.DISALLOWED_ITEM -> throw disallowedValueException.createWithContext(reader, input)
             ParsingFail.UNKNOWN_ITEM -> throw unknownValueException.createWithContext(reader, input)
