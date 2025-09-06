@@ -313,6 +313,17 @@ object ChatUtils {
         chat(TextHelper.join(components).prefix(msgPrefix))
     }
 
+    /**
+     * This does the same as if you entered the given string in the chat gui and pressed enter with the only differnce of no history.
+     */
+    fun executeAsChatInput(message: String) {
+//         //#if MC < 1.21
+//         ClientCommandHandler.instance.executeCommand(MinecraftCompat.localPlayer, message)
+//         //#else
+//         //$$ MinecraftClient.getInstance().networkHandler.sendChatMessage(message)
+//         //#endif
+    }
+
     private val chatGui get() = Minecraft.getMinecraft().ingameGUI.chatGUI
 
     //#if MC < 1.21

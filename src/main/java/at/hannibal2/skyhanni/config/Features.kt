@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.config.features.gui.GuiConfig
 import at.hannibal2.skyhanni.config.features.hunting.HuntingConfig
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig
 import at.hannibal2.skyhanni.config.features.mining.MiningConfig
-import at.hannibal2.skyhanni.config.features.misc.MiscConfig
 import at.hannibal2.skyhanni.config.features.rift.RiftConfig
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig
@@ -28,6 +27,9 @@ import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.gui.HorizontalAlign
 import io.github.notenoughupdates.moulconfig.processor.ProcessedCategory
+
+import at.hannibal2.skyhanni.config.features.misc.NumpadConfig
+import at.hannibal2.skyhanni.config.features.misc.MiscConfig
 
 class Features : Config() {
     private val discord = MyResourceLocation("skyhanni", "social/discord.png")
@@ -140,6 +142,10 @@ class Features : Config() {
     @Expose
     @Category(name = "Misc", desc = "Settings without a category.")
     var misc: MiscConfig = MiscConfig()
+
+    @Expose
+    @Category(name = "Numpad Codes", desc = "Configure the numpad codes system (/sh numpad).")
+    var numpad: NumpadConfig = NumpadConfig()
 
     // Bottom
     @Expose

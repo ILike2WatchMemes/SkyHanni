@@ -393,10 +393,29 @@ object GuiRenderUtils {
             y,
             width,
             height,
-            light = -0xefefea,
-            dark = -0xcfcfca,
             shadow = shadow,
         )
+    }
+
+    // Simple scrollbar drawing helper (x = left of scrollbar)
+    fun drawScrollbar(x: Int, y: Int, height: Int, contentHeight: Int, scroll: Int) {
+        val barW = 8
+        // Background frame (slightly larger than track for contrast)
+        val frameColor = 0x60101010
+        drawRect(x - 1, y - 1, x + barW + 1, y + height + 1, frameColor)
+        // Track
+        val trackColor = 0x202F2F2F
+        drawRect(x, y, x + barW, y + height, trackColor)
+        if (contentHeight <= 0) return
+        val visible = height.coerceAtLeast(1)
+        val ratio = (visible.toFloat() / contentHeight.toFloat()).coerceIn(0f, 1f)
+        val thumbH = (visible * ratio).toInt().coerceIn(12, visible)
+        val maxScroll = (contentHeight - visible).coerceAtLeast(1)
+        val thumbY = y + ((scroll.toFloat() / maxScroll.toFloat()) * (visible - thumbH)).toInt().coerceIn(0, visible - thumbH)
+        val thumbOuter = 0x80A0A0A0.toInt()
+        val thumbInner = 0xC0282828.toInt()
+        drawRect(x + 1, thumbY + 1, x + barW - 1, thumbY + thumbH - 1, thumbOuter)
+        drawRect(x + 2, thumbY + 2, x + barW - 2, thumbY + thumbH - 2, thumbInner)
     }
 
     // todo, does this actually have to be matching Mojang's projection matrix?

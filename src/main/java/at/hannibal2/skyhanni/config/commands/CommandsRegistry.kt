@@ -5,29 +5,47 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BaseBrigadierBuilder
 import at.hannibal2.skyhanni.config.commands.brigadier.CommandData
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.requireDevEnv
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrInsert
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.mojang.brigadier.CommandDispatcher
 //#if MC < 1.21
 import net.minecraftforge.client.ClientCommandHandler
+import tv.twitch.chat.Chat
 
 //#else
 //$$ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 //$$ import com.mojang.brigadier.builder.LiteralArgumentBuilder
+//$$ import net.minecraft.client.MinecraftClient
 //#endif
 
 @SkyHanniModule
 object CommandsRegistry {
     //#if MC < 1.21
     private val dispatcher: CommandDispatcher<Any?> = CommandDispatcher()
+
+    // shared reference accessible at runtime for suggestion queries (set on registration)
+    private var brigadierDispatcher: CommandDispatcher<Any?>? = null
+
+    // Expose the dispatcher for runtime suggestion queries (returns the currently-registered dispatcher)
+    fun getDispatcher(): CommandDispatcher<Any?> = brigadierDispatcher ?: dispatcher.also { brigadierDispatcher = it }
+    //#else
+    //$$ private var brigadierDispatcher: CommandDispatcher<Any?>? = null
+    //$$ fun getDispatcher(): CommandDispatcher<Any?> = brigadierDispatcher ?: error("Brigadier dispatcher is not registered yet")
     //#endif
 
     @HandleEvent(PreInitFinishedEvent::class)
     fun onPreInitFinished() {
         //#if MC < 1.21
         CommandRegistrationEvent(dispatcher).post()
+        // ensure shared reference is set for legacy path
+        brigadierDispatcher = dispatcher
         //#else
         //$$ ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
+        //$$     // store dispatcher for runtime queries
+        //$$     brigadierDispatcher = dispatcher as CommandDispatcher<Any?>
         //$$     CommandRegistrationEvent(dispatcher as CommandDispatcher<Any?>).post()
         //$$ }
         //#endif
@@ -87,5 +105,33 @@ object CommandsRegistry {
             }
         }
         builders.add(this)
+    }
+
+    fun mcServerDispatcher(): CommandDispatcher<Any>? {
+        //#if MC < 1.21
+        return null
+        //#else
+        //$$ return MinecraftClient.getInstance().networkHandler?.commandDispatcher as CommandDispatcher<Any>?
+        //#endif
+    }
+
+    /**
+     * Supports executing both server AND client commands based on string command input
+     */
+    fun execAutomaticCommand(raw: String) {
+        val raw = if (raw.startsWith("/")) raw.removePrefix("/") else raw
+        val baseDispatcher = getDispatcher()
+        val baseParse = baseDispatcher.parse(raw, MinecraftCompat.localPlayer)
+        if (!baseParse.reader.canRead()) {
+            baseDispatcher.execute(baseParse)
+        } else {
+            val serverDispatcher = mcServerDispatcher()
+            val serverParse = serverDispatcher?.parse(raw, MinecraftCompat.localPlayer)
+            if (serverParse != null && !serverParse.reader.canRead()) {
+                ChatUtils.sendMessageToServer("/$raw")
+            } else {
+                ErrorManager.skyHanniError("Could not execute command: '$raw' (not found)")
+            }
+        }
     }
 }
