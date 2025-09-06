@@ -18,11 +18,11 @@ object ChatPromptUtils {
     @HandleEvent
     fun key(event: KeyDownEvent) {
         val activePrompt = activePromptBlock ?: return
+        activePromptBlock = null
         if (event.keyCode != activePrompt.keyCode || !event.keyCode.isKeyHeld()) return
         if (SkyHanniMod.feature.dev.debug.enabled){
             ChatUtils.chat("Chat Prompt reset")
         }
-        activePromptBlock = null
         activePrompt.codeBlock.invoke()
     }
 
@@ -44,7 +44,7 @@ object ChatPromptUtils {
             ChatUtils.chat("Set new Chat Prompt task")
         }
         DelayedRun.runDelayed(keyBind.getEffectiveExpirationDuration()) {
-            if (this.activePromptBlock == activePromptBlock) this.activePromptBlock = null
+            if (this.activePromptBlock === activePromptBlock) this.activePromptBlock = null
             if (SkyHanniMod.feature.dev.debug.enabled){
                 ChatUtils.chat("Chat Prompt expired")
             }
