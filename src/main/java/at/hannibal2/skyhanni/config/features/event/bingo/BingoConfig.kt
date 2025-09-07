@@ -1,12 +1,15 @@
 package at.hannibal2.skyhanni.config.features.event.bingo
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.KeyBind
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import org.lwjgl.input.Keyboard
 
 class BingoConfig {
     @Expose
@@ -77,4 +80,15 @@ class BingoConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var sendImportantCataMilestones: Boolean = false
+
+
+    @Expose
+    @ConfigOption(
+        name = "Pet XP Carrot Candy Helper",
+        desc = "Key has 2 functions when Set: \n" +
+            "1) Press while having carrots in your inventory to open simple carrot candy recipe\n" +
+            "2) Press while having simple carrot candy in your hand to open the pets menu"
+    )
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    var petXpComGoalKeybind: Int = Keyboard.KEY_NONE
 }
