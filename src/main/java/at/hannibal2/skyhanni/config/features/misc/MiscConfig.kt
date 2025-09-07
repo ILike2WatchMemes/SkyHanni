@@ -518,4 +518,8 @@ class MiscConfig {
     @ConfigOption(name = "Hide Party Messages", desc = "Hides party chat messages.")
     @Accordion
     val hidePartyMessagesConfig: HidePartyMessagesConfig = HidePartyMessagesConfig()
+
+    // Persisted saved keybinds stored in FEATURES config under misc
+    @Expose
+    var keybinds: MutableList<SavedKeybind> = mutableListOf()
 }

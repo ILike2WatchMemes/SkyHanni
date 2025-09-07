@@ -15,6 +15,8 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.TextFieldController
 import kotlin.collections.plusAssign
+import at.hannibal2.skyhanni.utils.CommandSuggestionProvider
+import at.hannibal2.skyhanni.utils.ui.CommandSuggestionController
 
 /**
  * Clean rebuilt NumpadEditorGui with:
@@ -55,12 +57,11 @@ class NumpadEditorGui : SkyhanniBaseScreen() {
     private val editActionDelaySelectionEnds = mutableListOf<Int?>()
     private var ensuringSizes = false
 
-    // Suggestions (DISABLED for code field now)
-    private var suggestions: List<String> = emptyList()
-    private var suggestionIndex = -1
-    private var suggestionScroll = 0
-    private val maxSuggestions = 12
-    private var showSuggestions = true
+    // Suggestions controller (replaces legacy fields) for action command fields only
+    private val suggestionController = CommandSuggestionController(12) { text, cursor ->
+        try { CommandSuggestionProvider.suggest(text, cursor) } catch (_: Throwable) { emptyList() }
+    }
+    private var suggestionSelectionVisible = true
 
     // Focus
     private enum class FocusTarget { NONE, CODE, ACTIONS }
@@ -79,7 +80,6 @@ class NumpadEditorGui : SkyhanniBaseScreen() {
     private var codesScroll = 0
 
     // Additional enhanced UX state
-    private var suggestionSelectionVisible = true
     private var lastMouseX = 0
     private var lastMouseY = 0
 
@@ -157,59 +157,34 @@ class NumpadEditorGui : SkyhanniBaseScreen() {
         }
     }
 
-    private fun querySuggestions(text: String, cursor: Int): List<String> = try { editor.suggestFor(text, cursor) } catch (_: Throwable) { emptyList() }
-
     private fun updateSuggestions(actions: Boolean) {
-        if (!actions) { // disable suggestions for code field entirely
-            suggestions = emptyList()
-            suggestionIndex = -1
-            suggestionScroll = 0
-            showSuggestions = false
-            return
-        }
-        val list = if (actionFocusedIndex !in editActionsList.indices) emptyList() else {
-            val f = actionCommandControllers.getOrNull(actionFocusedIndex)
-            val txt = f?.getText() ?: editActionsList[actionFocusedIndex].command
-            val cur = f?.getCursorPosition() ?: txt.length
-            querySuggestions(txt, cur)
-        }.distinct().filter { it.isNotBlank() }
-        suggestions = list
-        suggestionIndex = if (list.isNotEmpty()) 0 else -1
-        suggestionScroll = 0
-        showSuggestions = list.isNotEmpty()
-    }
-
-    private fun pageSuggestions(next: Boolean) {
-        if (!showSuggestions || suggestions.isEmpty()) return
-        val delta = if (next) maxSuggestions else -maxSuggestions
-        suggestionIndex = (suggestionIndex + delta).coerceIn(0, suggestions.lastIndex)
-        if (suggestionIndex < suggestionScroll) suggestionScroll = suggestionIndex
-        if (suggestionIndex >= suggestionScroll + maxSuggestions) suggestionScroll = suggestionIndex - maxSuggestions + 1
+        if (!actions) { suggestionController.reset(); return }
+        if (actionFocusedIndex !in editActionsList.indices) { suggestionController.reset(); return }
+        val f = actionCommandControllers.getOrNull(actionFocusedIndex)
+        val txt = f?.getText() ?: editActionsList[actionFocusedIndex].command
+        val cur = f?.getCursorPosition() ?: txt.length
+        suggestionController.update(txt, cur, enabled = true)
         suggestionSelectionVisible = true
     }
 
+    private fun pageSuggestions(next: Boolean) { suggestionController.page(next); suggestionSelectionVisible = true }
+
     private fun acceptSuggestion(forActions: Boolean) {
-        if (suggestionIndex !in suggestions.indices) return
-        val chosen = suggestions[suggestionIndex]
-        if (!forActions) return // no suggestions for code field anymore
+        if (!forActions) return
         if (actionFocusedIndex !in editActionsList.indices) return
         val field = actionCommandControllers.getOrNull(actionFocusedIndex) ?: return
         val text = field.getText()
         val cursor = try { field.getCursorPosition() } catch (_: Throwable) { text.length }
-        val left = text.substring(0, cursor).lastIndexOf(' ').let { if (it < 0) 0 else it + 1 }
-        val right = text.substring(cursor).indexOf(' ').let { if (it < 0) text.length else cursor + it }
-        val newText = text.substring(0, left) + chosen + text.substring(right)
-        field.setTextValue(newText)
-        try { field.setCursorPosition(left + chosen.length) } catch (_: Throwable) {}
-        editActionsList[actionFocusedIndex].command = newText
-        showSuggestions = false
-        suggestionSelectionVisible = true
+        val pair = suggestionController.accept(text, cursor) ?: return
+        field.setTextValue(pair.first)
+        try { field.setCursorPosition(pair.second) } catch (_: Throwable) {}
+        editActionsList[actionFocusedIndex].command = pair.first
     }
 
     private fun suggestionBoxPos(editLeft: Int, editTop: Int, editW: Int, actionsBoxTop: Int): Pair<Int, Int> {
         val boxW = (editW - 4).coerceAtMost(360)
         val itemH = 12
-        val boxH = (suggestions.size * itemH).coerceAtMost(160)
+        val boxH = (suggestionController.suggestions.size * itemH).coerceAtMost(160)
         return when (focusTarget) {
             FocusTarget.CODE -> Pair(editLeft + (editW - boxW) / 2, editTop + 40) // simplified, rarely used now
             FocusTarget.ACTIONS -> {
@@ -223,15 +198,15 @@ class NumpadEditorGui : SkyhanniBaseScreen() {
     }
 
     private fun handleSuggestionClick(mx: Int, my: Int, editLeft: Int, editTop: Int, editW: Int, actionsBoxTop: Int): Boolean {
-        if (!showSuggestions || suggestions.isEmpty()) return false
+        if (!suggestionController.visible || suggestionController.suggestions.isEmpty()) return false
         val (x, y) = suggestionBoxPos(editLeft, editTop, editW, actionsBoxTop)
         val w = (editW - 4).coerceAtMost(360)
         val itemH = 12
-        val visible = suggestions.drop(suggestionScroll).take(maxSuggestions)
+        val visible = suggestionController.visibleSlice()
         val h = (visible.size * itemH).coerceAtMost(160)
         if (!GuiRenderUtils.isPointInRect(mx, my, x, y, w, h)) return false
         val idx = ((my - y) / itemH).coerceIn(0, visible.lastIndex)
-        suggestionIndex = suggestionScroll + idx
+        suggestionController.select(suggestionController.scroll + idx)
         acceptSuggestion(focusTarget == FocusTarget.ACTIONS)
         return true
     }
@@ -383,19 +358,19 @@ class NumpadEditorGui : SkyhanniBaseScreen() {
             drawEditor(editLeft, editTop, editW)
         }
 
-        if (currentlyEditing && showSuggestions && suggestions.isNotEmpty()) {
+        if (currentlyEditing && suggestionController.visible && suggestionController.suggestions.isNotEmpty()) {
             val (sx, sy) = suggestionBoxPos(editLeft, editTop, editW, editTop + 48)
             val w = (editW - 4).coerceAtMost(360)
             val itemH = 12
-            val visible = suggestions.drop(suggestionScroll).take(maxSuggestions)
+            val visible = suggestionController.visibleSlice()
             val h = (visible.size * itemH).coerceAtMost(160)
             GuiRenderUtils.drawRect(sx - 2, sy - 2, sx + w + 2, sy + h + 2, 0xC0202020.toInt())
             visible.forEachIndexed { i, s ->
-                val real = suggestionScroll + i
-                if (real == suggestionIndex && suggestionSelectionVisible) GuiRenderUtils.drawRect(sx, sy + i * itemH, sx + w, sy + (i + 1) * itemH, 0x80446699.toInt())
+                val real = suggestionController.scroll + i
+                if (real == suggestionController.index && suggestionSelectionVisible) GuiRenderUtils.drawRect(sx, sy + i * itemH, sx + w, sy + (i + 1) * itemH, 0x80446699.toInt())
                 GuiRenderUtils.drawString(s, sx + 4, sy + i * itemH + 2)
             }
-            GuiRenderUtils.drawScrollbar(sx + w + 3, sy, h, suggestions.size * itemH, suggestionScroll * itemH)
+            GuiRenderUtils.drawScrollbar(sx + w + 3, sy, h, suggestionController.suggestions.size * itemH, suggestionController.scroll * itemH)
         }
     }
 
@@ -497,7 +472,7 @@ class NumpadEditorGui : SkyhanniBaseScreen() {
                 when {
                     removeRect -> { if (focusTarget == FocusTarget.ACTIONS && actionFocusedField == ActionField.DELAY && actionFocusedIndex == idx) finalizeDelayBlur(); editActionsList.removeAt(idx); if (idx < editActionDelayText.size) editActionDelayText.removeAt(idx); rebuildFields() }
                     cmdRect -> { if (focusTarget == FocusTarget.ACTIONS && actionFocusedField == ActionField.DELAY && actionFocusedIndex != idx) finalizeDelayBlur(); actionFocusedIndex = idx; actionFocusedField = ActionField.COMMAND; focusTarget = FocusTarget.ACTIONS; updateSuggestions(true); actionCommandControllers[idx].click(mx - (editLeft + 4), my - rowY, false) }
-                    delayRect -> { if (focusTarget == FocusTarget.ACTIONS && actionFocusedField == ActionField.DELAY && actionFocusedIndex != idx) finalizeDelayBlur(); actionFocusedIndex = idx; actionFocusedField = ActionField.DELAY; focusTarget = FocusTarget.ACTIONS; showSuggestions = false; actionDelayControllers[idx].click(mx - (editLeft + 4 + cmdW + 6), my - rowY, false); lastDelayFocusedIndex = idx }
+                    delayRect -> { if (focusTarget == FocusTarget.ACTIONS && actionFocusedField == ActionField.DELAY && actionFocusedIndex != idx) finalizeDelayBlur(); actionFocusedIndex = idx; actionFocusedField = ActionField.DELAY; focusTarget = FocusTarget.ACTIONS; actionDelayControllers[idx].click(mx - (editLeft + 4 + cmdW + 6), my - rowY, false); lastDelayFocusedIndex = idx }
                 }
             }
             return
@@ -522,7 +497,6 @@ class NumpadEditorGui : SkyhanniBaseScreen() {
         islandSelectionOpen = false
         focusTarget = FocusTarget.CODE
         actionFocusedIndex = -1
-        showSuggestions = false
         rebuildFields()
     }
 
@@ -538,7 +512,6 @@ class NumpadEditorGui : SkyhanniBaseScreen() {
         islandSelectionOpen = false
         focusTarget = FocusTarget.CODE
         actionFocusedIndex = -1
-        showSuggestions = false
         rebuildFields()
     }
 
@@ -652,18 +625,17 @@ class NumpadEditorGui : SkyhanniBaseScreen() {
         val scroll = MouseCompat.getScrollDelta()
         if (scroll == 0) return
         if (currentlyEditing) {
-            if (showSuggestions && suggestions.isNotEmpty()) {
+            if (suggestionController.visible && suggestionController.suggestions.isNotEmpty()) {
                 val (sx, sy) = suggestionBoxPos(editLeft, editTop, editW, actionsBoxTop)
                 val w = (editW - 4).coerceAtMost(360)
                 val itemH = 12
-                val visible = suggestions.drop(suggestionScroll).take(maxSuggestions)
+                val visible = suggestionController.visibleSlice()
                 val h = (visible.size * itemH).coerceAtMost(160)
                 val over = GuiRenderUtils.isPointInRect(GuiScreenUtils.mouseX, GuiScreenUtils.mouseY, sx, sy, w, h)
                 if (over || focusTarget != FocusTarget.NONE) {
                     val dir = if (scroll > 0) -1 else 1
-                    suggestionIndex = (suggestionIndex + dir).coerceIn(0, suggestions.lastIndex)
-                    if (suggestionIndex < suggestionScroll) suggestionScroll = suggestionIndex
-                    if (suggestionIndex >= suggestionScroll + maxSuggestions) suggestionScroll = suggestionIndex - maxSuggestions + 1
+                    suggestionController.navigate(dir)
+                    suggestionSelectionVisible = true
                     return
                 }
             }
@@ -700,110 +672,17 @@ class NumpadEditorGui : SkyhanniBaseScreen() {
 
     override fun onKeyTyped(ch: Char?, keyCode: Int?) {
         val kc = keyCode ?: -1
-        val ctrl = Keyboard.KEY_LCONTROL.isKeyHeld() || Keyboard.KEY_RCONTROL.isKeyHeld()
+        Keyboard.KEY_LCONTROL.isKeyHeld() || Keyboard.KEY_RCONTROL.isKeyHeld()
 
-        // PageUp/PageDown for suggestions (re-enabled)
-        if (showSuggestions && suggestions.isNotEmpty() && (kc == Keyboard.KEY_NEXT || kc == Keyboard.KEY_PRIOR)) {
-            pageSuggestions(kc == Keyboard.KEY_NEXT)
+        // PageUp/PageDown suggestions
+        if (suggestionController.visible && suggestionController.suggestions.isNotEmpty() && (kc == Keyboard.KEY_NEXT || kc == Keyboard.KEY_PRIOR)) { pageSuggestions(kc == Keyboard.KEY_NEXT); return }
+        if ((kc == Keyboard.KEY_RETURN || kc == Keyboard.KEY_NUMPADENTER) && suggestionController.visible && suggestionController.suggestions.isNotEmpty()) { acceptSuggestion(focusTarget == FocusTarget.ACTIONS); return }
+        if (suggestionController.visible && suggestionController.suggestions.isNotEmpty() && (kc == Keyboard.KEY_DOWN || kc == Keyboard.KEY_UP)) {
+            suggestionController.navigate(if (kc == Keyboard.KEY_DOWN) 1 else -1)
+            suggestionSelectionVisible = true
             return
         }
-
-        // Island selection page jump
-        if (islandSelectionOpen && (kc == Keyboard.KEY_NEXT || kc == Keyboard.KEY_PRIOR)) {
-            val lineH = 14
-            val boxH = 200
-            val totalLines = 2 + IslandType.entries.count { it.isValidIsland() }
-            val maxScroll = (totalLines * lineH - boxH).coerceAtLeast(0)
-            val delta = boxH // one full page
-            islandSelectionScroll = (islandSelectionScroll + if (kc == Keyboard.KEY_NEXT) delta else -delta).coerceIn(0, maxScroll)
-            return
-        }
-
-        // Accept suggestion early
-        if ((kc == Keyboard.KEY_RETURN || kc == Keyboard.KEY_NUMPADENTER) && showSuggestions && suggestions.isNotEmpty()) {
-            acceptSuggestion(focusTarget == FocusTarget.ACTIONS)
-            return
-        }
-
-        // Suggestion navigation
-        if (showSuggestions && suggestions.isNotEmpty() && (kc == Keyboard.KEY_DOWN || kc == Keyboard.KEY_UP)) {
-            val dir = if (kc == Keyboard.KEY_DOWN) 1 else -1
-            suggestionIndex = (suggestionIndex + dir).coerceIn(0, suggestions.lastIndex)
-            if (suggestionIndex < suggestionScroll) suggestionScroll = suggestionIndex
-            if (suggestionIndex >= suggestionScroll + maxSuggestions) suggestionScroll = suggestionIndex - maxSuggestions + 1
-            return
-        }
-
-        // Codes navigation when not editing
-        if (!currentlyEditing && (kc == Keyboard.KEY_DOWN || kc == Keyboard.KEY_UP)) {
-            if (codes.isNotEmpty()) {
-                val dir = if (kc == Keyboard.KEY_DOWN) 1 else -1
-                selectedIndex = if (selectedIndex == -1) 0 else (selectedIndex + dir).coerceIn(0, codes.lastIndex)
-                val rowY = selectedIndex * 14
-                if (rowY < codesScroll) codesScroll = rowY else if (rowY > codesScroll + 300 - 14) codesScroll = rowY - (300 - 14)
-            }
-            return
-        }
-
-        // Clipboard copy
-        if (kc == Keyboard.KEY_C && ctrl) {
-            try {
-                if (focusTarget == FocusTarget.CODE) {
-                    codeController?.getSelectedText()?.takeIf { it.isNotEmpty() }?.let { ClipboardUtils.copyToClipboard(it) }
-                } else if (focusTarget == FocusTarget.ACTIONS && actionFocusedIndex in editActionsList.indices) {
-                    actionCommandControllers.getOrNull(actionFocusedIndex)?.getSelectedText()?.takeIf { it.isNotEmpty() }?.let {
-                        ClipboardUtils.copyToClipboard(it)
-                    }
-                }
-            } catch (_: Throwable) {}
-            return
-        }
-
-        // Paste
-        if (kc == Keyboard.KEY_V && ctrl) {
-            runBlocking {
-                val clip = ClipboardUtils.readFromClipboard() ?: return@runBlocking
-                if (focusTarget == FocusTarget.CODE) {
-                    val digits = clip.filter { it.isDigit() }
-                    codeController?.writeText(digits); editCodeText = codeController?.getText() ?: editCodeText; sanitizeCode()
-                } else if (focusTarget == FocusTarget.ACTIONS && actionFocusedIndex in editActionsList.indices) {
-                    if (actionFocusedField == ActionField.COMMAND) {
-                        actionCommandControllers.getOrNull(actionFocusedIndex)?.writeText(clip)
-                        editActionsList[actionFocusedIndex].command = actionCommandControllers[actionFocusedIndex].getText(); updateSuggestions(true)
-                    } else {
-                        actionDelayControllers.getOrNull(actionFocusedIndex)?.writeText(clip)
-                        editActionDelayText[actionFocusedIndex] = actionDelayControllers[actionFocusedIndex].getText(); sanitizeDelay(actionFocusedIndex, finalize = false)
-                    }
-                }
-            }
-            return
-        }
-
-        // Cut
-        if (kc == Keyboard.KEY_X && ctrl) {
-            try {
-                if (focusTarget == FocusTarget.CODE) {
-                    val f = codeController; val sel = f?.getSelectedText(); if (!sel.isNullOrEmpty()) { ClipboardUtils.copyToClipboard(sel); f.writeText(""); editCodeText = f.getText(); sanitizeCode() }
-                } else if (focusTarget == FocusTarget.ACTIONS && actionFocusedIndex in editActionsList.indices) {
-                    val f = actionCommandControllers.getOrNull(actionFocusedIndex); val sel = f?.getSelectedText(); if (!sel.isNullOrEmpty()) { ClipboardUtils.copyToClipboard(sel); f.writeText(""); editActionsList[actionFocusedIndex].command = f.getText() }
-                }
-            } catch (_: Throwable) {}
-            return
-        }
-
-        // Select all
-        if (kc == Keyboard.KEY_A && ctrl) {
-            if (focusTarget == FocusTarget.CODE) codeController?.textboxKeyTyped(null, kc)
-            else if (focusTarget == FocusTarget.ACTIONS && actionFocusedIndex in editActionsList.indices) actionCommandControllers.getOrNull(actionFocusedIndex)?.textboxKeyTyped(null, kc)
-            return
-        }
-
-        // Tab -> cycle suggestions / request
-        if (kc == Keyboard.KEY_TAB) {
-            if (focusTarget == FocusTarget.ACTIONS) updateSuggestions(true)
-            return
-        }
-
+        if (kc == Keyboard.KEY_TAB && focusTarget == FocusTarget.ACTIONS) { updateSuggestions(true); return }
         // Forward char input
         try {
             if (focusTarget == FocusTarget.CODE) {

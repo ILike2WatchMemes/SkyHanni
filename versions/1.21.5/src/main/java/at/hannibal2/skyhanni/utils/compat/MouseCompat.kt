@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.utils.DelayedRun
 import net.minecraft.client.MinecraftClient
+import org.lwjgl.glfw.GLFW
 
 object MouseCompat {
     var deltaMouseY = 0.0
@@ -15,7 +16,9 @@ object MouseCompat {
     }
 
     fun isButtonDown(button: Int): Boolean {
-        return lastEventButton == button
+        // Query actual GLFW state so side buttons (e.g., 4,5) stay active while held.
+        val window = MinecraftClient.getInstance().window.handle
+        return GLFW.glfwGetMouseButton(window, button) == GLFW.GLFW_PRESS
     }
 
     fun getScrollDelta(): Int {
