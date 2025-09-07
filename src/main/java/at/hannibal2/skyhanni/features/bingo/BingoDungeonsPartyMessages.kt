@@ -10,12 +10,20 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
-object Dungeons {
+object BingoDungeonsPartyMessages {
     val config = SkyHanniMod.feature.event.bingo
     val patternGroup = RepoPattern.group("feature.event.bingo.dungeons")
     val skillLVLUPPattern by patternGroup.pattern(
         "skill-level-up",
-        "DUNGEON LEVEL UP The Catacombs",
+        "§r§b§lDUNGEON LEVEL UP §3§cThe Catacombs §8(?<oldLevel>\\d+)➜§3(?<newLevel>\\d+)",
+    )
+
+    /**
+     * REGEX-TEST §e§lMage Milestone §r§e❶§r§7: You have dealt §r§c60,000§r§7 Total Damage so far! §r§a02s
+     */
+    val milestoneReachedPattern by patternGroup.pattern(
+        "milestone-reached",
+        "§e§lMage Milestone §r§e(?<milestone>.)§r§7.*",
     )
 
     @HandleEvent
@@ -25,7 +33,12 @@ object Dungeons {
             HypixelCommands.partyChat("Dungeon Skill Level Up: ${group("newLevel")}")
         }
         if (config.sendImportantCataMilestones) {
-            // TODO add the cata milestone pattern check and post
+            milestoneReachedPattern.matchMatcher(event.message) {
+                val milestone = group("milestone")
+                if (milestone == "❷" || milestone == "❸") {
+                    HypixelCommands.partyChat("Dungeon Milestone $milestone reached!")
+                }
+            }
         }
     }
 }
