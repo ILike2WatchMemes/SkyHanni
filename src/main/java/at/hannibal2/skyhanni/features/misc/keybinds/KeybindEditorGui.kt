@@ -180,6 +180,23 @@ class KeybindEditorGui : SkyhanniBaseScreen() {
             }
         }
 
+        // Vanilla key usage info (educational, always shown during editing)
+        val vanillaMap = Keybinds.vanillaBoundKeyNames()
+        if (vanillaMap.isNotEmpty()) {
+            val vanillaKeysSample = vanillaMap.keys.take(10).joinToString(", ")
+            val more = if (vanillaMap.size > 10) " ..." else ""
+            val infoLines = listOf(
+                "§7Info: You can not use keys mapped to Vanilla Functions.",
+                "§7This allows you to use combos even while you are moving etc",
+                "§8Bound vanilla keys sample: §f$vanillaKeysSample$more"
+            )
+            for (line in infoLines) {
+                GuiRenderUtils.drawString(line, editLeft, warnY)
+                warnY += 12
+            }
+            warnY += 2
+        }
+
         GuiRenderUtils.drawString("Command:", editLeft, warnY)
         GuiRenderUtils.drawRect(editLeft, warnY + 12 - 2, editLeft + editW - 4, warnY + 12 + 20, 0xFF2B2B2B.toInt())
         commandField?.setSize(editW - 4, 20); commandField?.render(editLeft, warnY + 12)

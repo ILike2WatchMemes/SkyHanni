@@ -36,11 +36,14 @@ object Keybinds {
     private val modifierOrder = listOf("CTRL", "SHIFT", "ALT")
 
     private var chordActive = false
-    private val chordBaseKeys = mutableSetOf<String>()
+
+    // replaced name tracking with code tracking to avoid mismatches (e.g. mouse buttons)
+    private val chordBaseKeyCodes = mutableSetOf<Int>()
     private var chordPeakCombo: Keybind? = null
     private var chordPeakSize = 0
 
     @Volatile private var cachedVanillaKeys: Map<String, String>? = null
+    @Volatile private var cachedVanillaKeyCodes: Set<Int>? = null
     private var lastVanillaCacheStamp: Long = 0L
 
     fun normalizeCombo(combo: String): String {
@@ -72,7 +75,7 @@ object Keybinds {
         val (_, base) = splitCombo(normalized)
         if (base.isEmpty()) return emptyList()
         val vanilla = vanillaBoundKeyNames()
-        return base.mapNotNull { k -> vanilla[k] ?.let { "$it ($k)" } }
+        return base.mapNotNull { k -> vanilla[k]?.let { "$it ($k)" } }
     }
 
     fun vanillaBoundKeyNames(): Map<String, String> {
@@ -80,46 +83,45 @@ object Keybinds {
         val cached = cachedVanillaKeys
         if (cached != null && (now - lastVanillaCacheStamp) < 5_000) return cached
         val map = mutableMapOf<String, String>()
+        val codes = mutableSetOf<Int>()
         try {
             //#if MC < 1.21.6
             try {
                 val mc = Minecraft.getMinecraft()
-                val arr = mc.gameSettings.keyBindings
-                for (kb in arr) {
+                for (kb in mc.gameSettings.keyBindings) {
                     try {
                         val code = kb.keyCode
-                        if (code == 0 || code == -100 || code == -99) continue
-                        val human = humanizeDescription(kb.keyDescription ?: continue)
-                        map[keyName(code)] = human
-                    } catch (_: Throwable) {}
+                        if (code == 0) continue
+                        val description = kb.keyDescription ?: "Unknown"
+                        // Only include core vanilla Minecraft keys, not mod keys
+                        // This ensures we get proper movement/action keys detection
+                        codes += code
+                        val keyName = keyName(code)
+                        map[keyName] = humanizeDescription(description)
+                    } catch (_: Throwable) {
+                    }
                 }
-            } catch (_: Throwable) {}
+            } catch (_: Throwable) {
+            }
             //#else
             //$$ try {
             //$$     val mc = MinecraftClient.getInstance()
-            //$$     val list = mc.options.allKeys
-            //$$     for (kb in list) {
+            //$$     for (kb in mc.options.allKeys) {
             //$$         try {
-            //$$             val code = try {
-            //$$                 val boundField = kb.javaClass.getDeclaredField("boundKey").apply { isAccessible = true }
-            //$$                 val boundObj = boundField.get(kb)
-            //$$                 boundObj?.javaClass?.methods?.firstOrNull { it.name in setOf("getCode","getValue","code") && it.parameterCount==0 }?.invoke(boundObj) as? Int
-            //$$             } catch (_: Throwable) {
-            //$$                 try {
-            //$$                     val defField = kb.javaClass.getDeclaredField("defaultKey").apply { isAccessible = true }
-            //$$                     val defObj = defField.get(kb)
-            //$$                     defObj?.javaClass?.methods?.firstOrNull { it.name in setOf("getCode","getValue","code") && it.parameterCount==0 }?.invoke(defObj) as? Int
-            //$$                 } catch (_: Throwable) { null }
-            //$$             }
-            //$$             if (code == null || code == 0 || code == -100 || code == -99) continue
-            //$$             val label = (kb.translationKey)
-            //$$             map[keyName(code)] = humanizeDescription(label)
+            //$$             val code = kb.boundKey.code
+            //$$             if (code == null || code == -1) continue
+            //$$             val label = kb.translationKey
+            //$$             codes += code
+            //$$             val keyName = keyName(code)
+            //$$             map[keyName] = humanizeDescription(label)
             //$$         } catch (_: Throwable) {}
             //$$     }
             //$$ } catch (_: Throwable) {}
             //#endif
-        } catch (_: Throwable) {}
+        } catch (_: Throwable) {
+        }
         cachedVanillaKeys = map
+        cachedVanillaKeyCodes = codes
         lastVanillaCacheStamp = now
         return map
     }
@@ -133,13 +135,23 @@ object Keybinds {
 
     fun isVanillaBoundKeyName(name: String): Boolean = vanillaBoundKeyNames().containsKey(name.uppercase())
 
+    private fun isVanillaKeyCode(code: Int): Boolean {
+        vanillaBoundKeyNames() // refresh if needed
+        return cachedVanillaKeyCodes?.contains(code) == true
+    }
+
     fun register(b: Keybind) {
         val normalized = normalizeCombo(b.combo)
         if (duplicateExists(normalized, null, b.command)) {
             ChatUtils.userError("Combo already in use: $normalized"); return
         }
-        if (vanillaKeyConflicts(normalized).isNotEmpty()) {
-            ChatUtils.userError("Combo uses vanilla bound key(s): ${vanillaKeyConflicts(normalized).joinToString(", ")}"); return
+        // Show warning but don't block registration - vanilla keys will be ignored during execution
+        val vanillaConflicts = vanillaKeyConflicts(normalized)
+        if (vanillaConflicts.isNotEmpty()) {
+            ChatUtils.chat(
+                "§eWarning: Combo uses vanilla key(s): ${vanillaConflicts.joinToString(", ")} - these will be ignored when held",
+                prefix = true,
+            )
         }
         val toAdd = b.copy(combo = normalized)
         synchronized(binds) {
@@ -174,89 +186,179 @@ object Keybinds {
     }
 
     private fun executeCommandRaw(cmd: String) {
-        try { CommandsRegistry.execAutomaticCommand(cmd) } catch (_: Throwable) {
+        try {
+            CommandsRegistry.execAutomaticCommand(cmd)
+        } catch (_: Throwable) {
             ErrorManager.skyHanniError("Keybinds: Failed to execute command: $cmd")
         }
     }
 
-    private fun keyName(code: Int): String = try { KeyboardManager.getKeyName(code).uppercase() } catch (_: Throwable) { code.toString() }
-    private fun isModifier(code: Int) = code in setOf(Keyboard.KEY_LCONTROL, Keyboard.KEY_RCONTROL, Keyboard.KEY_LSHIFT, Keyboard.KEY_RSHIFT, Keyboard.KEY_LMENU, Keyboard.KEY_RMENU)
+    private fun keyName(code: Int): String = try {
+        KeyboardManager.getKeyName(code).uppercase()
+    } catch (_: Throwable) {
+        code.toString()
+    }
+
+    private fun isModifier(code: Int) = code in setOf(
+        Keyboard.KEY_LCONTROL,
+        Keyboard.KEY_RCONTROL,
+        Keyboard.KEY_LSHIFT,
+        Keyboard.KEY_RSHIFT,
+        Keyboard.KEY_LMENU,
+        Keyboard.KEY_RMENU,
+    )
+
     private fun currentModifiers(): Set<String> = buildSet {
         if (Keyboard.KEY_LCONTROL.isKeyHeld() || Keyboard.KEY_RCONTROL.isKeyHeld()) add("CTRL")
         if (Keyboard.KEY_LSHIFT.isKeyHeld() || Keyboard.KEY_RSHIFT.isKeyHeld()) add("SHIFT")
         if (Keyboard.KEY_LMENU.isKeyHeld() || Keyboard.KEY_RMENU.isKeyHeld()) add("ALT")
     }
 
-    private fun snapshotNormalized(): String = normalizeCombo((currentModifiers() + chordBaseKeys).joinToString("+"))
+    private fun currentBaseKeyNames(): Set<String> = chordBaseKeyCodes.map { keyName(it) }.toSet()
+
+    private fun snapshotNormalized(): String = normalizeCombo((currentModifiers() + currentBaseKeyNames()).joinToString("+"))
 
     private fun tryUpdatePeak() {
-        if (!chordActive || chordBaseKeys.isEmpty()) return
-        val norm = snapshotNormalized()
-        val candidate = synchronized(binds) { binds.firstOrNull { normalizeCombo(it.combo) == norm } }
-        if (candidate != null) {
-            val size = splitCombo(norm).second.size
-            if (size > chordPeakSize) {
-                chordPeakSize = size
-                chordPeakCombo = candidate
+        if (!chordActive || chordBaseKeyCodes.isEmpty()) return
+        val curMods = currentModifiers()
+        val baseNames = currentBaseKeyNames()
+        var best: Keybind? = chordPeakCombo
+        var bestBaseSize = chordPeakSize
+        var bestModsSize = if (chordPeakCombo == null) -1 else splitCombo(normalizeCombo(chordPeakCombo!!.combo)).first.size
+        synchronized(binds) {
+            for (b in binds) {
+                val norm = normalizeCombo(b.combo)
+                val (mods, base) = splitCombo(norm)
+                // modifiers must be subset of currently held modifiers
+                if (!mods.all { it in curMods }) continue
+                // base keys must be subset of currently held custom base keys
+                if (!base.all { it in baseNames }) continue
+                val baseSize = base.size
+                val modsSize = mods.size
+                val better = when {
+                    baseSize > bestBaseSize -> true
+                    baseSize == bestBaseSize && modsSize > bestModsSize -> true
+                    else -> false
+                }
+                if (better) {
+                    best = b
+                    bestBaseSize = baseSize
+                    bestModsSize = modsSize
+                }
             }
         }
+        if (best != null) {
+            chordPeakCombo = best
+            chordPeakSize = bestBaseSize
+        }
+    }
+
+    private fun maybeExecuteImmediate() {
+        if (!chordActive || chordBaseKeyCodes.isEmpty()) return
+        val curMods = currentModifiers()
+        val baseNames = currentBaseKeyNames()
+        // Find exact matches (mods and base sets exactly equal current)
+        val exactMatches = synchronized(binds) {
+            binds.filter { b ->
+                val (mods, base) = splitCombo(normalizeCombo(b.combo))
+                mods == curMods && base == baseNames
+            }
+        }
+        if (exactMatches.isEmpty()) return
+        // If there exists any other bind that could extend this (same modifiers, strictly superset base), defer.
+        val hasPotentialExtension = synchronized(binds) {
+            binds.any { b ->
+                val (mods, base) = splitCombo(normalizeCombo(b.combo))
+                mods == curMods && baseNames.all { it in base } && base.size > baseNames.size
+            }
+        }
+        if (hasPotentialExtension) return
+        // Choose longest command string (arbitrary stable choice if multiple). Could also just take first.
+        val toRun = exactMatches.maxByOrNull { it.command.length }?.takeIf { isAllowedNow(it) } ?: return
+        executeCommandRaw(toRun.command.trim())
+        resetChord()
     }
 
     private fun resetChord() {
         chordActive = false
-        chordBaseKeys.clear()
+        chordBaseKeyCodes.clear()
         chordPeakCombo = null
         chordPeakSize = 0
     }
 
-    @HandleEvent fun onKeyDown(e: KeyDownEvent) {
+    @HandleEvent
+    fun onKeyDown(e: KeyDownEvent) {
         try {
             //#if MC < 1.21.6
             val mc = Minecraft.getMinecraft()
             //#else
             //$$ val mc = MinecraftClient.getInstance()
             //#endif
-            if (mc.currentScreen != null) { resetChord(); return }
-            if (isModifier(e.keyCode)) return
-            if (e.keyCode == -100 || e.keyCode == -99) return
-            val name = keyName(e.keyCode)
-            if (isVanillaBoundKeyName(name)) return
+            if (mc.currentScreen != null) {
+                resetChord(); return
+            }
+            val code = e.keyCode
+            if (isModifier(code)) return
+            // Ignore vanilla movement/action keys (do not consume or create base entries)
+            if (isVanillaKeyCode(code)) return
             chordActive = true
-            chordBaseKeys += name
+            chordBaseKeyCodes += code
             tryUpdatePeak()
-        } catch (_: Throwable) {}
+            maybeExecuteImmediate() // new immediate execution logic
+        } catch (_: Throwable) {
+        }
     }
 
-    @HandleEvent fun onKeyUp(e: KeyUpEvent) {
+    @HandleEvent
+    fun onKeyUp(e: KeyUpEvent) {
         try {
             //#if MC < 1.21.6
             val mc = Minecraft.getMinecraft()
             //#else
             //$$ val mc = MinecraftClient.getInstance()
             //#endif
-            if (mc.currentScreen != null) { resetChord(); return }
-            if (isModifier(e.keyCode)) return
-            if (e.keyCode == -100 || e.keyCode == -99) return
-            val name = keyName(e.keyCode)
-            chordBaseKeys.remove(name)
-            if (chordBaseKeys.isEmpty() && chordActive) {
+            if (mc.currentScreen != null) {
+                resetChord(); return
+            }
+            val code = e.keyCode
+            if (isModifier(code)) return
+            // Releasing an ignored vanilla key: if no custom base keys remain, execute
+            if (isVanillaKeyCode(code)) {
+                if (chordBaseKeyCodes.isEmpty() && chordActive) {
+                    val toRun = chordPeakCombo?.takeIf { isAllowedNow(it) }
+                    if (toRun != null) executeCommandRaw(toRun.command.trim())
+                    resetChord()
+                }
+                return
+            }
+            chordBaseKeyCodes.remove(code)
+            if (chordBaseKeyCodes.isEmpty() && chordActive) {
                 val toRun = chordPeakCombo?.takeIf { isAllowedNow(it) }
                 if (toRun != null) executeCommandRaw(toRun.command.trim())
                 resetChord()
             } else {
                 tryUpdatePeak()
             }
-        } catch (_: Throwable) {}
+        } catch (_: Throwable) {
+        }
     }
 
-    @HandleEvent fun onKeyPress(@Suppress("UNUSED_PARAMETER") e: KeyPressEvent) { }
+    @HandleEvent
+    fun onKeyPress(@Suppress("UNUSED_PARAMETER") e: KeyPressEvent) {
+    }
 
     private fun persist() {
         try {
             val list = synchronized(binds) { binds.map { toSaved(it) }.toMutableList() }
             SkyHanniMod.feature.misc.let { it.keybinds = list }
-            SkyHanniMod.launchCoroutine { SkyHanniMod.configManager.saveConfig(at.hannibal2.skyhanni.config.ConfigFileType.FEATURES, "Updated keybinds") }
-        } catch (_: Throwable) {}
+            SkyHanniMod.launchCoroutine {
+                SkyHanniMod.configManager.saveConfig(
+                    at.hannibal2.skyhanni.config.ConfigFileType.FEATURES,
+                    "Updated keybinds",
+                )
+            }
+        } catch (_: Throwable) {
+        }
     }
 
     private fun loadFromConfig() {
@@ -265,7 +367,8 @@ object Keybinds {
             synchronized(binds) {
                 binds.clear(); binds.addAll(cfgList.mapNotNull { fromSaved(it) })
             }
-        } catch (_: Throwable) {}
+        } catch (_: Throwable) {
+        }
     }
 
     private fun toSaved(k: Keybind): at.hannibal2.skyhanni.config.features.misc.SavedKeybind {
@@ -281,9 +384,13 @@ object Keybinds {
         return Keybind(s.combo ?: return null, s.command ?: return null, islands, s.allowOutsideSkyBlock)
     }
 
-    @HandleEvent fun onConfigLoad(@Suppress("UNUSED_PARAMETER") e: ConfigLoadEvent) { loadFromConfig() }
+    @HandleEvent
+    fun onConfigLoad(@Suppress("UNUSED_PARAMETER") e: ConfigLoadEvent) {
+        loadFromConfig()
+    }
 
-    @HandleEvent fun onCommandRegistration(e: CommandRegistrationEvent) {
+    @HandleEvent
+    fun onCommandRegistration(e: CommandRegistrationEvent) {
         e.registerBrigadier("shkeybinds") {
             description = "Manage keybinds"
             simpleCallback {
