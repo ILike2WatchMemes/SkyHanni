@@ -37,6 +37,11 @@ object Keybinds {
     // Remember the exact set of base key names that fired last, to allow only one reactivation when the held set changes
     private var lastFiredBaseSet: Set<String>? = null
 
+    // Cached mapping of VANILLA (Minecraft options) bound key names -> human readable description.
+    // Uppercased key name as produced by KeyboardManager.getKeyName(code).uppercase()
+    @Volatile private var cachedVanillaKeys: Map<String, String>? = null
+    private var lastVanillaCacheStamp: Long = 0L
+
     // --- Normalization & validation ---
     fun normalizeCombo(combo: String): String {
         val raw = combo.split('+').map { it.trim().uppercase() }.filter { it.isNotEmpty() }
@@ -62,12 +67,94 @@ object Keybinds {
                 val (modsOld, baseOld) = splitCombo(normOld)
                 if (modsOld != modsNew) continue
                 if (baseOld.containsAll(baseNew) || baseNew.containsAll(baseOld)) {
-                    return "Combo conflicts with existing combo '${'$'}normOld' (subset/superset)"
+                    return "Combo conflicts with existing combo '$normOld' (subset/superset)"
                 }
             }
         }
         return null
     }
+
+    /** True if another (different original) bind already uses this exact normalized combo */
+    fun duplicateExists(normalized: String, original: String?): Boolean = synchronized(binds) {
+        binds.any { normalizeCombo(it.combo) == normalized && (original == null || normalizeCombo(original) != normalized) }
+    }
+
+    /** Return list of human readable vanilla key descriptions used by base part of combo. */
+    fun vanillaKeyConflicts(normalized: String): List<String> {
+        val (_, base) = splitCombo(normalized)
+        if (base.isEmpty()) return emptyList()
+        val vanilla = vanillaBoundKeyNames()
+        return base.mapNotNull { k -> vanilla[k] ?.let { "$it ($k)" } }
+    }
+
+    /** Provide mapping of uppercase key name -> human readable label for all currently bound vanilla keys. */
+    fun vanillaBoundKeyNames(): Map<String, String> {
+        val now = System.currentTimeMillis()
+        val cached = cachedVanillaKeys
+        if (cached != null && (now - lastVanillaCacheStamp) < 5_000) return cached // refresh every 5s
+        val map = mutableMapOf<String, String>()
+        try {
+            //#if MC < 1.21.6
+            try {
+                val kbClass = Class.forName("net.minecraft.client.settings.KeyBinding")
+                val field = kbClass.getDeclaredField("keybindArray")
+                field.isAccessible = true
+                val list = field.get(null) as? Iterable<*> ?: emptyList<Any>()
+                for (entry in list) {
+                    try {
+                        val descField = kbClass.getDeclaredField("keyDescription").apply { isAccessible = true }
+                        val codeField = kbClass.getDeclaredField("keyCode").apply { isAccessible = true }
+                        val descRaw = descField.get(entry) as? String ?: continue
+                        val code = (codeField.get(entry) as? Int) ?: continue
+                        if (code == 0 || code == -100 || code == -99) continue
+                        val human = humanizeDescription(descRaw)
+                        val keyName = keyName(code)
+                        map[keyName] = human
+                    } catch (_: Throwable) {}
+                }
+            } catch (_: Throwable) {}
+            //#else
+            try {
+                val mc = Minecraft.getMinecraft() // preprocessor will swap to getInstance in modern versions if needed
+                val optionsFieldName = "options"
+                val opt = try { mc.javaClass.getDeclaredField(optionsFieldName).apply { isAccessible = true }.get(mc) } catch (_: Throwable) { null }
+                opt?.let { optionsObj ->
+                    for (f in optionsObj.javaClass.declaredFields) {
+                        try {
+                            f.isAccessible = true
+                            val v = f.get(optionsObj) ?: continue
+                            val typeName = v.javaClass.name
+                            if (!typeName.contains("KeyMapping") && !typeName.contains("KeyBinding")) continue
+                            val code: Int? = try {
+                                val keyObj = v.javaClass.methods.firstOrNull { it.name == "getKey" && it.parameterCount == 0 }?.invoke(v)
+                                keyObj?.javaClass?.methods?.firstOrNull { it.name == "getValue" && it.parameterCount == 0 }?.invoke(keyObj) as? Int
+                            } catch (_: Throwable) { null }
+                            if (code == null || code == 0 || code == -100 || code == -99) continue
+                            val label: String = try {
+                                (v.javaClass.methods.firstOrNull { it.name == "getName" && it.parameterCount == 0 }?.invoke(v) as? String)
+                                    ?: f.name
+                            } catch (_: Throwable) { f.name }
+                            val human = humanizeDescription(label)
+                            map[keyName(code)] = human
+                        } catch (_: Throwable) {}
+                    }
+                }
+            } catch (_: Throwable) {}
+            //#endif
+        } catch (_: Throwable) {}
+        cachedVanillaKeys = map
+        lastVanillaCacheStamp = now
+        return map
+    }
+
+    private fun humanizeDescription(raw: String): String {
+        val r = raw.removePrefix("key.").removePrefix("key.")
+        val base = r.substringAfterLast('.')
+            .replace('_', ' ').replace('.', ' ')
+        return base.split(' ').filter { it.isNotBlank() }.joinToString(" ") { it.lowercase().replaceFirstChar { c -> c.uppercase() } }
+    }
+
+    fun isVanillaBoundKeyName(name: String): Boolean = vanillaBoundKeyNames().containsKey(name.uppercase())
 
     // --- Registration ---
     fun register(b: Keybind) {
@@ -75,20 +162,28 @@ object Keybinds {
         conflictError(normalized)?.let {
             ChatUtils.userError(it); return
         }
+        // Prevent unintentional duplicate reuse (new behaviour) – block if an existing different bind uses exact combo
+        if (duplicateExists(normalized, null)) {
+            ChatUtils.userError("Combo already in use: $normalized"); return
+        }
+        // Also block any vanilla key usage (base part)
+        if (vanillaKeyConflicts(normalized).isNotEmpty()) {
+            ChatUtils.userError("Combo uses vanilla bound key(s): ${vanillaKeyConflicts(normalized).joinToString(", ")}"); return
+        }
         val toAdd = b.copy(combo = normalized)
         synchronized(binds) {
             binds.removeAll { normalizeCombo(it.combo) == normalized }
             binds.add(toAdd)
         }
         persist()
-        try { ChatUtils.chat("Registered keybind: ${'$'}{toAdd.combo}", prefix = true) } catch (_: Throwable) {}
+        try { ChatUtils.chat("Registered keybind: ${toAdd.combo}", prefix = true) } catch (_: Throwable) {}
     }
 
     fun unregister(combo: String) {
         val normalized = normalizeCombo(combo)
         synchronized(binds) { binds.removeAll { normalizeCombo(it.combo) == normalized } }
         persist()
-        try { ChatUtils.chat("Unregistered keybind: ${'$'}normalized", prefix = true) } catch (_: Throwable) {}
+        try { ChatUtils.chat("Unregistered keybind: $normalized", prefix = true) } catch (_: Throwable) {}
     }
 
     fun allBinds(): List<Keybind> = synchronized(binds) { binds.toList() }
@@ -106,7 +201,7 @@ object Keybinds {
 
     private fun executeCommandRaw(cmd: String) {
         try { CommandsRegistry.execAutomaticCommand(cmd) } catch (_: Throwable) {
-            ErrorManager.skyHanniError("Keybinds: Failed to execute command: ${'$'}cmd")
+            ErrorManager.skyHanniError("Keybinds: Failed to execute command: $cmd")
         }
     }
 
@@ -131,6 +226,8 @@ object Keybinds {
             if (isModifier(e.keyCode)) return
             if (e.keyCode == -100 || e.keyCode == -99) return // ignore left/right mouse
             val name = keyName(e.keyCode)
+            // Ignore vanilla bound base keys so movement/jump etc do not interfere with combos
+            if (isVanillaBoundKeyName(name)) return
             pressedBaseKeys += name
             val attempt = buildAttempt(currentModifiers(), pressedBaseKeys)
             if (attempt != activeFiredCombo) {
@@ -158,17 +255,17 @@ object Keybinds {
                 return
             }
             if (e.keyCode == -100 || e.keyCode == -99) return // ignore left/right mouse
-            pressedBaseKeys.remove(keyName(e.keyCode))
+            val name = keyName(e.keyCode)
+            // We only added non-vanilla keys; remove if present
+            pressedBaseKeys.remove(name)
             if (pressedBaseKeys.isEmpty()) {
                 // reset once all base keys released so combo can trigger again
                 activeFiredCombo = null
                 lastTriggeredMultiCombo = null
                 lastFiredBaseSet = null
             } else {
-                // If the currently held base keys form a DIFFERENT (smaller) combo than what fired, allow new fire once
                 val attempt = buildAttempt(currentModifiers(), pressedBaseKeys)
                 if (lastFiredBaseSet != null && pressedBaseKeys != lastFiredBaseSet) {
-                    // a key was released compared to what fired -> allow re-fire
                     activeFiredCombo = null
                     lastFiredBaseSet = null
                 } else if (attempt != activeFiredCombo) activeFiredCombo = null

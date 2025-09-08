@@ -34,6 +34,9 @@ class KeybindEditorGui : SkyhanniBaseScreen() {
     // track original combo when editing to avoid duplicate entries on save
     private var editingOriginalCombo: String? = null
 
+    // dynamic warnings (updated every frame)
+    private var liveWarnings: List<String> = emptyList()
+
     // Command field caret + selection
     private var commandCaret = 0
     private var commandSelStart: Int? = null
@@ -98,6 +101,12 @@ class KeybindEditorGui : SkyhanniBaseScreen() {
 
     private fun pageSuggestions(next: Boolean) { suggestionController.page(next) }
 
+    private fun recomputeWarnings() {
+        if (!currentlyEditing) { liveWarnings = emptyList(); return }
+        val e = KeybindEditor.EditorKeybind(editCombo, editCommand, editingAllowedIslands, allowOutside)
+        liveWarnings = editor.validate(e, editingOriginalCombo)
+    }
+
     override fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
         // Auto-finalize combo capture when all recorded base keys released (updated implementation)
         if (capturingCombo && captureHasBase) {
@@ -111,6 +120,9 @@ class KeybindEditorGui : SkyhanniBaseScreen() {
                 capturingBaseKeys.clear(); capturingBaseKeyCodes.clear(); capturingModifiersUsed.clear(); captureHasBase = false
             }
         }
+
+        // refresh live validation warnings each frame while editing
+        recomputeWarnings()
 
         drawDefaultBackground(mouseX, mouseY, partialTicks)
         val totalW = 860; val totalH = 520
@@ -159,14 +171,24 @@ class KeybindEditorGui : SkyhanniBaseScreen() {
         }
         GuiRenderUtils.drawString(comboLabel, editLeft + 4, editTop + 12)
 
-        GuiRenderUtils.drawString("Command:", editLeft, editTop + 40)
-        GuiRenderUtils.drawRect(editLeft, editTop + 52 - 2, editLeft + editW - 4, editTop + 52 + 20, 0xFF2B2B2B.toInt())
-        commandField?.setSize(editW - 4, 20); commandField?.render(editLeft, editTop + 52)
+        // Draw live warnings under combo box
+        var warnY = editTop + 36
+        if (liveWarnings.isNotEmpty()) {
+            for (w in liveWarnings.take(4)) {
+                GuiRenderUtils.drawString("§c! $w", editLeft, warnY)
+                warnY += 12
+            }
+        }
+
+        GuiRenderUtils.drawString("Command:", editLeft, warnY)
+        GuiRenderUtils.drawRect(editLeft, warnY + 12 - 2, editLeft + editW - 4, warnY + 12 + 20, 0xFF2B2B2B.toInt())
+        commandField?.setSize(editW - 4, 20); commandField?.render(editLeft, warnY + 12)
         editCommand = commandField?.getText() ?: editCommand
 
         // Islands box
-        GuiRenderUtils.drawString("Islands (toggle):", editLeft, editTop + 80)
-        val boxTop = editTop + 92
+        val islandsLabelY = warnY + 40
+        GuiRenderUtils.drawString("Islands (toggle):", editLeft, islandsLabelY)
+        val boxTop = islandsLabelY + 12
         val boxH = 200
         GuiRenderUtils.drawRect(editLeft, boxTop, editLeft + editW - 4, boxTop + boxH, 0x20202020)
         val lineH = 16
@@ -191,13 +213,14 @@ class KeybindEditorGui : SkyhanniBaseScreen() {
         GuiRenderUtils.drawScrollbar(editLeft + editW, boxTop, boxH, totalLines * lineH, islandScroll)
 
         val buttonsY = boxTop + boxH + 8
-        drawButton(editLeft, buttonsY, 120, "§2Save")
+        val saveDisabled = liveWarnings.isNotEmpty()
+        drawButton(editLeft, buttonsY, 120, if (saveDisabled) "§7Save" else "§2Save")
         drawButton(editLeft + 128, buttonsY, 120, "§4Cancel")
 
         // Suggestions popup
         if (suggestionController.visible && suggestionController.suggestions.isNotEmpty()) {
             val sx = editLeft
-            val sy = editTop + 52 + 24
+            val sy = warnY + 12 + 24 // under command field
             val w = (editW - 4).coerceAtMost(360)
             val itemH = 12
             val visible = suggestionController.visibleSlice()
@@ -260,6 +283,12 @@ class KeybindEditorGui : SkyhanniBaseScreen() {
         val editTop = listTop
         val editW = totalW - (editLeft - left) - 14
 
+        // Determine dynamic layout offsets based on warnings count
+        var warnY = editTop + 36
+        if (liveWarnings.isNotEmpty()) {
+            warnY += (12 * liveWarnings.take(4).size)
+        }
+
         // Combo capture box
         if (GuiRenderUtils.isPointInRect(mx, my, editLeft, editTop + 12, 260, 20)) {
             // start capture; if this was a mouse button press include it immediately
@@ -277,10 +306,10 @@ class KeybindEditorGui : SkyhanniBaseScreen() {
         }
 
         // Command field
-        if (GuiRenderUtils.isPointInRect(mx, my, editLeft, editTop + 52, editW - 4, 20)) {
+        if (GuiRenderUtils.isPointInRect(mx, my, editLeft, warnY + 12, editW - 4, 20)) {
             capturingCombo = false
             commandFieldFocused = true
-            commandField?.click(mx - editLeft, my - (editTop + 52), Keyboard.KEY_LSHIFT.isKeyHeld() || Keyboard.KEY_RSHIFT.isKeyHeld())
+            commandField?.click(mx - editLeft, my - (warnY + 12), Keyboard.KEY_LSHIFT.isKeyHeld() || Keyboard.KEY_RSHIFT.isKeyHeld())
             updateSuggestions(); return
         } else if (commandFieldFocused) {
             // clicking outside unfocus -> hide suggestions
@@ -291,7 +320,7 @@ class KeybindEditorGui : SkyhanniBaseScreen() {
         // Suggestions click
         if (suggestionController.visible && suggestionController.suggestions.isNotEmpty()) {
             val sx = editLeft
-            val sy = editTop + 52 + 24
+            val sy = warnY + 12 + 24
             val w = (editW - 4).coerceAtMost(360)
             val itemH = 12
             val visible = suggestionController.visibleSlice()
@@ -304,7 +333,7 @@ class KeybindEditorGui : SkyhanniBaseScreen() {
         }
 
         // Islands box
-        val boxTop = editTop + 92
+        val boxTop = warnY + 40 + 12
         val boxH = 200
         val lineH = 16
         2 + IslandType.entries.count { it.isValidIsland() }
@@ -320,7 +349,8 @@ class KeybindEditorGui : SkyhanniBaseScreen() {
         }
 
         val buttonsY = boxTop + boxH + 8
-        if (GuiRenderUtils.isPointInRect(mx, my, editLeft, buttonsY, 120, 18)) { saveEditing(); return }
+        val saveDisabled = liveWarnings.isNotEmpty()
+        if (GuiRenderUtils.isPointInRect(mx, my, editLeft, buttonsY, 120, 18)) { if (!saveDisabled) { saveEditing() } else ChatUtils.userError("Cannot save: resolve warnings first") ; return }
         if (GuiRenderUtils.isPointInRect(mx, my, editLeft + 128, buttonsY, 120, 18)) { cancelEditing(); return }
     }
 
@@ -350,10 +380,13 @@ class KeybindEditorGui : SkyhanniBaseScreen() {
         val editLeft = listLeft + listW + 24
         val editTop = listTop
         val editW = totalW - (editLeft - left) - 14
+        // Determine dynamic layout offsets based on warnings count
+        var warnY = editTop + 36
+        if (liveWarnings.isNotEmpty()) warnY += (12 * liveWarnings.take(4).size)
         // Suggestions scroll
         if (suggestionController.visible && suggestionController.suggestions.isNotEmpty()) {
             val sx = editLeft
-            val sy = editTop + 52 + 24
+            val sy = warnY + 12 + 24
             val w = (editW - 4).coerceAtMost(360)
             val itemH = 12
             val visible = suggestionController.visibleSlice()
@@ -365,7 +398,7 @@ class KeybindEditorGui : SkyhanniBaseScreen() {
             }
         }
         // Island scroll
-        val boxTop = editTop + 92
+        val boxTop = warnY + 40 + 12
         val boxH = 200
         if (GuiRenderUtils.isPointInRect(GuiScreenUtils.mouseX, GuiScreenUtils.mouseY, editLeft, boxTop, editW - 4, boxH)) {
             val lineH = 16
@@ -479,7 +512,7 @@ class KeybindEditorGui : SkyhanniBaseScreen() {
         islandScroll = 0
         commandFieldFocused = true
         editingOriginalCombo = null
-        ensureFields(); updateSuggestions()
+        ensureFields(); updateSuggestions(); recomputeWarnings()
     }
 
     private fun editSelected() {
@@ -493,7 +526,7 @@ class KeybindEditorGui : SkyhanniBaseScreen() {
         islandScroll = 0
         commandFieldFocused = true
         editingOriginalCombo = b.combo
-        ensureFields(); updateSuggestions()
+        ensureFields(); updateSuggestions(); recomputeWarnings()
     }
 
     private fun removeSelected() {
@@ -509,18 +542,18 @@ class KeybindEditorGui : SkyhanniBaseScreen() {
     private fun saveEditing() {
         val e = KeybindEditor.EditorKeybind(editCombo, editCommand, editingAllowedIslands, allowOutside)
         // validate first so we don't accidentally remove the original on error
-        val validation = editor.validate(e)
-        if (validation.isNotEmpty()) { validation.forEach { ChatUtils.userError(it) }; return }
+        val validation = editor.validate(e, editingOriginalCombo)
+        if (validation.isNotEmpty()) { liveWarnings = validation; return }
         // if we were editing an existing bind, unregister the original first to avoid duplicates/conflicts
         editingOriginalCombo?.let { manager.unregister(it); editingOriginalCombo = null }
-        val errs = editor.save(e)
+        val errs = editor.save(e, null) // original already removed so no need to pass now
         if (errs.isEmpty()) {
             ChatUtils.chat("Saved keybind $editCombo")
             currentlyEditing = false
             suggestionController.reset()
             refresh()
-        } else errs.forEach { ChatUtils.userError(it) }
+        } else { liveWarnings = errs }
     }
 
-    private fun cancelEditing() { currentlyEditing = false; suggestionController.reset(); refresh() }
+    private fun cancelEditing() { currentlyEditing = false; suggestionController.reset(); refresh(); liveWarnings = emptyList() }
 }
