@@ -19,19 +19,20 @@ class KeybindEditor {
         if (e.command.isBlank()) errors += "Command cannot be empty"
         if (errors.isNotEmpty()) return errors
         val normalized = Keybinds.normalizeCombo(e.combo)
-        // Subset/superset conflicts
-        Keybinds.conflictError(normalized)?.let { errors += it }
-        // Duplicate (exact) reuse (ignore if same original)
-        if (Keybinds.duplicateExists(normalized, original)) errors += "Reuse: combo already bound"
+        // Subset/superset allowed now; only block true duplicate from different command context
+        if (Keybinds.duplicateExists(normalized, original, e.command)) errors += "Reuse: combo already bound"
         // Vanilla (Minecraft) bound key usage
         val vanilla = Keybinds.vanillaKeyConflicts(normalized)
         if (vanilla.isNotEmpty()) errors += "Uses Minecraft bound key(s): ${vanilla.joinToString(", ")}"
         return errors
     }
 
-    fun toKeybind(e: EditorKeybind): Keybinds.Keybind {
-        return Keybinds.Keybind(Keybinds.normalizeCombo(e.combo.trim()), e.command.trim(), e.allowedIslands.toSet(), e.allowOutsideSkyBlock)
-    }
+    fun toKeybind(e: EditorKeybind): Keybinds.Keybind = Keybinds.Keybind(
+        Keybinds.normalizeCombo(e.combo.trim()),
+        e.command.trim(),
+        e.allowedIslands.toSet(),
+        e.allowOutsideSkyBlock
+    )
 
     fun save(e: EditorKeybind, original: String? = null): List<String> {
         val errs = validate(e, original)
