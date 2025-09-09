@@ -6,11 +6,16 @@ The following List does not include Bug Fixes. If empty may be only Bug Fixes.
 
 ## Bingo Net Changes:
 
-Added /warp arachne chat prompt after death (if deaths comes from arachne) (enabled by default)
+- added chat prompts. enable in config and run /shnumpad to configure
+  - Developer Note: while you are able to configure your own codes please note that configuring codes which start with a 0 
+  are deemed Developer Codes and may be overridden or deleted without warning in the future! 0 starting Codes may be used to activate internal
+  functions or for configuration purposes globally in the future! 
 
-Added an option to reduce the opacity of players near arachne mobs (disabled by default)
+- actually added the milestone reached / cata level up messages implementations
 
-added contributor bypass for bingo net contributors
+- added a helper Keybind for Pet Xp Com Goal. Disabled by default. Enable in Bingo Settings. (default is no keybind)
+
+- added keybind / key combo support. configure using sh keybinds
 
 ## Static Info for modrinth:
 
