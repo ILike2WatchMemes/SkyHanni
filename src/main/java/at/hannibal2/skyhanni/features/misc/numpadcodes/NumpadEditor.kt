@@ -103,6 +103,7 @@ class NumpadEditor {
     fun validate(editorCode: EditorCode): List<String> {
         val errors = mutableListOf<String>()
         if (editorCode.code.isBlank()) errors += "Code cannot be empty"
+        if (editorCode.code.startsWith("0")) errors+="0 Starting Codes may be overridden by Global SH Codes used for Development / Internal use."
         if (editorCode.actions.isEmpty()) errors += "At least one action is required"
         editorCode.actions.forEachIndexed { i, act ->
             if (act.command.isBlank()) errors += "Action #${i + 1} command is empty"
