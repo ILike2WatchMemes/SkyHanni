@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.config.features.event.bingo.BingoNetSystem
 import at.hannibal2.skyhanni.config.features.inventory.hubselector.HubSelectorKeybinds
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.toBNIsland
-import at.hannibal2.skyhanni.features.bingo.bingonet.RegistrationScreen
+import at.hannibal2.skyhanni.features.bingo.bingonet.BNRegistrationScreen
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import de.hype.bingonet.BNConnection.reconnectToBNServer
@@ -129,7 +129,7 @@ object BNCommands {
                 category = CommandCategory.DEVELOPER_DEBUG
                 description = "Opens the Bingo Net Registration Screen"
                 simpleCallback {
-                    RegistrationScreen.openHelper()
+                    BNRegistrationScreen.openHelper()
                 }
             },
         )

@@ -11,11 +11,13 @@ The following List does not include Bug Fixes. If empty may be only Bug Fixes.
   are deemed Developer Codes and may be overridden or deleted without warning in the future! 0 starting Codes may be used to activate internal
   functions or for configuration purposes globally in the future! 
 
-- actually added the milestone reached / cata level up messages implementations
+- actually added the catacombs milestone reached / level up messages implementations
 
 - added a helper Keybind for Pet Xp Com Goal. Disabled by default. Enable in Bingo Settings. (default is no keybind)
 
-- added keybind / key combo support. configure using sh keybinds
+- added keybind / key combo support. configure using /shkeybinds
+
+- Fixed multiple Issues (one Blocking) with the Bingo Net Registration Screen and made it more lenient.
 
 ## Static Info for modrinth:
 

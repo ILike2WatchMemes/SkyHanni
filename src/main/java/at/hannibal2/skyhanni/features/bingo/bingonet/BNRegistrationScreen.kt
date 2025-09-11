@@ -23,9 +23,9 @@ import de.hype.bingonet.environment.packetconfig.InterceptPacketInfo
 import de.hype.bingonet.shared.packets.network.RequestAuthentication
 import de.hype.bingonet.shared.packets.network.RequestRegisterPacket
 import java.lang.Thread.sleep
-import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
-class RegistrationScreen(
+class BNRegistrationScreen(
     val discordUserId: String,
     val discordUserName: String,
 ) : SkyhanniBaseScreen() {
@@ -68,10 +68,11 @@ class RegistrationScreen(
 
     private fun openTermsRenderable(maxSize: Int) = Renderable.clickable(
         text("§a(Click to open Terms of Service, Privacy Policy and Rules)", maxSize),
-        {
+        onLeftClick = {
             clickedTos = SimpleTimeMark.now()
             openTerms()
         },
+        bypassChecks = true,
     )
 
     var clickedTos: SimpleTimeMark? = null
@@ -83,15 +84,16 @@ class RegistrationScreen(
             val clicked = clickedTos
             if (clicked == null) {
                 openTerms()
-                clickedTos = SimpleTimeMark.now().plus(3.minutes)
+                clickedTos = SimpleTimeMark.now().plus(30.seconds)
                 feedbackMessage =
-                    "§cYou did not read the Terms of Service. You can't continue for 3 minutes now so get yourself an overview."
+                    "§cYou need to read the Text above before you can continue."
                 return@darkRectButton
             } else if (clicked.isInPast()) {
                 registerNow()
             } else openTerms()
         },
         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+        bypassChecks = true,
     )
 
     // Feedback message to show to the user
@@ -152,7 +154,7 @@ class RegistrationScreen(
     fun registerNow() {
         if (!RequestRegisterPacket.passesAccuracyCheck(textInput.textBox)) {
             // Show error that they have to write the phrase.
-            feedbackMessage = "§cYou must correctly repeat the phrase in the box below (95% accuracy, case-insensitive)."
+            feedbackMessage = "§cYou must correctly repeat the phrase in the box above (95% accuracy, case-insensitive)."
             return
         }
         feedbackMessage = "§eWaiting for server response..."
@@ -223,7 +225,7 @@ class RegistrationScreen(
                         "§cYou are not registered in the Bingo Net Network. Click here to open the Registration Screen",
                         {
                             SkyHanniMod.screenToOpen =
-                                RegistrationScreen(userId, username)
+                                BNRegistrationScreen(userId, username)
                         },
                     )
                 } else {
