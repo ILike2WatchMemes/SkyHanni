@@ -288,6 +288,7 @@ object Keybinds {
 
     @HandleEvent
     fun onKeyDown(e: KeyDownEvent) {
+        if (binds.isEmpty()) return
         try {
             //#if MC < 1.21.6
             val mc = Minecraft.getMinecraft()
@@ -311,6 +312,7 @@ object Keybinds {
 
     @HandleEvent
     fun onKeyUp(e: KeyUpEvent) {
+        if (binds.isEmpty()) return
         try {
             //#if MC < 1.21.6
             val mc = Minecraft.getMinecraft()
