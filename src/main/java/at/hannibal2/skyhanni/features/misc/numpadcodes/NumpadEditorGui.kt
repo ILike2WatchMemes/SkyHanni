@@ -415,6 +415,18 @@ class NumpadEditorGui : SkyhanniBaseScreen() {
 
         // Suggestions click
         if (handleSuggestionClick(mx, my, editLeft, editTop, editW, actionsBoxTop)) return
+        // If suggestions are visible but the click was not inside the suggestion box, hide suggestions.
+        if (suggestionController.visible && suggestionController.suggestions.isNotEmpty()) {
+            val (sx, sy) = suggestionBoxPos(editLeft, editTop, editW, actionsBoxTop)
+            val w = (editW - 4).coerceAtMost(360)
+            val itemH = 12
+            val visible = suggestionController.visibleSlice()
+            val h = (visible.size * itemH).coerceAtMost(160)
+            if (!GuiRenderUtils.isPointInRect(mx, my, sx, sy, w, h)) {
+                suggestionController.reset()
+                suggestionSelectionVisible = false
+            }
+        }
 
         if (islandSelectionOpen) {
             val lineH = 14
