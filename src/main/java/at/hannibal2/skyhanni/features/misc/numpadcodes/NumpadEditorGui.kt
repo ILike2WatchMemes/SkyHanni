@@ -672,7 +672,157 @@ class NumpadEditorGui : SkyhanniBaseScreen() {
 
     override fun onKeyTyped(ch: Char?, keyCode: Int?) {
         val kc = keyCode ?: -1
-        Keyboard.KEY_LCONTROL.isKeyHeld() || Keyboard.KEY_RCONTROL.isKeyHeld()
+        val ctrlHeld = Keyboard.KEY_LCONTROL.isKeyHeld() || Keyboard.KEY_RCONTROL.isKeyHeld()
+
+        // Handle clipboard shortcuts when CTRL is held
+        if (ctrlHeld) {
+            try {
+                when (kc) {
+                    Keyboard.KEY_V -> {
+                        val clip = try { runBlocking { ClipboardUtils.readFromClipboard() } ?: "" } catch (_: Throwable) { "" }
+                         if (clip.isEmpty()) return
+                        when (focusTarget) {
+                            FocusTarget.CODE -> {
+                                val txt = codeController?.getText() ?: editCodeText
+                                val selA = editCodeSelectionStart
+                                val selB = editCodeSelectionEnd
+                                val (s, e) = if (selA != null && selB != null) Pair(minOf(selA, selB), maxOf(selA, selB)) else Pair(-1, -1)
+                                val filtered = clip.filter { it.isDigit() }
+                                val cursor = codeController?.getCursorPosition() ?: txt.length
+                                val result = if (s >= 0 && e >= s) txt.substring(0, s) + filtered + txt.substring(e) else txt.substring(0, cursor) + filtered + txt.substring(cursor)
+                                editCodeText = result.filter { it.isDigit() }
+                                codeController?.setTextValue(editCodeText)
+                                val pos = (if (s >= 0 && e >= s) s + filtered.length else (cursor + filtered.length)).coerceAtMost(editCodeText.length)
+                                try { codeController?.setCursorPosition(pos) } catch (_: Throwable) {}
+                                sanitizeCode()
+                            }
+                            FocusTarget.ACTIONS -> {
+                                if (actionFocusedIndex in editActionsList.indices) {
+                                    if (actionFocusedField == ActionField.COMMAND) {
+                                        val ctrl = actionCommandControllers.getOrNull(actionFocusedIndex)
+                                        val txt = ctrl?.getText() ?: editActionsList[actionFocusedIndex].command
+                                        val selA = editActionSelectionStarts.getOrNull(actionFocusedIndex)
+                                        val selB = editActionSelectionEnds.getOrNull(actionFocusedIndex)
+                                        val (s, e) = if (selA != null && selB != null) Pair(minOf(selA, selB), maxOf(selA, selB)) else Pair(-1, -1)
+                                        val cursor = ctrl?.getCursorPosition() ?: txt.length
+                                        val result = if (s >= 0 && e >= s) txt.substring(0, s) + clip + txt.substring(e) else txt.substring(0, cursor) + clip + txt.substring(cursor)
+                                        editActionsList[actionFocusedIndex].command = result
+                                        ctrl?.setTextValue(result)
+                                        try { ctrl?.setCursorPosition((if (s >= 0 && e >= s) s + clip.length else (cursor + clip.length)).coerceAtMost(result.length)) } catch (_: Throwable) {}
+                                        updateSuggestions(true)
+                                    } else {
+                                        val ctrl = actionDelayControllers.getOrNull(actionFocusedIndex)
+                                        val txt = ctrl?.getText() ?: editActionDelayText.getOrNull(actionFocusedIndex) ?: ""
+                                        val selA = editActionDelaySelectionStarts.getOrNull(actionFocusedIndex)
+                                        val selB = editActionDelaySelectionEnds.getOrNull(actionFocusedIndex)
+                                        val (s, e) = if (selA != null && selB != null) Pair(minOf(selA, selB), maxOf(selA, selB)) else Pair(-1, -1)
+                                        val cursor = ctrl?.getCursorPosition() ?: txt.length
+                                        val result = if (s >= 0 && e >= s) txt.substring(0, s) + clip + txt.substring(e) else txt.substring(0, cursor) + clip + txt.substring(cursor)
+                                        editActionDelayText[actionFocusedIndex] = result
+                                        ctrl?.setTextValue(result)
+                                        try { ctrl?.setCursorPosition((if (s >= 0 && e >= s) s + clip.length else (cursor + clip.length)).coerceAtMost(result.length)) } catch (_: Throwable) {}
+                                        sanitizeDelay(actionFocusedIndex, finalize = false)
+                                    }
+                                }
+                            }
+                            else -> {}
+                        }
+                        return
+                    }
+                    Keyboard.KEY_C -> {
+                        when (focusTarget) {
+                            FocusTarget.CODE -> {
+                                val txt = codeController?.getText() ?: editCodeText
+                                val selA = editCodeSelectionStart
+                                val selB = editCodeSelectionEnd
+                                if (selA != null && selB != null && selA != selB) {
+                                    val s = minOf(selA, selB); val e = maxOf(selA, selB)
+                                    ClipboardUtils.copyToClipboard(txt.substring(s, e))
+                                }
+                            }
+                            FocusTarget.ACTIONS -> {
+                                if (actionFocusedIndex in editActionsList.indices) {
+                                    if (actionFocusedField == ActionField.COMMAND) {
+                                        val ctrl = actionCommandControllers.getOrNull(actionFocusedIndex)
+                                        val txt = ctrl?.getText() ?: editActionsList[actionFocusedIndex].command
+                                        val selA = editActionSelectionStarts.getOrNull(actionFocusedIndex)
+                                        val selB = editActionSelectionEnds.getOrNull(actionFocusedIndex)
+                                        if (selA != null && selB != null && selA != selB) {
+                                            val s = minOf(selA, selB); val e = maxOf(selA, selB)
+                                            ClipboardUtils.copyToClipboard(txt.substring(s, e))
+                                        }
+                                    } else {
+                                        val ctrl = actionDelayControllers.getOrNull(actionFocusedIndex)
+                                        val txt = ctrl?.getText() ?: editActionDelayText.getOrNull(actionFocusedIndex) ?: ""
+                                        val selA = editActionDelaySelectionStarts.getOrNull(actionFocusedIndex)
+                                        val selB = editActionDelaySelectionEnds.getOrNull(actionFocusedIndex)
+                                        if (selA != null && selB != null && selA != selB) {
+                                            val s = minOf(selA, selB); val e = maxOf(selA, selB)
+                                            ClipboardUtils.copyToClipboard(txt.substring(s, e))
+                                        }
+                                    }
+                                }
+                            }
+                            else -> {}
+                        }
+                        return
+                    }
+                    Keyboard.KEY_X -> {
+                        when (focusTarget) {
+                            FocusTarget.CODE -> {
+                                val txt = codeController?.getText() ?: editCodeText
+                                val selA = editCodeSelectionStart
+                                val selB = editCodeSelectionEnd
+                                if (selA != null && selB != null && selA != selB) {
+                                    val s = minOf(selA, selB); val e = maxOf(selA, selB)
+                                    ClipboardUtils.copyToClipboard(txt.substring(s, e))
+                                    val result = txt.substring(0, s) + txt.substring(e)
+                                    editCodeText = result
+                                    codeController?.setTextValue(editCodeText)
+                                    try { codeController?.setCursorPosition(s.coerceAtMost(editCodeText.length)) } catch (_: Throwable) {}
+                                    sanitizeCode()
+                                }
+                            }
+                            FocusTarget.ACTIONS -> {
+                                if (actionFocusedIndex in editActionsList.indices) {
+                                    if (actionFocusedField == ActionField.COMMAND) {
+                                        val ctrl = actionCommandControllers.getOrNull(actionFocusedIndex)
+                                        val txt = ctrl?.getText() ?: editActionsList[actionFocusedIndex].command
+                                        val selA = editActionSelectionStarts.getOrNull(actionFocusedIndex)
+                                        val selB = editActionSelectionEnds.getOrNull(actionFocusedIndex)
+                                        if (selA != null && selB != null && selA != selB) {
+                                            val s = minOf(selA, selB); val e = maxOf(selA, selB)
+                                            ClipboardUtils.copyToClipboard(txt.substring(s, e))
+                                            val result = txt.substring(0, s) + txt.substring(e)
+                                            editActionsList[actionFocusedIndex].command = result
+                                            ctrl?.setTextValue(result)
+                                            try { ctrl?.setCursorPosition(s.coerceAtMost(result.length)) } catch (_: Throwable) {}
+                                            updateSuggestions(true)
+                                        }
+                                    } else {
+                                        val ctrl = actionDelayControllers.getOrNull(actionFocusedIndex)
+                                        val txt = ctrl?.getText() ?: editActionDelayText.getOrNull(actionFocusedIndex) ?: ""
+                                        val selA = editActionDelaySelectionStarts.getOrNull(actionFocusedIndex)
+                                        val selB = editActionDelaySelectionEnds.getOrNull(actionFocusedIndex)
+                                        if (selA != null && selB != null && selA != selB) {
+                                            val s = minOf(selA, selB); val e = maxOf(selA, selB)
+                                            ClipboardUtils.copyToClipboard(txt.substring(s, e))
+                                            val result = txt.substring(0, s) + txt.substring(e)
+                                            editActionDelayText[actionFocusedIndex] = result
+                                            ctrl?.setTextValue(result)
+                                            try { ctrl?.setCursorPosition(s.coerceAtMost(result.length)) } catch (_: Throwable) {}
+                                            sanitizeDelay(actionFocusedIndex, finalize = false)
+                                        }
+                                    }
+                                }
+                            }
+                            else -> {}
+                        }
+                        return
+                    }
+                }
+            } catch (_: Throwable) {}
+        }
 
         // PageUp/PageDown suggestions
         if (suggestionController.visible && suggestionController.suggestions.isNotEmpty() && (kc == Keyboard.KEY_NEXT || kc == Keyboard.KEY_PRIOR)) { pageSuggestions(kc == Keyboard.KEY_NEXT); return }
