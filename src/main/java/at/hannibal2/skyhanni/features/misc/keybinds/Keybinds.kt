@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-//#if MC < 1.21.6
+//#if MC < 1.21
 import net.minecraft.client.Minecraft
 //#else
 //$$ import net.minecraft.client.MinecraftClient
@@ -85,7 +85,7 @@ object Keybinds {
         val map = mutableMapOf<String, String>()
         val codes = mutableSetOf<Int>()
         try {
-            //#if MC < 1.21.6
+            //#if MC < 1.21
             try {
                 val mc = Minecraft.getMinecraft()
                 for (kb in mc.gameSettings.keyBindings) {
@@ -290,7 +290,7 @@ object Keybinds {
     fun onKeyDown(e: KeyDownEvent) {
         if (binds.isEmpty()) return
         try {
-            //#if MC < 1.21.6
+            //#if MC < 1.21
             val mc = Minecraft.getMinecraft()
             //#else
             //$$ val mc = MinecraftClient.getInstance()
@@ -314,7 +314,7 @@ object Keybinds {
     fun onKeyUp(e: KeyUpEvent) {
         if (binds.isEmpty()) return
         try {
-            //#if MC < 1.21.6
+            //#if MC < 1.21
             val mc = Minecraft.getMinecraft()
             //#else
             //$$ val mc = MinecraftClient.getInstance()
