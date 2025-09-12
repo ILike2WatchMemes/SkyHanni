@@ -16,7 +16,7 @@ class NeuMinionTypeData : MinionType {
     override val category: MinionCategory
 
     @Expose
-    @SerializedName("requiredactions")
+    @SerializedName("required_actions")
     override val requiredActions: Int
 
     @Expose
