@@ -49,6 +49,7 @@ java {
     // causing crashes during tests. You can still manually select DCEVM in the Minecraft Client
     // IntelliJ run configuration.
     toolchain.vendor.set(JvmVendorSpec.ADOPTIUM)
+    // Also build a sources JAR; Loom will provide remapSourcesJar for it
 }
 val runDirectory = rootProject.file("run")
 runDirectory.mkdirs()
@@ -143,20 +144,35 @@ val cleanupMappingFiles by tasks.registering(CleanupMappingFiles::class) {
     this.mappingsDirectory.set(layout.projectDirectory.asFile.parentFile)
 }
 
-val publishToModrinth by tasks.registering(PublishToModrinth::class)
-
-tasks.runClient {
-    this.javaLauncher.set(
-        javaToolchains.launcherFor {
-            languageVersion.set(target.minecraftVersion.javaLanguageVersion)
-        },
-    )
+// Ensure build/libs is clean before compiling to avoid leftover jars
+val cleanLibs by tasks.registering(Delete::class) {
+    delete(layout.buildDirectory.dir("libs"))
+    delete(rootProject.layout.buildDirectory.dir("libs"))
+}
+// Run cleanLibs before classes (compilation) to guarantee a fresh libs directory
+tasks.named("classes") {
+    dependsOn(cleanLibs)
 }
 
-tasks.register("checkPrDescription", ChangelogVerification::class) {
-    this.outputDirectory.set(layout.buildDirectory)
-    this.prTitle = project.findProperty("prTitle") as? String ?: ""
-    this.prBody = project.findProperty("prBody") as? String ?: ""
+// Configure remapSourcesJar on all projects so sources land in root build/libs with '-sources' classifier
+tasks.named<net.fabricmc.loom.task.RemapSourcesJarTask>("remapSourcesJar") {
+    destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs"))
+    archiveClassifier.set("sources")
+}
+
+// Register root-only publishToModrinth that depends on all remap tasks
+if (project == rootProject) {
+    tasks.register("publishToModrinth", PublishToModrinth::class) {
+        group = "publishing"
+        description = "Publish all built jars to Modrinth (root-only) and update GitHub release."
+        // Ensure this project builds
+        dependsOn(tasks.named("remapJar"))
+        // Ensure sources for this project
+        dependsOn(tasks.named("remapSourcesJar"))
+        // Ensure all subprojects produce their remapped jars and sources
+        dependsOn(subprojects.mapNotNull { sp -> sp.tasks.findByName("remapJar") })
+        dependsOn(subprojects.mapNotNull { sp -> sp.tasks.findByName("remapSourcesJar") })
+    }
 }
 
 // Disabled because it breaks mixins with the minecraft dev plugin
