@@ -106,7 +106,7 @@ object ChatUtils {
         }
     }
 
-    private val messagesThatAreOnlySentOnce = mutableListOf<String>()
+    private val messagesThatAreOnlySentOnce = mutableSetOf<String>()
 
     private fun internalChat(
         message: String,
@@ -115,19 +115,11 @@ object ChatUtils {
         messageId: Int? = null,
     ): Boolean {
         val text = message.asComponent()
-        if (onlySendOnce) {
-            if (message in messagesThatAreOnlySentOnce) {
-                return false
-            }
-            messagesThatAreOnlySentOnce.add(message)
-        }
-
+        if (onlySendOnce && !messagesThatAreOnlySentOnce.add(message)) return false
         return if (replaceSameMessage || messageId != null) {
-            text.send(messageId ?: getUniqueMessageIdForString(message))
+            text.send(messageId ?: message.getUniqueMessageIdForString())
             chat(text, false)
-        } else {
-            chat(text)
-        }
+        } else chat(text)
     }
 
     fun chat(message: IChatComponent, send: Boolean = true): Boolean {
@@ -173,11 +165,8 @@ object ChatUtils {
             this.hover = hover.asComponent()
         }
 
-        if (replaceSameMessage) {
-            text.send(getUniqueMessageIdForString(rawText))
-        } else {
-            chat(text)
-        }
+        if (replaceSameMessage) text.send(rawText.getUniqueMessageIdForString())
+        else chat(text)
     }
 
     /**
@@ -223,10 +212,8 @@ object ChatUtils {
     }
 
     private val uniqueMessageIdStorage = mutableMapOf<String, Int>()
-
-    // TODO kill Detekt's Missing newline after "{" check and then format this function in a kotlin typical way again
-    private fun getUniqueMessageIdForString(string: String): Int {
-        return uniqueMessageIdStorage.getOrPut(string) { getUniqueMessageId() }
+    private fun String.getUniqueMessageIdForString() = uniqueMessageIdStorage.getOrPut(this) {
+        getUniqueMessageId()
     }
 
     private var lastUniqueMessageId = 123242
@@ -287,11 +274,9 @@ object ChatUtils {
             this.url = url
             this.hover = "$prefixColor$hover".asComponent()
         }
-        if (replaceSameMessage) {
-            text.send(getUniqueMessageIdForString(message))
-        } else {
-            chat(text)
-        }
+
+        if (replaceSameMessage) text.send(message.getUniqueMessageIdForString())
+        else chat(text)
 
         if (autoOpen) OSUtils.openBrowser(url)
     }
