@@ -109,11 +109,9 @@ object ChChestUpdateListener {
         }
 
     fun addOpenedChest(pos: Position) {
-        SkyHanniMod.launchCoroutine {
-            if (chestsOpened.contains(pos)) return@launchCoroutine
+        if (chestsOpened.contains(pos)) return
             chestsOpened.add(pos)
             setWaypoints()
-        }
     }
 
     fun addChestAndUpdate(coords: Position, items: Map<ChChestItem, IntRange>) {
@@ -150,7 +148,7 @@ object ChChestUpdateListener {
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (!config.chestWaypoints) return
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("CH Chest Subscribe") {
             val serverId = HypixelData.serverId ?: return@launchCoroutine
             if (event.newIsland == IslandType.CRYSTAL_HOLLOWS) {
                 val packet = SubscribeToChServer(serverId, getLobbyClosingTime())

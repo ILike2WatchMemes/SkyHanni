@@ -85,7 +85,7 @@ object SplashManager {
                 "§d${splash.announcer}§r is Splashing in $islandType #${splash.hubSelectorData.hubNumber}§r at ${splash.locationInHub.displayString} (§aPress %KEY% to warp to a §d${splash.hubSelectorData.hubType}§r) §7| §6${splash.extraMessage ?: ""}",
                 SkyHanniMod.feature.event.bingo.bingoNetworks.splashHubWarp,
                 {
-                    SkyHanniMod.launchCoroutine {
+                    SkyHanniMod.launchCoroutine("Splash Hub Warp Helper") {
                         prepareHubWarp(splash, source)
                     }
                 },

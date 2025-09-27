@@ -137,7 +137,7 @@ object BNConnection {
     @HandleEvent
     fun launchHook(event: ConfigLoadEvent) {
         if (bnConfig.useBN) {
-            SkyHanniMod.launchCoroutine {
+            SkyHanniMod.launchCoroutine("BN Load → Config Load Event") {
                 if (!isConnected) connect("hackthetime.de", bnConfig.system.port)
             }
         } else {
@@ -275,7 +275,7 @@ object BNConnection {
                             intercept.parseAndRun(packet)
                         } else {
                             intercepts.remove(intercept)
-                            SkyHanniMod.launchCoroutine {
+                            SkyHanniMod.launchCoroutine("BN Intercepted Packet Execution") {
                                 intercept.parseAndRun(packet)
                             }
                         }
@@ -301,7 +301,9 @@ object BNConnection {
                         if (intercept.blockExecutionForCompletion) {
                             intercept.parseAndRun(packet)
                         } else {
-                            SkyHanniMod.launchCoroutine {
+                            SkyHanniMod.launchCoroutine(
+                                "BN Intercepted Packet Execution",
+                            ) {
                                 intercept.parseAndRun(packet)
                             }
                         }
@@ -336,7 +338,9 @@ object BNConnection {
             if (retry <= 0) {
                 ChatUtils.chat("§cBN: Failed to send packet $packetName. Not connected to Bingo Net Server.")
             } else {
-                SkyHanniMod.launchCoroutine {
+                SkyHanniMod.launchCoroutine(
+                    "BN Reconnect & Resend Packet $packetName (Disconnected originally). Retries left: $retry",
+                ) {
                     BNConnection.reconnectToBNServer()
                     sendPacket(packet, blockLog, retry - 1)
                 }
@@ -359,7 +363,9 @@ object BNConnection {
             ChatUtils.clickableChat(
                 "Bingo Net is currently disabled. (Click to enable). §cKeep in mind that Hype_the_Time controls the Server and NOT the Sky Hanni Team!",
                 {
-                    SkyHanniMod.launchCoroutine {
+                    SkyHanniMod.launchCoroutine(
+                        "BN Connect to $system | Enabled via Chat Message",
+                    ) {
                         bnConfig.useBN = true
                         reconnectToBNServer(ignoreIfConnected, system, packetIntercepts)
                     }
@@ -423,7 +429,7 @@ object BNConnection {
             DelayedRun.runDelayed(
                 (packet.waitBeforeReconnect[i] + (Math.random() * packet.randomExtraDelay)).seconds,
                 {
-                    SkyHanniMod.launchCoroutine {
+                    SkyHanniMod.launchCoroutine("BN Reconnect after Disconnect Packet") {
                         if (finalI == 0) {
                             reconnectToBNServer(false)
                         } else {
@@ -447,7 +453,9 @@ object BNConnection {
                 DelayedRun.runDelayed(
                     i.seconds,
                     {
-                        SkyHanniMod.launchNoScopeCoroutine {
+                        SkyHanniMod.launchNoScopeCoroutine(
+                            "BN Reconnect after Disconnect Packet"
+                        ) {
                             reconnectToBNServer(true)
                         }
                     },

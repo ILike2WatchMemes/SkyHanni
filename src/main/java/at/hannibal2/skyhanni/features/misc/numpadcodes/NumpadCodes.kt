@@ -154,7 +154,9 @@ object NumpadCodes {
         try {
             val saved = synchronized(codes) { codes.map { toSavedNumpadCode(it) }.toMutableList() }
             SkyHanniMod.feature.numpad.savedCodes = saved
-            SkyHanniMod.launchCoroutine { SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "Updated numpad codes") }
+            SkyHanniMod.launchCoroutine(
+                "NumpadCodes Config Save",
+            ) { SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "Updated numpad codes") }
         } catch (_: Throwable) {}
     }
 
@@ -173,7 +175,9 @@ object NumpadCodes {
         try {
             val saved = synchronized(codes) { codes.map { toSavedNumpadCode(it) }.toMutableList() }
             SkyHanniMod.feature.numpad.savedCodes = saved
-            SkyHanniMod.launchCoroutine { SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "Updated numpad codes") }
+            SkyHanniMod.launchCoroutine(
+                "NumpadCodes Config Save",
+            ) { SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "Updated numpad codes") }
         } catch (_: Throwable) {
         }
     }
@@ -387,7 +391,7 @@ object NumpadCodes {
         val actionsCount = candidate.actions.size
         if (actionsCount <= codeLen + 1) {
             // No extra enters needed
-            SkyHanniMod.launchCoroutine { executeCode(candidate) }
+            SkyHanniMod.launchCoroutine("Numpad Code ($input) execution") { executeCode(candidate) }
             clear()
             return
         }
@@ -404,7 +408,9 @@ object NumpadCodes {
         val remaining = extraNeededTotal - extraEnterCount
         if (remaining <= 0) {
             clear()
-            SkyHanniMod.launchCoroutine { executeCode(candidate) }
+            SkyHanniMod.launchCoroutine(
+                "Numpad Code (${candidate.code}) execution",
+            ) { executeCode(candidate) }
         } else computeAndSendOverlay()
     }
 
@@ -460,7 +466,9 @@ object NumpadCodes {
             try {
                 val saved = synchronized(codes) { codes.map { toSavedNumpadCode(it) }.toMutableList() }
                 SkyHanniMod.feature.numpad.savedCodes = saved
-                SkyHanniMod.launchCoroutine { SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "Auto-persisted new islands for UNKNOWN numpad codes") }
+                SkyHanniMod.launchCoroutine(
+                    "NumpadCodes Config Save",
+                ) { SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "Auto-persisted new islands for UNKNOWN numpad codes") }
                 ChatUtils.debug("[NumpadCodes] Auto-persisted new islands into codes using UNKNOWN sentinel")
             } catch (_: Throwable) {}
             computeAndSendOverlay()

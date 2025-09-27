@@ -55,10 +55,8 @@ object SearchItem {
             // greedyString allows multi-word tags like in legacy implementation
             arg("tag", BrigadierArguments.greedyString(), dynamicSuggestionProvider { ItemTagManager.getAllTags() }) { tagArg ->
                 callback {
-                    SkyHanniMod.launchCoroutine {
-                        val tag = getArg(tagArg)
-                        if (tag.isBlank()) ChatUtils.userError("Usage: /shtagitem <tag>") else tagCurrentItem(tag)
-                    }
+                    val tag = getArg(tagArg)
+                    if (tag.isBlank()) ChatUtils.userError("Usage: /shtagitem <tag>") else tagCurrentItem(tag)
                 }
             }
             // Executing without args -> usage
@@ -73,7 +71,7 @@ object SearchItem {
             literal("tag") {
                 arg("tag", BrigadierArguments.greedyString(), dynamicSuggestionProvider { ItemTagManager.getAllTags() }) { tagArg ->
                     callback {
-                        SkyHanniMod.launchCoroutine {
+                        SkyHanniMod.launchCoroutine("SearchItem /searchitem tag") {
                             searchByTag(getArg(tagArg))
                         }
                     }
@@ -84,7 +82,7 @@ object SearchItem {
             literal("name") {
                 arg("pattern", BrigadierArguments.greedyString(), nameSuggestionProvider) { pat ->
                     callback {
-                        SkyHanniMod.launchCoroutine {
+                        SkyHanniMod.launchCoroutine("SearchItem /searchitem name") {
                             val pattern = getArg(pat)
                             if (pattern.isBlank()) ChatUtils.userError("Empty pattern") else searchByDisplayName(pattern)
                         }
@@ -96,7 +94,7 @@ object SearchItem {
             literal("desc", "lore") {
                 arg("pattern", BrigadierArguments.greedyString()) { pat ->
                     callback {
-                        SkyHanniMod.launchCoroutine {
+                        SkyHanniMod.launchCoroutine("SearchItem /searchitem desc") {
                             val pattern = getArg(pat)
                             if (pattern.isBlank()) ChatUtils.userError("Empty pattern") else searchByDescription(pattern)
                         }
@@ -108,7 +106,7 @@ object SearchItem {
             literal("id") {
                 arg("id", BrigadierArguments.string(), dynamicSuggestionProvider { collectItemIds() }) { idArg ->
                     callback {
-                        SkyHanniMod.launchCoroutine {
+                        SkyHanniMod.launchCoroutine("SearchItem /searchitem id") {
                             val id = getArg(idArg)
                             if (id.isBlank()) ChatUtils.userError("Empty id") else searchByItemId(id)
                         }
@@ -124,7 +122,7 @@ object SearchItem {
                     dynamicSuggestionProvider { ItemTagManager.getAllTaggedItems().values },
                 ) { uuidArg ->
                     callback {
-                        SkyHanniMod.launchCoroutine {
+                        SkyHanniMod.launchCoroutine("SearchItem /searchitem uuid") {
                             searchByUuidString(getArg(uuidArg))
                         }
                     }
@@ -134,7 +132,7 @@ object SearchItem {
             // Fallback: treat single arg as tag OR clear search if empty and there is a previous search
             arg("fallback", BrigadierArguments.greedyString()) { fb ->
                 callback {
-                    SkyHanniMod.launchCoroutine {
+                    SkyHanniMod.launchCoroutine("SearchItem /searchitem fallback") {
                         val maybeTag = getArg(fb)
                         if (maybeTag.isBlank()) {
                             if (StorageApi.toHighlightResults.isNotEmpty()) {

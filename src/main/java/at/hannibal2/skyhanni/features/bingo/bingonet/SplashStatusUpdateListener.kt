@@ -44,7 +44,7 @@ object SplashStatusUpdateListener {
         data = SplashManager.getSplashInServer(true)
         maxPlayers = HypixelData.getMaxPlayersForCurrentServer() - 5
         currentJob?.cancel()
-        currentJob = SkyHanniMod.launchCoroutine {
+        currentJob = SkyHanniMod.launchCoroutine("Splash Status Updater") {
             run()
         }
     }

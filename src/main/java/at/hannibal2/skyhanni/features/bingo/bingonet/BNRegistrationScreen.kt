@@ -200,16 +200,16 @@ class BNRegistrationScreen(
                 feedbackMessage = stringResponse
             }
         }
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("BN Registration") {
             BNConnection.reconnectToBNServer(false, BingoNetSystem.MAIN, listOf(intercept, reponseIntercept))
         }
     }
 
     companion object {
         fun openHelper() {
-            SkyHanniMod.launchCoroutine {
+            SkyHanniMod.launchCoroutine("Opening BN Registration Helper") {
                 val isStarted = DiscordRPCManager.isStarted()
-                SkyHanniMod.launchCoroutine {
+                SkyHanniMod.launchCoroutine("Starting Discord RPC for BN Registration") {
                     if (!isStarted || !DiscordRPCManager.isConnected()) {
                         ChatUtils.chat("Starting Rich Presence to obtain Discord User ID and Username.")
                         DiscordRPCManager.start(false)

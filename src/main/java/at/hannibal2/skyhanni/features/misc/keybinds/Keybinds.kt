@@ -353,7 +353,7 @@ object Keybinds {
         try {
             val list = synchronized(binds) { binds.map { toSaved(it) }.toMutableList() }
             SkyHanniMod.feature.misc.let { it.keybinds = list }
-            SkyHanniMod.launchCoroutine {
+            SkyHanniMod.launchCoroutine("save keybinds") {
                 SkyHanniMod.configManager.saveConfig(
                     at.hannibal2.skyhanni.config.ConfigFileType.FEATURES,
                     "Updated keybinds",

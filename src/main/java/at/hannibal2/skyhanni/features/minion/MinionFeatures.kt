@@ -238,7 +238,7 @@ object MinionFeatures {
         val key = config.openMinionRecipeForHeldResource
         if (!key.isKeyHeld()) return
         val stack = stackUnderCursor() ?: return
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("Open Minion Recipe for Held Resource Processor") {
             val currentItem = NeuItems.getInternalName(stack)
             for (entry in NeuItems.allItemsCache) {
                 if (!entry.value.asString().endsWith("GENERATOR_1")) continue

@@ -83,7 +83,7 @@ object HubSelectorKeybinds {
         "§8Server: (?<serverid>.*)",
     )
     private var mainInventory = InventoryDetector(
-        openInventory = {
+        onOpenInventory = {
             hubIdToNumberCache.clear()
             lastUpdate = SimpleTimeMark.now()
             val cache = HashMap<Int, HubData>()
@@ -95,8 +95,8 @@ object HubSelectorKeybinds {
             }
             openedCache = cache
         },
-        closeInventory = { openedCache = null },
-        pattern = hubSelectorGuiNamePattern,
+        onCloseInventory = { openedCache = null },
+        pattern = hubSelectorGuiNamePattern
     )
 
     @HandleEvent(onlyOnSkyblock = true)

@@ -140,7 +140,7 @@ object BNCommands {
                 category = CommandCategory.DEVELOPER_DEBUG
                 description = "Opens the Bingo Net Registration Screen"
                 simpleCallback {
-                    SkyHanniMod.launchCoroutine {
+                    SkyHanniMod.launchCoroutine("BN Debug Breakpoint") {
                         debugBreakpoint()
                     }
                 }
@@ -154,7 +154,7 @@ object BNCommands {
             BNConnection.disconnect()
             return
         }
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("BN Connect to $system") {
             BNConnection.reconnectToBNServer(false, system)
         }
     }

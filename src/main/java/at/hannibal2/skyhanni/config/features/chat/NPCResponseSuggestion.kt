@@ -16,7 +16,7 @@ object NPCResponseSuggestion {
 
     @HandleEvent
     fun onMessage(event: SkyHanniChatEvent) {
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("NPC Response Suggestion Message Analyser") {
             val validComponents = event.chatComponent.siblings.filter { sib ->
                 commandPrefixes.any { prefix ->
                     sib.command?.startsWith(prefix)

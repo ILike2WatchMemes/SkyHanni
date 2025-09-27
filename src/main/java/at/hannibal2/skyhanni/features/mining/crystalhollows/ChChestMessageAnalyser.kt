@@ -37,7 +37,7 @@ object ChChestMessageAnalyser {
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onChatMessage(event: SkyHanniChatEvent) {
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("ChChestMessageAnalyser") {
             val message = event.message
             if (globalChestPattern.matches(message)) {
                 isInMessage = true

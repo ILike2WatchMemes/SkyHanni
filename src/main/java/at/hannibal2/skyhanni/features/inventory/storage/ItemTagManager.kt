@@ -116,7 +116,7 @@ object ItemTagManager {
     }
 
     private fun saveData() {
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("Save Item Tags") {
             SkyHanniMod.configManager.saveConfig(ConfigFileType.STORAGE, "Updated item tags")
         }
     }

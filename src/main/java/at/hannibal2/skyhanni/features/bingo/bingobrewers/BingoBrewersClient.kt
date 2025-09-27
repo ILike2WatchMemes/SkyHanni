@@ -27,7 +27,7 @@ object BingoBrewersClient {
     @HandleEvent
     fun event(event: ConfigLoadEvent) {
         if (isEnabled()) {
-            SkyHanniMod.launchCoroutine {
+            SkyHanniMod.launchCoroutine("Init BingoBrewersClient after ConfigLoadEvent") {
                 if (client?.isConnected != true) init()
             }
         } else {
@@ -56,7 +56,7 @@ object BingoBrewersClient {
     private fun getListener(): Listener {
         return object : Listener() {
             override fun received(connection: Connection?, `object`: Any) {
-                SkyHanniMod.launchCoroutine {
+                SkyHanniMod.launchCoroutine("BingoBrewers Packet handling") {
                     if (`object`.javaClass.`package`.name.contains("com.esotericsoftware.kryonet")) return@launchCoroutine
                     if (`object` is BingoBrewersPackets.BingoBrewersPacket<*>) {
                         if (SkyHanniMod.feature.event.bingo.bingoNetworks.showPacketTraffic) println("BN Bingobrewrs: ${gson.toJson(`object`)}")
