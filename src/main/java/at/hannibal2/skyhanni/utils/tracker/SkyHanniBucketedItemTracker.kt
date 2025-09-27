@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addNullableButton
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 
 @Suppress("SpreadOperator")
-class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTrackerData<E>>(
+abstract class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTrackerData<E>>(
     name: String,
     createNewSession: () -> BucketedData,
     getStorage: (ProfileSpecificStorage) -> BucketedData,
@@ -32,24 +32,28 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
     override fun ItemAddEvent.addItemFromEvent() {
         val command = source == ItemAddManager.Source.COMMAND
         lateinit var bucket: E
+        // TODO find out why those two booleans are necessary, fix the cause properly, and then remove the  two booleans
+        var done = false
+        var errorMessage: String? = null
         modify { data ->
             bucket = data.selectedBucket ?: run {
-                ChatUtils.userError(
-                    "No §b${data.bucketName()} §cselected for §b$name§c.\n§cSelect one in the §b$name §cGUI, then try again.",
-                )
+                errorMessage = "No §b${data.bucketName()} §cselected for §b$name§c.\n§cSelect one in the §b$name §cGUI, then try again."
                 cancel()
                 return@modify
             }
             data.addItem(bucket, internalName, amount, command)
+            done = true
+        }
+        if (done) {
             logCompletedAddEvent()
+        } else {
+            errorMessage?.let {
+                ChatUtils.userError(it)
+            }
         }
     }
 
-    @Deprecated(
-        "Use addItem(bucket, internalName, amount, command, message) instead",
-        ReplaceWith("addItem(bucket, internalName, amount, command, message)"),
-    )
-    override fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean, message: Boolean) =
+    final override fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean, message: Boolean) =
         throw UnsupportedOperationException("Use addItem(bucket, internalName, amount, command, message) instead")
 
     fun addItem(bucket: E, internalName: NeuInternalName, amount: Int, command: Boolean, message: Boolean = true) {

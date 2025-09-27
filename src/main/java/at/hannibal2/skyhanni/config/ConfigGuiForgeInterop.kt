@@ -22,8 +22,7 @@ class ConfigGuiForgeInterop : IModGuiFactory {
 
     override fun getHandlerFor(element: RuntimeOptionCategoryElement): RuntimeOptionGuiHandler? = null
 
-    class WrappedSkyHanniConfig(private val parent: GuiScreen) :
-        GuiScreenElementWrapper(ConfigGuiManager.getEditorInstance()) {
+    class WrappedSkyHanniConfig(private val parent: GuiScreen) : GuiScreenElementWrapper(ConfigGuiManager.getEditorInstance()) {
 
         @Throws(IOException::class)
         override fun handleKeyboardInput() {

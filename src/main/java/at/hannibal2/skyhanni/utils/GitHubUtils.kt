@@ -65,6 +65,7 @@ object GitHubUtils {
                 ApiUtils.getZipResponse(destinationZip, fullArchiveUrl, apiName, !shouldError)
                 true
             } catch (e: Exception) {
+                ErrorManager.logErrorWithData(e, "Failed to download archive from $fullArchiveUrl")
                 SkyHanniMod.logger.error("Failed to download archive from $fullArchiveUrl", e)
                 false
             }

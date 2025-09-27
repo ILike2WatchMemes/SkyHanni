@@ -807,7 +807,7 @@ object ItemUtils {
         TextHelper.text("§eProcessing..").send(testItemMessageId)
 
         // running .getPrice() on thousands of items may take ~500ms
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("shtestitem") {
             buildTestItemMessage(args).send(testItemMessageId)
         }
     }
@@ -952,7 +952,7 @@ object ItemUtils {
     }
 
     fun NeuInternalName.getNumberedName(amount: Number): String {
-        val prefix = if (amount == 1.0) "" else "§8${amount.addSeparators()}x "
+        val prefix = if (amount.toDouble() == 1.0) "" else "§8${amount.addSeparators()}x "
         return "$prefix§r$repoItemName"
     }
 

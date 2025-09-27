@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig
+import at.hannibal2.skyhanni.utils.AutoUpdatingItemStack
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 
 private typealias StatsEntry = DropsStatisticsConfig.DropsStatisticsTextEntry
 
@@ -24,7 +24,7 @@ enum class VisitorReward(rawInternalName: String, val displayName: String) {
     ;
 
     private val internalName = rawInternalName.toInternalName()
-    val itemStack by lazy { internalName.getItemStack() }
+    val itemStack by AutoUpdatingItemStack(internalName)
     // TODO use this instead of hard coded item names once moulconfig no longer calls toString before the neu repo gets loaded
 //     val displayName by lazy { itemStack.nameWithEnchantment ?: internalName.asString() }
 

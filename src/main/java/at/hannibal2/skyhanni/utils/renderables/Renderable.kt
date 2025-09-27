@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
@@ -34,7 +35,6 @@ import at.hannibal2.skyhanni.utils.renderables.container.table.SearchableScrollT
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -327,7 +327,7 @@ interface Renderable {
                 ToolTipData.lastSlot == null
                     || GuiData.preDrawEventCancelled
             } else true
-            val isConfigScreen = guiScreen !is GuiScreenElementWrapper
+            val isConfigScreen = !ConfigUtils.configScreenCurrentlyOpen
 
             val openGui = guiScreen.javaClass.name ?: "none"
             val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"

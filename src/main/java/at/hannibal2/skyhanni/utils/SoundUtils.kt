@@ -115,7 +115,7 @@ object SoundUtils {
 
     // TODO use duration for delay
     fun repeatSound(delay: Long, repeat: Int, sound: ISound) {
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("repeatSound") {
             repeat(repeat) {
                 sound.playSound()
                 delay(delay)
