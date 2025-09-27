@@ -49,7 +49,8 @@ java {
     // causing crashes during tests. You can still manually select DCEVM in the Minecraft Client
     // IntelliJ run configuration.
     toolchain.vendor.set(JvmVendorSpec.ADOPTIUM)
-    // Also build a sources JAR; Loom will provide remapSourcesJar for it
+    // Enable generation of standard sources jar (classifier 'sources') so remapSourcesJar exists.
+    withSourcesJar()
 }
 val runDirectory = rootProject.file("run")
 runDirectory.mkdirs()
@@ -474,16 +475,11 @@ preprocess {
     vars.put("TODO", 0)
 }
 
-val sourcesJar by tasks.registering(Jar::class) {
-    destinationDirectory.set(layout.buildDirectory.dir("badjars"))
-    archiveClassifier.set("src")
-    from(sourceSets.main.get().allSource)
-}
-
 publishing.publications {
     create<MavenPublication>("maven") {
         artifact(tasks.remapJar)
-        artifact(sourcesJar) { classifier = "sources" }
+        // Include remapped sources jar produced by Loom
+        tasks.findByName("remapSourcesJar")?.let { artifact(it) }
         pom {
             name.set("SkyHanni")
             licenses {

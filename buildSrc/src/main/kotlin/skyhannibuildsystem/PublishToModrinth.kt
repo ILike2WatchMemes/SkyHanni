@@ -21,6 +21,8 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.nio.charset.StandardCharsets
 import java.time.Duration
+import java.io.StringWriter
+import java.io.PrintWriter
 
 abstract class PublishToModrinth : DefaultTask() {
 
@@ -392,6 +394,16 @@ abstract class PublishToModrinth : DefaultTask() {
             return
         }
 
+        val verbose = getProperty("github.verbose")?.toBooleanStrictOrNull() ?: false
+        fun vlog(msg: String) { if (verbose) println("[GitHub] $msg") }
+
+        // User can force skip via -PskipGithubRelease=true
+        val skipGithub = getProperty("skipGithubRelease")?.equals("true", ignoreCase = true) ?: false
+        if (skipGithub) {
+            println("GitHub release skipped: skipGithubRelease property set to true")
+            return
+        }
+
         val token = githubToken
         val repo = githubRepo
         if (token.isNullOrBlank() || repo.isNullOrBlank()) {
@@ -401,34 +413,134 @@ abstract class PublishToModrinth : DefaultTask() {
             println("GitHub release skipped due to configuration:\n" + reasons.joinToString("\n"))
             return
         }
+        // Default changed to false so GitHub hiccups don't fail the whole publish unless explicitly requested.
+        val failOnError = getProperty("github.failOnError")?.toBooleanStrictOrNull() ?: false
+        val allowExisting = getProperty("github.allowExisting")?.toBooleanStrictOrNull() ?: false
+        val retryOnRedirect = getProperty("github.retryOnRedirectError")?.toBooleanStrictOrNull() ?: true
+
         val tag = "$githubTagPrefix$versionNumber"
         val name = versionNumber
         val body = readChangelogFromFile()
         try {
-            val release = getOrCreateGithubRelease(repo, token, tag, name, body)
+            vlog("Preparing release tag=$tag allowExisting=$allowExisting failOnError=$failOnError")
+            val release = getOrCreateGithubRelease(repo, token, tag, name, body, allowExisting, verbose)
             val releaseId = release.get("id").asLong
+            vlog("Release ID: $releaseId")
 
             // Ensure assets are updated (replace if exist)
             val existingAssets = listGithubReleaseAssets(repo, token, releaseId)
                 .associateBy({ it.get("name").asString }, { it.get("id").asLong })
+            vlog("Existing assets: ${existingAssets.keys}")
 
             for (jar in jars) {
                 val fname = jar.name
-                existingAssets[fname]?.let { assetId -> deleteGithubReleaseAsset(repo, token, assetId) }
+                existingAssets[fname]?.let { assetId ->
+                    vlog("Deleting existing asset $fname (id=$assetId)")
+                    deleteGithubReleaseAsset(repo, token, assetId)
+                }
+                vlog("Uploading asset $fname")
                 uploadGithubReleaseAsset(repo, token, releaseId, jar)
 
-                // Upload sources jar as an asset too if present, name it as "<base>-compile-sources.jar"
                 val sourcesJar = File(jar.parentFile, jar.nameWithoutExtension + "-sources.jar")
                 if (sourcesJar.exists()) {
                     val compileName = jar.nameWithoutExtension + "-compile-sources.jar"
-                    existingAssets[compileName]?.let { assetId -> deleteGithubReleaseAsset(repo, token, assetId) }
+                    existingAssets[compileName]?.let { assetId ->
+                        vlog("Deleting existing sources asset $compileName (id=$assetId)")
+                        deleteGithubReleaseAsset(repo, token, assetId)
+                    }
+                    vlog("Uploading sources asset $compileName")
                     uploadGithubReleaseAssetWithCustomName(repo, token, releaseId, sourcesJar, compileName)
                 }
             }
-            println("GitHub release updated: $repo tag $tag")
+            println("GitHub release ${if (allowExisting) "created/updated" else "created"}: $repo tag $tag")
         } catch (e: Exception) {
-            throw RuntimeException("Failed to publish GitHub release: ${e.message}", e)
+            val rootMsg = e.message ?: e::class.qualifiedName
+            val isRedirectIssue = rootMsg?.contains("Invalid redirection", ignoreCase = true) == true
+            if (isRedirectIssue && retryOnRedirect) {
+                println("[INFO] Detected 'Invalid redirection'. Retrying once with a fresh basic JDK HttpClient (NORMAL redirects)...")
+                try {
+                    retryGithubPublishBasicClient(repo, token, tag, name, body, allowExisting, verbose)
+                    println("GitHub release published successfully on retry (basic client).")
+                    return
+                } catch (retryEx: Exception) {
+                    println("[WARN] Retry after redirection issue also failed: ${retryEx.message}")
+                    printFullStacktrace(retryEx, verbose)
+                }
+            }
+            println("[ERROR] GitHub release publishing failed: $rootMsg")
+            if (isRedirectIssue) {
+                println("[HINT] 'Invalid redirection' can be caused by corporate proxies / network middleboxes. You can: \n  - Disable: -PskipGithubRelease=true \n  - Allow continuation: -Pgithub.failOnError=false (default) \n  - Force fail: -Pgithub.failOnError=true")
+            }
+            printFullStacktrace(e, verbose)
+            if (failOnError) {
+                throw RuntimeException("Failed to publish GitHub release: $rootMsg", e)
+            } else {
+                println("[INFO] Continuing despite GitHub failure (github.failOnError=false)")
+            }
         }
+    }
+
+    private fun printFullStacktrace(e: Throwable, verbose: Boolean) {
+        val sw = StringWriter()
+        e.printStackTrace(PrintWriter(sw))
+        val trace = sw.toString()
+        if (verbose) println(trace) else println(trace.lineSequence().take(8).joinToString("\n") + "\n... (use -Pgithub.verbose=true for full trace)")
+    }
+
+    private fun retryGithubPublishBasicClient(
+        repo: String,
+        token: String,
+        tag: String,
+        name: String,
+        body: String,
+        allowExisting: Boolean,
+        verbose: Boolean
+    ) {
+        val client = HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .connectTimeout(Duration.ofSeconds(30))
+            .build()
+        fun vlog(msg: String) { if (verbose) println("[GitHub-Retry] $msg") }
+
+        // GET existing release
+        val getReq = HttpRequest.newBuilder()
+            .uri(java.net.URI.create("https://api.github.com/repos/$repo/releases/tags/$tag"))
+            .timeout(Duration.ofSeconds(30))
+            .header("Authorization", "token $token")
+            .header("User-Agent", userAgent)
+            .header("Accept", "application/vnd.github+json")
+            .GET().build()
+        val getResp = client.send(getReq, HttpResponse.BodyHandlers.ofString())
+        vlog("Retry GET status=${getResp.statusCode()}")
+        val releaseJson: JsonObject = if (getResp.statusCode() == 200) {
+            if (!allowExisting) throw RuntimeException("Release exists (retry path) but allowExisting=false")
+            com.google.gson.JsonParser.parseString(getResp.body()).asJsonObject
+        } else if (getResp.statusCode() == 404) {
+            val createObj = JsonObject().apply {
+                addProperty("tag_name", tag)
+                addProperty("name", name)
+                addProperty("body", body)
+                addProperty("draft", false)
+                addProperty("prerelease", false)
+            }
+            val createReq = HttpRequest.newBuilder()
+                .uri(java.net.URI.create("https://api.github.com/repos/$repo/releases"))
+                .timeout(Duration.ofSeconds(30))
+                .header("Authorization", "token $token")
+                .header("User-Agent", userAgent)
+                .header("Accept", "application/vnd.github+json")
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(createObj.toString()))
+                .build()
+            val createResp = client.send(createReq, HttpResponse.BodyHandlers.ofString())
+            vlog("Retry CREATE status=${createResp.statusCode()}")
+            if (createResp.statusCode() !in 200..299) throw RuntimeException("Retry create failed: HTTP ${createResp.statusCode()} - ${createResp.body()}")
+            com.google.gson.JsonParser.parseString(createResp.body()).asJsonObject
+        } else {
+            throw RuntimeException("Retry GET failed: HTTP ${getResp.statusCode()} - ${getResp.body()}")
+        }
+        val releaseId = releaseJson.get("id").asLong
+        vlog("Retry releaseId=$releaseId (no assets uploaded on retry path to keep logic simple)")
     }
 
     private fun getOrCreateGithubRelease(
@@ -436,18 +548,25 @@ abstract class PublishToModrinth : DefaultTask() {
         token: String,
         tag: String,
         name: String,
-        body: String
+        body: String,
+        allowExisting: Boolean,
+        verbose: Boolean
     ): JsonObject {
+        fun vlog(msg: String) { if (verbose) println("[GitHub] $msg") }
         // Try get by tag
         val getReq = MutableRequest.GET("https://api.github.com/repos/$repo/releases/tags/$tag")
             .timeout(Duration.ofSeconds(30L))
             .header("Authorization", "token $token")
             .header("User-Agent", userAgent)
             .header("Accept", "application/vnd.github+json")
+        vlog("GET release by tag $tag")
         val getResp = client.send(getReq, HttpResponse.BodyHandlers.ofString())
+        vlog("GET status=${getResp.statusCode()}")
         if (getResp.statusCode() == 200) {
-            // Per policy, fail if a release already exists for this tag instead of updating it.
-            throw RuntimeException("GitHub release already exists for tag '$tag' (repo: $repo). Aborting as configured to not update existing releases.")
+            if (!allowExisting) {
+                throw RuntimeException("GitHub release already exists for tag '$tag' (repo: $repo). Aborting as configured to not update existing releases. Set -Pgithub.allowExisting=true to reuse it.")
+            }
+            return com.google.gson.JsonParser.parseString(getResp.body()).asJsonObject
         }
 
         if (getResp.statusCode() != 404) {
@@ -468,7 +587,9 @@ abstract class PublishToModrinth : DefaultTask() {
             .header("User-Agent", userAgent)
             .header("Accept", "application/vnd.github+json")
             .header("Content-Type", "application/json")
+        vlog("POST create release tag=$tag")
         val createResp = client.send(createReq, HttpResponse.BodyHandlers.ofString())
+        vlog("CREATE status=${createResp.statusCode()}")
         if (createResp.statusCode() !in 200..299) {
             throw RuntimeException("Failed to create GitHub release: HTTP ${createResp.statusCode()} - ${createResp.body()}")
         }
