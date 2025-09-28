@@ -6,9 +6,7 @@ The following List does not include Bug Fixes. If empty may be only Bug Fixes.
 
 ## Bingo Net Changes:
 
-- Only merged in changes from SkyHanni. No additional changes.
-
-Currently working on an In game Guide which is going to take a while until its done.
+- Fixed some small Issues
 
 ## Static Info for modrinth:
 
