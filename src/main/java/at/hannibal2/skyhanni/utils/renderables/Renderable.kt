@@ -1332,7 +1332,8 @@ interface Renderable {
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 // Draw dark background box
-                val boxColor = if (isHovered(mouseOffsetX, mouseOffsetY)) {
+                val hovered = isHovered(mouseOffsetX, mouseOffsetY)
+                val boxColor = if (hovered) {
                     0xFF404040.toInt() // Lighter when hovered
                 } else {
                     0xFF202020.toInt() // Dark background
@@ -1342,7 +1343,7 @@ interface Renderable {
                 // Draw border
                 val borderColor = if (input.isActive) {
                     0xFF00AAFF.toInt() // Blue when active
-                } else if (isHovered(mouseOffsetX, mouseOffsetY)) {
+                } else if (hovered) {
                     0xFF888888.toInt() // Light gray when hovered
                 } else {
                     0xFF555555.toInt() // Dark gray normally
@@ -1352,14 +1353,18 @@ interface Renderable {
                 GuiRenderUtils.drawRect(0, 0, 1, height, borderColor) // Left
                 GuiRenderUtils.drawRect(width - 1, 0, width, height, borderColor) // Right
 
-                if (isHovered(mouseOffsetX, mouseOffsetY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                // Activation: previously this activated & handled only while hovered, disabling otherwise.
+                // That prevented deletions when mouse left the box. Now we only activate on hover+condition
+                // but keep it active until ESC (or other logic) disables it.
+                if (hovered && condition() && shouldAllowLink(true, bypassChecks)) {
                     input.makeActive()
-                    input.handle()
                     if (RIGHT_MOUSE.isKeyClicked()) {
                         input.clear()
                     }
-                } else {
-                    input.disable()
+                }
+                // Always handle keyboard input while active so user can continue editing even when not hovered.
+                if (input.isActive) {
+                    input.handle()
                 }
 
                 // Render text with some padding
