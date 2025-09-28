@@ -324,7 +324,7 @@ object BNConnection {
         val packetName = packet.javaClass.getSimpleName()
         val rawjson = PacketUtils.parsePacketToJson(packet)
         if (this.isConnected && writer != null) {
-            if (!blockLog) {
+            if (!blockLog && config.showPacketTraffic) {
                 ChatUtils.clickableChat(
                     "§b[BN-Send]: $rawjson",
                     {
