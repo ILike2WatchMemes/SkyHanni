@@ -51,13 +51,11 @@ object BNCommands {
         event.registerBrigadier("bc") {
             description = "Send a Message to Bingo Net Chat."
             category = CommandCategory.BINGO_NET
-            arg(
+            argCallback(
                 "message",
                 BrigadierArguments.greedyString(),
             ) {
-                callback {
-                    BNConnection.sendPacket(BingoChatMessagePacket(null, "", getArg(it), 0))
-                }
+                BNConnection.sendPacket(BingoChatMessagePacket(null, "", it, 0))
             }
         }
 
