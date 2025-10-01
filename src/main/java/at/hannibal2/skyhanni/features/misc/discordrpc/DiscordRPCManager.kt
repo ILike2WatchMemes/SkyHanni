@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -33,6 +32,7 @@ import dev.cbyrne.kdiscordipc.data.activity.Activity
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.INFINITE
 import dev.cbyrne.kdiscordipc.data.user.User
 import java.lang.Thread.sleep
 import kotlin.time.Duration.Companion.seconds
@@ -198,7 +198,7 @@ object DiscordRPCManager {
         if (SkyBlockUtils.inSkyBlock) {
             // todo discord rpc doesnt connect on 1.21
             //#if TODO
-            SkyHanniMod.launchNoScopeCoroutine("discord rpc start") { start() }
+            SkyHanniMod.launchNoScopeCoroutine("discord rpc start", timeout = INFINITE) { start() }
             //#endif
             started = true
         }
