@@ -1,5 +1,6 @@
 package de.hype.bingonet.shared.objects
 
+import com.google.gson.annotations.SerializedName
 import de.hype.bingonet.shared.constants.Islands
 import de.hype.bingonet.shared.constants.StatusConstants
 import kotlin.properties.Delegates
@@ -16,7 +17,14 @@ open class SplashData @JvmOverloads constructor(
     @JvmField val hubSelectorData: HubSelectorData?,
     @JvmField var status: StatusConstants = StatusConstants.WAITING,
 ) {
-    var splashId by Delegates.notNull<Int>()
+    @SerializedName("splashId")
+    private var _splashId : Int? = null
+
+    var splashId : Int
+        get() = _splashId ?: throw UninitializedPropertyAccessException("value was not initialized")
+        set(value) {
+            _splashId = value
+        }
 
 
     init {

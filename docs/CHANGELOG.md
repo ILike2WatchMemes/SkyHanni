@@ -6,7 +6,8 @@ The following List does not include Bug Fixes. If empty may be only Bug Fixes.
 
 ## Bingo Net Changes:
 
-- Fixed some small Issues
+- Possible fix for Chat Prompts not working properly
+- Attempted a fix of BN Splash Announce packets
 
 ## Static Info for modrinth:
 

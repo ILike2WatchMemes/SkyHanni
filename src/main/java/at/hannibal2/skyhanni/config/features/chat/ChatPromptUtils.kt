@@ -18,8 +18,8 @@ object ChatPromptUtils {
     @HandleEvent
     fun key(event: KeyDownEvent) {
         val activePrompt = activePromptBlock ?: return
-        activePromptBlock = null
         if (event.keyCode != activePrompt.keyCode || !event.keyCode.isKeyHeld()) return
+        activePromptBlock = null
         if (SkyHanniMod.feature.dev.debug.enabled){
             ChatUtils.chat("Chat Prompt reset")
         }
