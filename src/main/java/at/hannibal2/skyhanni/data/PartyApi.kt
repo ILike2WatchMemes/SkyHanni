@@ -33,7 +33,7 @@ object PartyApi {
     /**
      * REGEX-TEST: §9-----------------------------------------------------
      */
-    private val wrapper by patternGroup.pattern("wrapper", "§9-----------------------------------------------------")
+    private val wrapper by patternGroup.pattern("wrapper", "9m-----------------------------------------------------")
 
     /**
      * REGEX-TEST: §eYou have joined §b[MVP§d+§b] Throwpo's §eparty!
@@ -224,7 +224,7 @@ object PartyApi {
                 partyLeader = PlayerUtils.getName()
             }
             addPlayer(name)
-            if (partyMembers.size >= hideConfig.hideJoinAndLeave) {
+            if (partyMembers.size >= hideConfig.hideJoinAndLeave && hideConfig.hideJoinAndLeave!=0) {
                 event.blockedReason = "Hide Party Messages: Hide Join/Leave"
             }
         }
@@ -246,33 +246,33 @@ object PartyApi {
         otherLeftPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             removeWithLeader(name)
-            if (partyMembers.size >= hideConfig.hideJoinAndLeave) {
+            if (partyMembers.size >= hideConfig.hideJoinAndLeave && hideConfig.hideJoinAndLeave!=0) {
                 event.blockedReason = "Hide Party Messages: Hide Join/Leave"
             }
         }
         otherKickedPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             removeWithLeader(name)
-            if (partyMembers.size >= hideConfig.hideKicks) {
+            if (partyMembers.size >= hideConfig.hideKicks && hideConfig.hideKicks!=0) {
                 event.blockedReason = "Hide Party Messages: Hide Kicks"
             }
         }
         otherOfflineKickedPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             removeWithLeader(name)
-            if (partyMembers.size >= hideConfig.hideKicks) {
+            if (partyMembers.size >= hideConfig.hideKicks&& hideConfig.hideKicks!=0) {
                 event.blockedReason = "Hide Party Messages: Hide Kicks"
             }
         }
         otherDisconnectedPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
-            if (partyMembers.size >= hideConfig.hideDisconnects) {
+            if (partyMembers.size >= hideConfig.hideDisconnects && hideConfig.hideDisconnects!=0) {
                 event.blockedReason = "Hide Party Messages: Hide Disconnects"
             }
             partyMembers.remove(name)
         }
         otherDisconnect5MinTimePattern.matchMatcher(message) {
-            if (partyMembers.size >= hideConfig.hideDisconnects) {
+            if (partyMembers.size >= hideConfig.hideDisconnects && hideConfig.hideDisconnects!=0) {
                 event.blockedReason = "Hide Party Messages: Hide Disconnects"
             }
         }
