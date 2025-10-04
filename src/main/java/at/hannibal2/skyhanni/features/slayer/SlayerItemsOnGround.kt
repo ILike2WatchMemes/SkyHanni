@@ -54,5 +54,5 @@ object SlayerItemsOnGround {
     }
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled &&
-        SlayerApi.isInCorrectArea && SlayerApi.hasActiveSlayerQuest()
+        SlayerApi.isInCorrectArea && SlayerApi.hasActiveQuest()
 }
