@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import scala.annotation.meta.field
 
 class DungeonConfig {
     @Expose
@@ -199,4 +200,38 @@ class DungeonConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var springBootsNotification: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Show Item Quality in Tooltip",
+        desc = "Shows you the dungeon item quality on dungeon loot in the tooltip.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    val showQualityInTooltip: Boolean = true
+    @Expose
+    @ConfigOption(
+        name = "Show Item Quality Text",
+        desc = "Shows you the dungeon item quality on dungeon loot.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    val showQualityText: Boolean = false
+    @Expose
+    @ConfigOption(
+        name = "Highlight Best Quality",
+        desc = "Highlight the Item with the highest dungeon quality (per item type).",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    val highlightBestItem: Boolean = false
+    @Expose
+    @ConfigOption(
+        name = "Group Armor for Best Quality Highlight",
+        desc = "Groups all armor Types together when highlighting.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @ConfigLink(owner = DungeonConfig::class, field = "highlightBestItem")
+    val groupBestByArmorType: Boolean = false
 }

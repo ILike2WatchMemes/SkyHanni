@@ -8,6 +8,9 @@ The following List does not include Bug Fixes. If empty may be only Bug Fixes.
 
 - Possible fix for Chat Prompts not working properly
 - Attempted a fix of BN Splash Announce packets
+- Added Dungeon Quality Tooltip
+  - Supports best item highlighting 
+  - And support for showing it as stack size. 
 
 ## Static Info for modrinth:
 
