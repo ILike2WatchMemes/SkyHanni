@@ -1,7 +1,5 @@
 # Bingo Net
 
-#### Chat Features
-
 The following List does not include Bug Fixes. If empty may be only Bug Fixes.
 
 ## Bingo Net Changes:
