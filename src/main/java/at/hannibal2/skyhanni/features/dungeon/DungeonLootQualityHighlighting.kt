@@ -21,14 +21,15 @@ object DungeonLootQualityHighlighting {
     fun showQualityText(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!config.showQualityText) return
         InventoryUtils.getItemsInOpenChest().forEach {
-            event.drawSlotText(it.xDisplayPosition, it.yDisplayPosition, "${it.stack.getDungeonQuality()}", 1.0f)
+            val quality = it.stack.getDungeonQuality() ?: return@forEach
+            event.drawSlotText(it.xDisplayPosition+18, it.yDisplayPosition, "$quality", 1.0f)
         }
     }
 
     @HandleEvent
     fun itemQualityTooltip(event: ToolTipEvent) {
         if (!config.showQualityInTooltip) return
-        val quality = event.itemStack.getDungeonQuality() ?: return
+        val quality = event.itemStack.getDungeonQuality()?: return
         val color = when (quality) {
             50 -> "§6"
             in 35..49 -> "§a"
