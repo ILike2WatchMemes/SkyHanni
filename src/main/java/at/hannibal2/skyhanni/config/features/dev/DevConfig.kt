@@ -191,5 +191,5 @@ class DevConfig {
     @ConfigOption(name = "Non Blocking Message Processing", desc = "This improves performance, but may cause issues.")
     @ConfigEditorBoolean
     @OnlyModern
-    val nonBlockingMessageProcessing: Boolean = true
+    val nonBlockingMessageProcessing: Boolean = false
 }
