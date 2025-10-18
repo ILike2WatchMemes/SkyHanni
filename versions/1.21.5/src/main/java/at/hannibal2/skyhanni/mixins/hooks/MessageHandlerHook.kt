@@ -28,8 +28,9 @@ private object ChatMessageProcessor {
         if (started.compareAndSet(false, true)) {
             val t = Thread({
                 while (!Thread.currentThread().isInterrupted) {
-                    val task = queue.take()
-                    process(task)
+                    // Take one task (blocks until at least one is available), then drain any additional ready tasks
+                    val first = queue.take()
+                    processBatch(first)
                 }
             }, "SkyHanni-ChatProcessor")
             t.isDaemon = true
@@ -43,38 +44,52 @@ private object ChatMessageProcessor {
     }
 
     // Do non-UI work off-thread, marshal UI calls to the MC thread in-order
-    private fun process(task: Task) {
+    private fun processBatch(first: Task) {
         val client = MinecraftClient.getInstance()
 
-        if (task.actionBar) {
-            val transformed = ActionBarData.onChatReceive(task.message)
-            runOnMcThread(client) {
-                task.original.accept(transformed ?: task.message, task.actionBar)
+        // Collect a batch: include the first already-taken task and drain the rest that's currently available
+        val batch = ArrayList<Task>()
+        batch.add(first)
+        queue.drainTo(batch)
+
+        // Prepare UI actions while off the main thread so we can run them in one MC-thread invocation
+        val uiActions = ArrayList<() -> Unit>(batch.size)
+
+        for (task in batch) {
+            if (task.actionBar) {
+                val transformed = ActionBarData.onChatReceive(task.message)
+                uiActions.add { task.original.accept(transformed ?: task.message, task.actionBar) }
+                continue
             }
-            return
+
+            val (result, cancel) = ChatManager.onChatReceive(task.message)
+
+            when {
+                result != null -> {
+                    // Keep previous behavior for non-blocking path: deliver modified message to the original consumer
+                    uiActions.add { task.original.accept(result, task.actionBar) }
+                }
+                cancel -> {
+                    uiActions.add {
+                        val inGameHud = client.inGameHud
+                        val chatHudLine = ChatHudLine(inGameHud.ticks, task.message, null, MessageIndicator.system())
+                        // We want to still log the message even if we cancel it
+                        inGameHud.chatHud.logChatMessage(chatHudLine)
+
+                        // We also want to send the fabric canceled chat message event just to be nice
+                        ClientReceiveMessageEvents.ALLOW_GAME.invoker()
+                            .allowReceiveGameMessage(task.message, task.actionBar)
+                        ClientReceiveMessageEvents.GAME_CANCELED.invoker()
+                            .onReceiveGameMessageCanceled(task.message, task.actionBar)
+                    }
+                }
+                else -> uiActions.add { task.original.accept(task.message, task.actionBar) }
+            }
         }
 
-        val (result, cancel) = ChatManager.onChatReceive(task.message)
-
-        when {
-            result != null -> runOnMcThread(client) {
-                task.original.accept(result, task.actionBar)
-            }
-            cancel -> runOnMcThread(client) {
-                val inGameHud = client.inGameHud
-                val chatHudLine = ChatHudLine(inGameHud.ticks, task.message, null, MessageIndicator.system())
-                // We want to still log the message even if we cancel it
-                inGameHud.chatHud.logChatMessage(chatHudLine)
-
-                // We also want to send the fabric canceled chat message event just to be nice
-                ClientReceiveMessageEvents.ALLOW_GAME.invoker()
-                    .allowReceiveGameMessage(task.message, task.actionBar)
-                ClientReceiveMessageEvents.GAME_CANCELED.invoker()
-                    .onReceiveGameMessageCanceled(task.message, task.actionBar)
-            }
-            else -> runOnMcThread(client) {
-                task.original.accept(task.message, task.actionBar)
-            }
+        // Run all UI actions in a single MC-thread execution to ensure the render thread applies all ready lines at once
+        runOnMcThread(client) {
+            for (ui in uiActions) ui()
         }
     }
 
