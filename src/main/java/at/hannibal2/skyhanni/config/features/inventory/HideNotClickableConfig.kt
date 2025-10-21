@@ -7,6 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class HideNotClickableConfig {
+
     @Expose
     @ConfigOption(
         name = "Enabled",
@@ -14,7 +15,7 @@ class HideNotClickableConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var items: Boolean = false
+    var enabled: Boolean = false
 
     @Expose
     @ConfigOption(name = "Block Clicks", desc = "Block the clicks on these items.")
