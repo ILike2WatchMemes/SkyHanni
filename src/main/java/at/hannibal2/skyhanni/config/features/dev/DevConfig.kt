@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.dev
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.NoConfigLink
+import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig
 import com.google.gson.annotations.Expose
@@ -185,4 +186,10 @@ class DevConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var ignoreTermSignal: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Non Blocking Message Processing", desc = "This improves performance, but may cause issues.")
+    @ConfigEditorBoolean
+    @OnlyModern
+    val nonBlockingMessageProcessing: Boolean = false
 }
