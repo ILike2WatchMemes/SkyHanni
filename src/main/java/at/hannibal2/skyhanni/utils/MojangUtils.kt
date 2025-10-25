@@ -25,12 +25,18 @@ object MojangUtils {
                 .profile,
             Minecraft.getMinecraft().session.token, server,
         )
+        //#elseif MC < 1.21.10
+        //$$ MinecraftClient.getInstance().getSessionService().joinServer(
+        //$$          MinecraftClient.getInstance().getGameProfile().getId(),
+        //$$          MinecraftClient.getInstance().getSession().getAccessToken(),
+        //$$          server,
+        //$$ )
         //#else
-        //$$    MinecraftClient.getInstance().getSessionService().joinServer(
-        //$$             MinecraftClient.getInstance().getGameProfile().getId(),
-        //$$             MinecraftClient.getInstance().getSession().getAccessToken(),
-        //$$             server,
-        //$$         )
+        //$$ MinecraftClient.getInstance().apiServices.sessionService.joinServer(
+        //$$     MinecraftClient.getInstance().gameProfile.id,
+        //$$     MinecraftClient.getInstance().getSession().getAccessToken(),
+        //$$     server,
+        //$$ )
         //#endif
     }
 

@@ -17,6 +17,9 @@ object BlockCompat {
         //#if MC < 1.16
         val test = getTileEntity() as TileEntityChest
         return test.numPlayersUsing > 0f
+        //#elseif MC < 1.21.10
+        //$$ val chest = MinecraftCompat.localWorld.getBlockEntity(toBlockPos()) as ChestBlockEntity
+        //$$ return chest.lidAnimator.open
         //#else
         //$$ val chest = MinecraftCompat.localWorld.getBlockEntity(toBlockPos()) as ChestBlockEntity
         //$$ return chest.lidAnimator.open

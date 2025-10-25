@@ -12,7 +12,7 @@ class MineshaftDetectionConfig {
     @Expose
     @ConfigOption(
         name = "Mineshaft Detection",
-        desc = "Detects when you enter a mineshaft and displays the type of mineshaft you entered.",
+        desc = "Detects when you enter a mineshaft and displays the type of mineshaft you entered."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -21,7 +21,7 @@ class MineshaftDetectionConfig {
     @Expose
     @ConfigOption(
         name = "Send Type to Party Chat",
-        desc = "Sends the type of mineshaft you entered to party chat.",
+        desc = "Sends the type of mineshaft you entered to party chat."
     )
     @ConfigEditorBoolean
     var sendTypeToPartyChat: Boolean = true
@@ -31,7 +31,7 @@ class MineshaftDetectionConfig {
         name = "Party Chat Format",
         desc = "The party chat message format.\n" +
             "Available variables: §e{type}§7, §e{amountSinceThis}§7, §e{timeSinceThis}\n" +
-            "§eNote: Using multiple variables can cause the message to be too long and be cut off.",
+            "§eNote: Using multiple variables can cause the message to be too long and be cut off."
     )
     @ConfigEditorText
     var partyChatFormat: String = "Entered a {type} mineshaft!"
@@ -40,11 +40,11 @@ class MineshaftDetectionConfig {
     @ConfigOption(
         name = "Mineshaft to Track",
         desc = "Which mineshafts to send stats about.\n" +
-            "Other mineshafts will still have their data tracked, it just won't send stats for them.",
+            "Other mineshafts will still have their data tracked, it just won't send stats for them."
     )
     @ConfigEditorDraggableList
-    val mineshaftsToTrack: MutableList<MineshaftDetection.MineshaftTypes> = mutableListOf(
-        MineshaftDetection.MineshaftTypes.FAIR1,
-        MineshaftDetection.MineshaftTypes.JASP1,
+    val mineshaftsToTrack: MutableList<MineshaftDetection.MineshaftType> = mutableListOf(
+        MineshaftDetection.MineshaftType.FAIR_1,
+        MineshaftDetection.MineshaftType.JASP_1,
     )
 }

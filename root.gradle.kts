@@ -3,8 +3,8 @@ import com.replaymod.gradle.preprocess.Node
 import skyhannibuildsystem.PublishToModrinth
 
 plugins {
-    id("com.github.SkyHanniStudios.SkyHanni-Preprocessor") version "1.0.7"
-    id("gg.essential.loom") version "1.10.34" apply false
+    id("com.github.SkyHanniStudios.SkyHanni-Preprocessor") version "1.0.8"
+    id("gg.essential.loom") version "1.10.36" apply false
     kotlin("jvm") version "2.0.0" apply false
     kotlin("plugin.power-assert") version "2.0.0" apply false
     id("com.google.devtools.ksp") version "2.0.0-1.0.24" apply false
