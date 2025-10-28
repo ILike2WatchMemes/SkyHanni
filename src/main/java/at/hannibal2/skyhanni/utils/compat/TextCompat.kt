@@ -261,7 +261,9 @@ fun addChatMessageToChat(message: IChatComponent) {
     //#if FORGE
     Minecraft.getMinecraft().thePlayer.addChatMessage(message)
     //#else
+    //$$ MinecraftClient.getInstance().execute {
     //$$ MinecraftClient.getInstance().player?.sendMessage(message, false)
+    //$$ }
     //#endif
 }
 
