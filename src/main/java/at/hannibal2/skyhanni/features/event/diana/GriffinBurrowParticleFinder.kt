@@ -132,11 +132,8 @@ object GriffinBurrowParticleFinder {
         //#endif
         ENCHANT(
             {
-                type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 5 && speed == 0.05f && offset.roundTo(2) == LorenzVec(
-                    0.5,
-                    0.4,
-                    0.5,
-                )
+                type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 5 && speed == 0.05f && offset.roundTo(2) ==
+                    LorenzVec(0.5, 0.4, 0.5)
             },
         )
     }
