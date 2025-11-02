@@ -23,18 +23,20 @@ object ChatPromptUtils {
         if (SkyHanniMod.feature.dev.debug.enabled){
             ChatUtils.chat("Chat Prompt reset")
         }
-        activePrompt.codeBlock.invoke()
+        if (!activePrompt.codeBlock.invoke()){
+            this.activePromptBlock = activePrompt
+        }
     }
 
     private data class ActiveKeyBind(
         val keybind: KeyBind,
-        val codeBlock: () -> Unit,
+        val codeBlock: () -> Boolean,
     ) {
         @Suppress("StorageNeedsExpose")
         val keyCode by lazy { keybind.getEffectiveKey() }
     }
 
-    fun setActivePrompt(keyBind: KeyBind, codeBlock: () -> Unit) {
+    fun setActivePrompt(keyBind: KeyBind, codeBlock: () -> Boolean) {
         val activePromptBlock = ActiveKeyBind(
             keybind = keyBind,
             codeBlock = codeBlock,

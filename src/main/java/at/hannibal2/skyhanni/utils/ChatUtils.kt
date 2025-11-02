@@ -174,10 +174,10 @@ object ChatUtils {
      *
      * [message] supports the %KEY% placeholder which will be replaced with the effective key string of the [keyBind].
      */
-    fun chatPrompt(
+    fun chatConsumerPrompt(
         message: String,
         keyBind: KeyBind,
-        code: () -> Unit,
+        consumer: () -> Boolean,
         hover: String = "§eThis Message is a Chat Prompt and can be clicked!",
         prefix: Boolean = true,
         prefixColor: String = "§e",
@@ -187,11 +187,29 @@ object ChatUtils {
         // TODO isnt the permanent click action essentially a small memory leak that bunches up over time?
         val rawText = msgPrefix + message.replace("%KEY%", keyBind.getEffectiveKeyString())
         val text = TextHelper.text(rawText) {
-            this.onClick(SimpleTimeMark.now().plus(keyBind.getEffectiveExpirationDuration()), true, code)
+            this.onClick(SimpleTimeMark.now().plus(keyBind.getEffectiveExpirationDuration()), true, consumer)
             this.hover = hover.asComponent()
         }
-        ChatPromptUtils.setActivePrompt(keyBind, code)
+        ChatPromptUtils.setActivePrompt(keyBind, consumer)
         chat(text)
+    }
+
+    fun chatPrompt(
+        message: String,
+        keyBind: KeyBind,
+        code: () -> Unit,
+        hover: String = "§eThis Message is a Chat Prompt and can be clicked!",
+        prefix: Boolean = true,
+        prefixColor: String = "§e",
+    ) {
+        chatConsumerPrompt(
+            message, keyBind,
+            consumer = {
+                code.invoke()
+                true
+            },
+            hover, prefix, prefixColor,
+        )
     }
 
     /**
