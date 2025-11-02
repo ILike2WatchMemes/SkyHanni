@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import de.hype.bingonet.shared.constants.Islands
+import de.hype.bingonet.shared.objects.BNRole
 import de.hype.bingonet.shared.objects.SplashData
 import de.hype.bingonet.shared.packets.function.RequestDynamicSplashInvitePacket
 import de.hype.bingonet.shared.packets.function.SplashUpdatePacket
@@ -104,17 +105,19 @@ object SplashManager {
         } else {
             val currentIsland = HypixelData.skyBlockIsland
             if (splash.hubSelectorData.hubType == Islands.HUB) {
+                if (BNConnection.roles.contains(BNRole.DEBUG)) ChatUtils.chat("§e[Debug] Current Island: $currentIsland")
                 if (
                     currentIsland == IslandType.DUNGEON_HUB ||
                     currentIsland == IslandType.THE_FARMING_ISLANDS ||
+                    currentIsland == IslandType.THE_PARK ||
                     currentIsland == IslandType.SPIDER_DEN ||
                     currentIsland == IslandType.GOLD_MINES
                 ) {
                     // Double warp needed
-                    HypixelCommands.warp(Islands.HUB.name)
-                    sleep(100)
+                    HypixelCommands.warp(Islands.HUB.warpArgument!!)
+                    sleep(250)
                 }
-                HypixelCommands.warp(Islands.HUB.name)
+                HypixelCommands.warp(Islands.HUB.warpArgument!!)
             } else {
                 HypixelCommands.warp(splash.hubSelectorData.hubType.warpArgument ?: error("Illegal Island Type."))
             }
