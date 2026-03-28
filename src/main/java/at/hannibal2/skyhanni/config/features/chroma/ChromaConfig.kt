@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.chroma
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
+import at.hannibal2.skyhanni.features.chroma.CHROMA_PREVIEW_COLOR_CODE
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -13,7 +13,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class ChromaConfig {
-    @ConfigOption(name = "Chroma Preview", desc = "§fPlease star SkyHanni on GitHub!")
+    @ConfigOption(name = "Chroma Preview", desc = "§" + CHROMA_PREVIEW_COLOR_CODE + "Please star SkyHanni on GitHub!")
     @ConfigEditorInfoText(infoTitle = "Only in SkyBlock")
     var chromaPreview: Boolean = false
 
@@ -43,13 +43,13 @@ class ChromaConfig {
     @ConfigEditorDropdown
     var chromaDirection: Direction = Direction.FORWARD_RIGHT
 
-    enum class Direction(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
-        FORWARD_RIGHT("Forward + Right", 0),
-        FORWARD_LEFT("Forward + Left", 1),
-        BACKWARD_RIGHT("Backward + Right", 2),
-        BACKWARD_LEFT("Backward + Left", 3);
+    enum class Direction(private val displayName: String) {
+        FORWARD_RIGHT("Forward + Right"),
+        FORWARD_LEFT("Forward + Left"),
+        BACKWARD_RIGHT("Backward + Right"),
+        BACKWARD_LEFT("Backward + Left"),
+        ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 
@@ -60,7 +60,7 @@ class ChromaConfig {
     @Expose
     @ConfigOption(
         name = "Everything Chroma",
-        desc = "Render §4§l§oALL §r§7text in chroma. §e(Disables Patcher's Optimized Font Renderer while enabled)"
+        desc = "Render §4§l§oALL §r§7text in chroma. §e(Disables Patcher's Optimized Font Renderer while enabled)",
     )
     @ConfigEditorBoolean
     var allChroma: Boolean = false
@@ -68,7 +68,7 @@ class ChromaConfig {
     @Expose
     @ConfigOption(
         name = "Ignore Chat",
-        desc = "Prevent Everything Chroma from applying to the chat (if you unironically use that feature...)"
+        desc = "Prevent Everything Chroma from applying to the chat (if you unironically use that feature...)",
     )
     @ConfigEditorBoolean
     var ignoreChat: Boolean = false

@@ -1,17 +1,38 @@
 package at.hannibal2.skyhanni.config.features.slayer
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeConfig
 import at.hannibal2.skyhanni.config.features.slayer.endermen.EndermanConfig
+import at.hannibal2.skyhanni.config.features.slayer.spider.SpiderConfig
 import at.hannibal2.skyhanni.config.features.slayer.vampire.VampireConfig
+import at.hannibal2.skyhanni.features.slayer.HideSlayerSpawnParticles.SpawnParticles
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class SlayerConfig {
+
+    @Expose
+    @ConfigOption(name = "Zombie", desc = "")
+    @Accordion
+    val zombie: ZombieConfig = ZombieConfig()
+
+    @Expose
+    @ConfigOption(name = "Spider", desc = "")
+    @Accordion
+    val spider: SpiderConfig = SpiderConfig()
+
     // TODO rename to "enderman"
     @Expose
     @Category(name = "Enderman", desc = "Enderman Slayer Feature")
@@ -48,6 +69,31 @@ class SlayerConfig {
     val slayerBossWarning: SlayerBossWarningConfig = SlayerBossWarningConfig()
 
     @Expose
+    @ConfigOption(name = "Remaining Kills", desc = "Display the names and remaining amount of mob kills needed until the boss spawns.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var remainingKills: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Remaining Kills Level", desc = "Include the mob Level in the Remaining Kills display")
+    @ConfigEditorBoolean
+    var remainingKillsLevel: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Remaining Kills Health", desc = "Include the mob Health in the Remaining Kills display")
+    @ConfigEditorBoolean
+    var remainingKillsHealth: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = SlayerConfig::class, field = "remainingKills")
+    val remainingKillsPosition: Position = Position(410, 110)
+
+    @Expose
+    @ConfigOption(name = "Active Boss Transparency", desc = "")
+    @Accordion
+    val activeBossTransparency: ActiveBossTransparencyConfig = ActiveBossTransparencyConfig()
+
+    @Expose
     @ConfigOption(
         name = "Block Not Spawnable",
         desc = "Prevent clicking slayer bosses that cannot be spawned in the current dimension in Maddox's menu.",
@@ -71,7 +117,7 @@ class SlayerConfig {
     @Expose
     @ConfigOption(
         name = "Line to Miniboss Width",
-        desc = "The width of the line pointing to every Slayer Mini-Boss around you."
+        desc = "The width of the line pointing to every Slayer Mini-Boss around you.",
     )
     @ConfigEditorSlider(minStep = 1f, minValue = 1f, maxValue = 10f)
     var slayerMinibossLineWidth: Int = 3
@@ -80,7 +126,7 @@ class SlayerConfig {
     @ConfigOption(
         name = "Hide Mob Names",
         desc = "Hide the name of the mobs you need to kill in order for the Slayer boss to spawn. " +
-            "Exclude mobs that are damaged, corrupted, runic or semi rare."
+            "Exclude mobs that are damaged, corrupted, runic or semi rare.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -89,7 +135,7 @@ class SlayerConfig {
     @Expose
     @ConfigOption(
         name = "Quest Warning",
-        desc = "Warn when wrong Slayer quest is selected, or killing mobs for the wrong Slayer."
+        desc = "Warn when wrong Slayer quest is selected, or killing mobs for the wrong Slayer.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -100,4 +146,69 @@ class SlayerConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var questWarningTitle: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Hide Irrelevant Mobs",
+        desc = "Makes mobs partially transparent so that they dont annoy while having an active slayer quest. " +
+            "Useful for e.g. Magma Cubes in Burning Desert for Tara Slayer.",
+    )
+    @SearchTag("tarantula spider opacity")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideIrrelevantMobs: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Adjust Irrelevant Transparency",
+        desc = "Adjust the transparency of irrelevant mobs. (in %)",
+    )
+    @SearchTag("magma cube tarantula tara spider slayer quest")
+    @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 1f)
+    var hideIrrelevantMobsTransparency: Int = 40
+
+    @Expose
+    @ConfigOption(name = "Time to Kill Message", desc = "Sends time to kill a slayer in chat.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var timeToKillMessage: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Quest Complete Message", desc = "Sends time to complete (Spawn & Kill) a slayer quest in chat.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var questCompleteMessage: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Compact Time Messages", desc = "Shorter Time to Kill and Quest Complete messages.")
+    @ConfigEditorBoolean
+    var compactTimeMessage: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Slayer Cocoon Title", desc = "Send title when Slayer Boss is cocooned.")
+    @ConfigEditorBoolean
+    var cocoonTitle: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Slayer Cocoon Notification Sound", desc = "Sends a sound notification when your Slayer Boss is cocooned.")
+    @ConfigEditorBoolean
+    var cocoonDing: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Spawn Particles", desc = "Spawn Particles To Hide")
+    @ConfigEditorDraggableList
+    val spawnParticleHider: Property<MutableList<SpawnParticles>> = Property.of(mutableListOf())
+
+    @Expose
+    @ConfigOption(name = "Hide Damage Splashes Near Slayer Boss", desc = "Hides Damage Splashes Near Slayer Boss.")
+    @ConfigEditorBoolean
+    var damageSplashHider: Boolean = false
+
+    @SkyHanniModule
+    companion object {
+        @HandleEvent
+        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            event.move(126, "slayer.hideIrrelevantMobsOpacity", "slayer.hideIrrelevantMobsTransparency")
+        }
+    }
 }

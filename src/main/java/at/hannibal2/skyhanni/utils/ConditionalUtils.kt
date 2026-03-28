@@ -2,6 +2,11 @@ package at.hannibal2.skyhanni.utils
 
 import io.github.notenoughupdates.moulconfig.observer.Observer
 import io.github.notenoughupdates.moulconfig.observer.Property
+import kotlin.reflect.full.hasAnnotation
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.jvm.javaField
+import kotlin.reflect.jvm.javaGetter
 
 object ConditionalUtils {
 
@@ -72,4 +77,35 @@ object ConditionalUtils {
         return second1.compareTo(second2)
     }
 
+    /**
+     * Recursively scans each given 'root' for any fields of type Property<*>,
+     * then calls the existing onToggle(...) overload with all discovered properties.
+     */
+    fun onAnyToggled(vararg roots: Any, observer: Runnable) = roots.forEach { root ->
+        collectProperties(root, mutableSetOf()).forEach {
+            onToggle(it, observer = observer)
+        }
+    }
+
+    private fun collectProperties(
+        current: Any,
+        visited: MutableSet<Any>,
+    ): List<Property<*>> = buildList {
+        if (current.javaClass.isArray || current.javaClass.isSynthetic) return@buildList
+        if (!visited.add(current)) return@buildList
+
+        val nonTransientProps = current::class.memberProperties.filter { !it.hasAnnotation<Transient>() }
+        for (prop in nonTransientProps) {
+            val getter = runCatching { prop.javaGetter }.getOrNull()
+            if (prop.javaField == null && getter == null) continue
+            if (runCatching { prop.isAccessible = true }.isFailure) continue
+            val value = runCatching { prop.getter.call(current) }.getOrNull() ?: continue
+            when (value) {
+                is Property<*> -> add(value)
+                else -> addAll(
+                    collectProperties(value, visited),
+                )
+            }
+        }
+    }
 }

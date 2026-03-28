@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -17,9 +18,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import net.minecraft.client.renderer.GlStateManager
 import java.time.Instant
 import kotlin.math.sin
 import kotlin.time.Duration.Companion.seconds
@@ -50,7 +49,7 @@ object HoppityCallWarning {
     // </editor-fold>
 
     private val config get() = HoppityEggsManager.config.hoppityCallWarning
-    private var warningSound = SoundUtils.createSound("note.pling", 1f)
+    private var warningSound = SoundUtils.createSound("block.note_block.pling", 1f)
     private var activeWarning = false
     private var nextWarningTime: Instant? = null
     private var finalWarningTime: Instant? = null
@@ -68,7 +67,7 @@ object HoppityCallWarning {
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         if (initHoppityCallPattern.matches(event.message)) startWarningUser()
         if (pickupHoppityCallPattern.matches(event.message)) stopWarningUser()
@@ -102,9 +101,8 @@ object HoppityCallWarning {
             GuiScreenUtils.displayWidth,
             GuiScreenUtils.displayHeight,
             // Apply the shifted alpha and combine it with the RGB components of flashColor.
-            shiftedRandomAlpha or (config.flashColor.toSpecialColorInt() and 0xFFFFFF),
+            shiftedRandomAlpha or (config.flashColor.toColor().rgb and 0xFFFFFF),
         )
-        GlStateManager.color(1F, 1F, 1F, 1F)
     }
 
     @HandleEvent(onlyOnSkyblock = true)

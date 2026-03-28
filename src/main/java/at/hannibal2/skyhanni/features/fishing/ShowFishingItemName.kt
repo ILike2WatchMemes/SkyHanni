@@ -5,25 +5,26 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi.isBait
-import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.RenderUtils.drawString
-import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeLimitedCache
-import net.minecraft.entity.item.EntityItem
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
+import net.minecraft.world.entity.item.ItemEntity
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object ShowFishingItemName {
 
     private val config get() = SkyHanniMod.feature.fishing.fishedItemName
-    private val itemsOnGround = TimeLimitedCache<EntityItem, String>(750.milliseconds)
+    private val itemsOnGround = TimeLimitedCache<ItemEntity, String>(750.milliseconds)
 
     // Textures taken from Skytils - moved to REPO
     private val cheapCoins by lazy {
@@ -36,10 +37,8 @@ object ShowFishingItemName {
     @HandleEvent
     fun onTick() {
         if (!isEnabled()) return
-        for (entityItem in EntityUtils.getEntitiesNextToPlayer<EntityItem>(15.0)) {
-            val itemStack = entityItem.entityItem
-            // Hypixel sometimes replaces the bait item midair with a stone
-            if (itemStack.displayName.removeColor() == "Stone") continue
+        for (entityItem in EntityUtils.getEntitiesNearby<ItemEntity>(15.0)) {
+            val itemStack = entityItem.item.orNull() ?: continue
             var text = ""
 
             val isBait = itemStack.isBait()
@@ -48,10 +47,10 @@ object ShowFishingItemName {
             if (itemStack.getSkullTexture() in cheapCoins) {
                 text = "§6Coins"
             } else {
-                val name = itemStack.displayName.transformIf({ isBait }) { "§7" + this.removeColor() }
+                val name = itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets().transformIf({ isBait }) { "§7" + this.removeColor() }
                 text += if (isBait) "§c§l- §r" else "§a§l+ §r"
 
-                val size = itemStack.stackSize
+                val size = itemStack.count
                 if (size != 1) text += "§7x$size §r"
                 text += name
             }
@@ -72,7 +71,7 @@ object ShowFishingItemName {
 
     private fun inCorrectArea(): Boolean {
         if (IslandType.HUB.isCurrent()) {
-            IslandAreas.currentAreaName.let {
+            SkyBlockUtils.graphArea?.let {
                 if (it.endsWith(" Atrium") || it.endsWith(" Museum")) return false
                 if (it == "Fashion Shop" || it == "Shen's Auction") return false
             }

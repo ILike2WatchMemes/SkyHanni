@@ -8,19 +8,20 @@ import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.getExtendedColorCode
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
+import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawCylinderInWorld
-import at.hannibal2.skyhanni.utils.RenderUtils.drawString
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
-import net.minecraft.entity.item.EntityArmorStand
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCylinderInWorld
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
+import net.minecraft.network.chat.Component
+import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object AshfangHighlights {
@@ -29,12 +30,12 @@ object AshfangHighlights {
 
     private val BLAZING_SOUL by lazy { SkullTextureHolder.getTexture("ASHFANG_BLAZING_SOUL") }
     private val GRAVITY_ORB by lazy { SkullTextureHolder.getTexture("ASHFANG_GRAVITY_ORB") }
-    private val blazingSouls = mutableSetOf<EntityArmorStand>()
-    private val gravityOrbs = mutableSetOf<EntityArmorStand>()
+    private val blazingSouls = mutableSetOf<ArmorStand>()
+    private val gravityOrbs = mutableSetOf<ArmorStand>()
     private const val MAX_DISTANCE = 15.0
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onEntityJoin(event: EntityEnterWorldEvent<EntityArmorStand>) {
+    fun onEntityJoin(event: EntityEnterWorldEvent<ArmorStand>) {
         if (!AshfangManager.active) return
         val entity = event.entity
         DelayedRun.runNextTick {
@@ -46,7 +47,7 @@ object AshfangHighlights {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onEntityLeave(event: EntityLeaveWorldEvent<EntityArmorStand>) {
+    fun onEntityLeave(event: EntityLeaveWorldEvent<ArmorStand>) {
         blazingSouls -= event.entity
         gravityOrbs -= event.entity
     }
@@ -56,7 +57,7 @@ object AshfangHighlights {
         if (!AshfangManager.active) return
 
         if (config.blazingSouls.enabled) {
-            val color = config.blazingSouls.color.toSpecialColor()
+            val color = config.blazingSouls.color.toColor()
             blazingSouls.forEach {
                 val location = event.exactLocation(it)
                 event.drawWaypointFilled(location.add(-0.5, 1.25, -0.5), color, extraSize = -0.15)
@@ -65,7 +66,7 @@ object AshfangHighlights {
         }
 
         if (config.gravityOrbs.enabled) {
-            val color = config.gravityOrbs.color.toSpecialColor()
+            val color = config.gravityOrbs.color.toColor()
             gravityOrbs.forEach {
                 val location = event.exactLocation(it)
                 event.drawCylinderInWorld(color, location.add(-0.5, -2.0, -0.5), 3.5f, 4.5f)
@@ -83,13 +84,19 @@ object AshfangHighlights {
     private fun SkyHanniRenderWorldEvent.drawBlendedColorString(location: LorenzVec, text: String) {
         val distance = location.distanceToPlayer()
         if (distance < MAX_DISTANCE) {
-            val colorCode = getColorCode(distance)
-            drawString(location.add(y = 2.5), colorCode + text)
+            val string = getColor(distance, text)
+            drawString(location.add(y = 2.5), string)
         }
     }
 
-    private fun getColorCode(distance: Double): String =
-        ColorUtils.blendRGB(LorenzColor.GREEN.toColor(), LorenzColor.RED.toColor(), distance / MAX_DISTANCE).getExtendedColorCode()
+    private fun getColor(distance: Double, text: String): Component =
+        ExtendedChatColor(
+            ColorUtils.blendRGB(
+                LorenzColor.GREEN.toColor(),
+                LorenzColor.RED.toColor(),
+                distance / MAX_DISTANCE
+            ).rgb
+        ).asText(text)
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

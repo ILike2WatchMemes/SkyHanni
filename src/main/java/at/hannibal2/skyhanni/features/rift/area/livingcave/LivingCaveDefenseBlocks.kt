@@ -10,19 +10,21 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
-import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.EntityUtils.isAtFullHealth
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.util.EnumParticleTypes
+import at.hannibal2.skyhanni.utils.compat.deceased
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.core.particles.ParticleTypes
 
 @SkyHanniModule
 object LivingCaveDefenseBlocks {
@@ -31,12 +33,12 @@ object LivingCaveDefenseBlocks {
     private var movingBlocks = mapOf<DefenseBlock, Long>()
     private var staticBlocks = emptyList<DefenseBlock>()
 
-    class DefenseBlock(val entity: EntityOtherPlayerMP, val location: LorenzVec, var hidden: Boolean = false)
+    class DefenseBlock(val entity: RemotePlayer, val location: LorenzVec, var hidden: Boolean = false)
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        staticBlocks = staticBlocks.editCopy { removeIf { it.entity.isDead } }
+        staticBlocks = staticBlocks.editCopy { removeIf { it.entity.deceased } }
     }
 
     @HandleEvent
@@ -61,8 +63,8 @@ object LivingCaveDefenseBlocks {
             event.cancel()
         }
 
-        if (event.type == EnumParticleTypes.CRIT_MAGIC) {
-            var entity: EntityOtherPlayerMP? = null
+        if (event.type == ParticleTypes.ENCHANTED_HIT) {
+            var entity: RemotePlayer? = null
 
             // read old entity data
             getNearestMovingDefenseBlock(location)?.let {
@@ -77,8 +79,8 @@ object LivingCaveDefenseBlocks {
             if (entity == null) {
                 // read new entity data
                 val compareLocation = event.location.add(-0.5, -1.5, -0.5)
-                entity = EntityUtils.getEntitiesNearby<EntityOtherPlayerMP>(compareLocation, 2.0)
-                    .filter { isCorrectMob(it.name) }
+                entity = compareLocation.getEntitiesNearby<RemotePlayer>(2.0)
+                    .filter { isCorrectMob(it.name.formattedTextCompatLessResets()) }
                     .filter { !it.isAtFullHealth() }
                     .minByOrNull { it.distanceTo(compareLocation) }
             }
@@ -116,7 +118,7 @@ object LivingCaveDefenseBlocks {
             val entity = getNearestMovingDefenseBlock(location)?.entity ?: return
             staticBlocks = staticBlocks.editCopy {
                 add(DefenseBlock(entity, location))
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                RenderLivingEntityHelper.setEntityColor(
                     entity,
                     color.addAlpha(50),
                 ) { isEnabled() && staticBlocks.any { it.entity == entity } }
@@ -156,7 +158,7 @@ object LivingCaveDefenseBlocks {
         }
         for (block in staticBlocks) {
             val location = block.location
-            event.drawDynamicText(location, "§bBreak!", 1.5, ignoreBlocks = false)
+            event.drawDynamicText(location, "§bBreak!", 1.5, seeThroughBlocks = false)
             event.drawWaypointFilled(location, color)
 
             event.draw3DLine(
@@ -169,7 +171,7 @@ object LivingCaveDefenseBlocks {
         }
     }
 
-    private val color get() = config.color.get().toSpecialColor()
+    private val color get() = config.color.get().toColor()
 
     fun isEnabled() = RiftApi.inRift() && config.enabled && RiftApi.inLivingCave()
 

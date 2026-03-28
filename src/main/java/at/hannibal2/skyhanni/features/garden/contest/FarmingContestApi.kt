@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.farming.FarmingContestEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -114,9 +114,10 @@ object FarmingContestApi {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    @HandleEvent(priority = HandleEvent.HIGHEST, onlyOnSkyblock = true)
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (event.inventoryName != "Your Contests") return
+        if (inInventory) return
         val bulkClaimStack = event.inventoryItems[50] ?: return
         val firstLine = bulkClaimStack.getLore().firstOrNull() ?: return
         if (!bulkClaimFarmingPattern.matches(firstLine)) return

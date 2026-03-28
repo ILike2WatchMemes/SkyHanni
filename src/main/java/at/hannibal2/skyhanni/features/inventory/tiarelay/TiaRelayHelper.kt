@@ -32,7 +32,7 @@ object TiaRelayHelper {
     fun onPlaySound(event: PlaySoundEvent) {
         val soundName = event.soundName
 
-        if (config.tiaRelayMute && soundName == "mob.wolf.whine") {
+        if (config.tiaRelayMute && soundName == "entity.wolf.whine") {
             event.cancel()
         }
 
@@ -105,9 +105,9 @@ object TiaRelayHelper {
         if (!inInventory) return
 
         val slot = event.slot
-        val stack = slot.stack
+        val stack = slot.item
 
-        val slotNumber = slot.slotNumber
+        val slotNumber = slot.index
 
         val position = resultDisplay.getOrDefault(slotNumber, null)
         if (position != null) {

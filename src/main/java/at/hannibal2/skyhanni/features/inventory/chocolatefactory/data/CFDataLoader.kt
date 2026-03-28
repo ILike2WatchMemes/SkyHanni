@@ -29,7 +29,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
-import net.minecraft.item.ItemStack
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object CFDataLoader {
@@ -176,9 +177,9 @@ object CFDataLoader {
     /**
      * REGEX-TEST: Time Tower I
      */
-    private val upgradeTierPattern by CFApi.patternGroup.pattern(
+    val upgradeTierPattern by CFApi.patternGroup.pattern(
         "upgradetier",
-        ".*\\s(?<tier>[IVXLC]+)",
+        "(?<upgrade>.*)\\s(?<tier>[IVXLC]+)",
     )
 
     /**
@@ -322,7 +323,7 @@ object CFDataLoader {
     private fun processChocolateItem(item: ItemStack) {
         val profileStorage = profileStorage ?: return
 
-        CFApi.chocolateAmountPattern.matchMatcher(item.displayName.removeColor()) {
+        CFApi.chocolateAmountPattern.matchMatcher(item.hoverName.string.removeColor()) {
             profileStorage.currentChocolate = group("amount").formatLong()
         }
         for (line in item.getLore()) {
@@ -338,7 +339,7 @@ object CFDataLoader {
     private fun processPrestigeItem(list: MutableList<CFUpgrade>, item: ItemStack) {
         val profileStorage = profileStorage ?: return
 
-        prestigeLevelPattern.matchMatcher(item.displayName) {
+        prestigeLevelPattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
             CFApi.currentPrestige = group("prestige").romanToDecimal()
         }
         var prestigeCost: Long? = null
@@ -469,7 +470,7 @@ object CFDataLoader {
 
         if (slotIndex !in CFApi.otherUpgradeSlots && slotIndex !in CFApi.rabbitSlots) return
 
-        val itemName = item.displayName.removeColor()
+        val itemName = item.hoverName.string.removeColor()
         val lore = item.getLore()
         val upgradeCost = CFApi.getChocolateBuyCost(lore)
         val averageChocolate = ChocolateAmount.averageChocPerSecond().roundTo(2)
@@ -504,6 +505,8 @@ object CFDataLoader {
 
         val chocolateIncrease = CFApi.rabbitSlots[slotIndex] ?: 0
         val newAverageChocolate = ChocolateAmount.averageChocPerSecond(rawPerSecondIncrease = chocolateIncrease)
+
+        if (upgradeCost == null) return
         addUpgradeToList(list, slotIndex, level, upgradeCost, averageChocolate, newAverageChocolate, isRabbit = true)
     }
 
@@ -541,6 +544,7 @@ object CFDataLoader {
             }
         }
 
+        if (upgradeCost == null) return
         addUpgradeToList(list, slotIndex, level, upgradeCost, averageChocolate, newAverageChocolate, isRabbit = false)
     }
 
@@ -548,13 +552,13 @@ object CFDataLoader {
         list: MutableList<CFUpgrade>,
         slotIndex: Int,
         level: Int,
-        upgradeCost: Long?,
+        upgradeCost: Long,
         averageChocolate: Double,
         newAverageChocolate: Double,
         isRabbit: Boolean,
     ) {
         val extra = (newAverageChocolate - averageChocolate).roundTo(2)
-        val effectiveCost = ((upgradeCost ?: 0) / extra).roundTo(2)
+        val effectiveCost = (upgradeCost / extra).roundTo(2)
         val upgrade = CFUpgrade(slotIndex, level, upgradeCost, extra, effectiveCost, isRabbit = isRabbit)
         list.add(upgrade)
     }

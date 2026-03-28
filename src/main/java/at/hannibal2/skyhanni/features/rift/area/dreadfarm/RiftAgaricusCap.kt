@@ -12,10 +12,10 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraft.init.Blocks
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule
 object RiftAgaricusCap {
@@ -39,10 +39,10 @@ object RiftAgaricusCap {
 
     private fun updateLocation(): LorenzVec? {
         if (InventoryUtils.getItemInHand()?.getInternalName() != RiftApi.farmingTool) return null
-        val currentLocation = BlockUtils.getBlockLookingAt() ?: return null
+        val currentLocation = BlockUtils.getTargetedBlock() ?: return null
 
         when (currentLocation.getBlockAt()) {
-            Blocks.brown_mushroom -> {
+            Blocks.BROWN_MUSHROOM -> {
                 return if (location != currentLocation) {
                     startTime = SimpleTimeMark.now()
                     currentLocation
@@ -54,7 +54,7 @@ object RiftAgaricusCap {
                 }
             }
 
-            Blocks.red_mushroom -> {
+            Blocks.RED_MUSHROOM -> {
                 if (location == currentLocation) {
                     startTime = SimpleTimeMark.farFuture()
                     return location

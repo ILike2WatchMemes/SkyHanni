@@ -33,7 +33,7 @@ object GoldenGoblinHighlight {
     private var lastGoblin: Mob? = null
 
     @HandleEvent
-    fun onEvent(event: SkyHanniChatEvent) {
+    fun onEvent(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         if (!MiningNotifications.goldenGoblinSpawn.matches(event.message) &&
             !MiningNotifications.diamondGoblinSpawn.matches(event.message)
@@ -58,9 +58,9 @@ object GoldenGoblinHighlight {
         lastGoblinSpawn = SimpleTimeMark.farPast()
 
         val goblin = lastGoblin ?: return
-        goblin.highlight(LorenzColor.GREEN.toColor())
+        goblin.highlight(LorenzColor.GREEN.toChromaColor())
         if (config.lineToYourGoldenGoblin) {
-            goblin.lineToPlayer(LorenzColor.GREEN.toColor()) { config.lineToYourGoldenGoblin }
+            goblin.lineToPlayer(LorenzColor.GREEN.toChromaColor()) { config.lineToYourGoldenGoblin }
         }
         lastGoblin = null
     }

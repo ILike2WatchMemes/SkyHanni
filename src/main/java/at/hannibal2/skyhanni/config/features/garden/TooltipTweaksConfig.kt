@@ -1,13 +1,12 @@
 package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class TooltipTweaksConfig {
     @Expose
@@ -24,8 +23,8 @@ class TooltipTweaksConfig {
         name = "Breakdown Hotkey",
         desc = "When the keybind is pressed, show a breakdown of all fortune sources on a tool."
     )
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
-    var fortuneTooltipKeybind: Int = Keyboard.KEY_LSHIFT
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_LEFT_SHIFT)
+    var fortuneTooltipKeybind: Int = GLFW.GLFW_KEY_LEFT_SHIFT
 
     @Expose
     @ConfigOption(
@@ -37,16 +36,12 @@ class TooltipTweaksConfig {
     @ConfigEditorDropdown
     var cropTooltipFortune: CropTooltipFortuneEntry = CropTooltipFortuneEntry.SHOW
 
-    enum class CropTooltipFortuneEntry(
-        private val displayName: String,
-        private val legacyId: Int = -1
-    ) : HasLegacyId {
-        DEFAULT("Default", 0),
-        SHOW("Show", 1),
-        REPLACE("Replace", 2),
+    enum class CropTooltipFortuneEntry(private val displayName: String) {
+        DEFAULT("Default"),
+        SHOW("Show"),
+        REPLACE("Replace"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 

@@ -3,16 +3,16 @@ package at.hannibal2.skyhanni.features.combat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object HideDamageSplash {
 
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!SkyHanniMod.feature.combat.hideDamageSplash) return
 
         if (DamageIndicatorManager.isDamageSplash(event.entity)) {

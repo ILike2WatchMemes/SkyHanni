@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -15,13 +16,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.toLorenzVec
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.world.entity.decoration.ArmorStand
 
 // TODO: Maybe implement automatic warp-in for chosen players if the user is not in a party.
 @SkyHanniModule
@@ -40,11 +41,13 @@ object CorpseLocator {
 
     private val sharedWaypoints: MutableList<LorenzVec> = mutableListOf()
 
+    // TODO: use entity events
+    @OptIn(AllEntitiesGetter::class)
     private fun findCorpse() {
-        EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()
+        EntityUtils.getAllEntities().filterIsInstance<ArmorStand>()
             .filterNot { corpse -> MineshaftWaypoints.waypoints.any { it.location.distance(corpse.getLorenzVec()) <= 3 } }
             .filter { entity ->
-                entity.showArms && entity.hasNoBasePlate() && !entity.isInvisible
+                entity.showArms() && entity.showBasePlate().not() && !entity.isInvisible
             }
             .forEach { entity ->
                 val helmetName = entity.getStandHelmet()?.getInternalName() ?: return
@@ -74,10 +77,10 @@ object CorpseLocator {
             .filter { it.location.distanceToPlayer() <= 5 }
             .minByOrNull { it.location.distanceToPlayer() } ?: return
 
-        val (x, y, z) = closestCorpse.location.toDoubleArray().map { it.toInt() }
+        val location = closestCorpse.location.toChatFormat()
         val type = closestCorpse.waypointType.displayText
 
-        HypixelCommands.partyChat("x: $x, y: $y, z: $z | ($type)")
+        HypixelCommands.partyChat("$location | ($type)")
         closestCorpse.shared = true
     }
 
@@ -100,12 +103,12 @@ object CorpseLocator {
     }
 
     @HandleEvent
-    fun onPartyChat(event: PartyChatEvent) {
+    fun onPartyChat(event: PartyChatEvent.Allow) {
         handleChatEvent(event.author, event.message)
     }
 
     @HandleEvent
-    fun onAllChat(event: PlayerAllChatEvent) {
+    fun onAllChat(event: PlayerAllChatEvent.Allow) {
         handleChatEvent(event.author, event.message)
     }
 
@@ -114,8 +117,7 @@ object CorpseLocator {
         if (PlayerUtils.getName() in author) return
 
         mineshaftCoordsPattern.matchMatcher(message) {
-            val (x, y, z) = listOf(group("x"), group("y"), group("z")).map { it.formatInt() }
-            val location = LorenzVec(x, y, z)
+            val location = toLorenzVec() ?: return
 
             // Return if someone had already sent a location nearby
             if (sharedWaypoints.any { it.distance(location) <= 5 }) return

@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.features.event.yearoftheseal
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onDisable
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
@@ -26,8 +25,8 @@ import at.hannibal2.skyhanni.utils.render.LineDrawer
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.phys.AABB
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -41,9 +40,9 @@ object BeachBallCatchHelper {
     private val NORMAL_BEACH_BALL by lazy { SkullTextureHolder.getTexture("NORMAL_BEACH_BALL") }
 //     private val GIANT_BEACH_BALL by lazy { SkullTextureHolder.getTexture("GIANT_BEACH_BALL") }
 
-    fun check(entity: EntityArmorStand) {
+    fun check(entity: ArmorStand) {
         if (entity.wearingSkullTexture(NORMAL_BEACH_BALL)) {
-            predictors.putIfAbsent(entity.entityId, Predictor(entity.getLorenzVec(), Variant.NORMAL))
+            predictors.putIfAbsent(entity.id, Predictor(entity.getLorenzVec(), Variant.NORMAL))
             println("normal detected")
             return
         }
@@ -55,7 +54,7 @@ object BeachBallCatchHelper {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onEntityEnterWorld(event: EntityEnterWorldEvent<EntityArmorStand>) {
+    fun onEntityEnterWorld(event: EntityEnterWorldEvent<ArmorStand>) {
         if (!isEnabled()) return
         DelayedRun.runDelayed(2.ticks) { check(event.entity) }
     }
@@ -73,7 +72,8 @@ object BeachBallCatchHelper {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
-        val color = config.bouncyBallLineColor.toSpecialColor()
+        if (predictors.isEmpty()) return
+        val color = config.bouncyBallLineColor.toColor()
         LineDrawer.draw3D(event, 4, true) {
             predictors.forEach { (_, predict) ->
                 drawPath(predict.prePath, color.darker(), bezierPoint = -1.0)
@@ -112,26 +112,27 @@ object BeachBallCatchHelper {
         val distance = location.distance(player)
         drawFilledBoundingBox(
             location.getAABB(predictor.variant),
+            // TODO add chroma color support via config
             when {
                 distance < 0.3 -> Color.GREEN
                 distance < 0.9 -> Color.ORANGE
                 else -> Color.RED
-            },
+            }.toChromaColor(),
         )
     }
 
-    private fun LorenzVec.getAABB(variant: Variant): AxisAlignedBB = when (variant) {
+    private fun LorenzVec.getAABB(variant: Variant): AABB = when (variant) {
         Variant.NORMAL -> add(-0.3, -0.3, -0.3).boundingToOffset(0.6, 0.6, 0.6)
         Variant.GIANT -> add(-0.9, -0.9, -0.9).boundingToOffset(1.8, 1.8, 1.8)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onIslandChange(event: IslandChangeEvent) {
+    fun onIslandChange() {
         predictors.clear()
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         config.bouncyBallLine.onDisable { DelayedRun.runDelayed(3.ticks) { predictors.clear() } }
     }
 

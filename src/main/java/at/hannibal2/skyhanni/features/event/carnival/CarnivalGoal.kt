@@ -2,13 +2,11 @@ package at.hannibal2.skyhanni.features.event.carnival
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -16,11 +14,14 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.init.Blocks
-import net.minecraft.init.Items
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.Blocks
 import org.intellij.lang.annotations.Language
 
 private val patternGroup = RepoPattern.group("event.carnival.goals")
@@ -187,13 +188,12 @@ enum class CarnivalGoal(
         }
 
         @HandleEvent
-        fun onChat(event: SkyHanniChatEvent) {
+        fun onChat(event: SkyHanniChatEvent.Allow) {
             if (!isEnabled()) return
             entries.firstOrNull { it.chatPattern.matches(event.message) }?.isReached = true
         }
 
         private var display = emptyList<Renderable>()
-        private var inCarnival = false
 
         @HandleEvent
         fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -207,25 +207,17 @@ enum class CarnivalGoal(
             config.goalsPosition.renderRenderables(display, posLabel = "Carnival Goals")
         }
 
-        @HandleEvent
-        fun onAreaChange(event: GraphAreaChangeEvent) {
-            inCarnival = event.area == "Carnival"
-        }
-
-        fun isEnabled() =
-            SkyBlockUtils.inSkyBlock && config.showGoals && Perk.CHIVALROUS_CARNIVAL.isActive && inCarnival
+        fun isEnabled() = SkyBlockUtils.inSkyBlock && config.showGoals && CarnivalAPI.inCarnivalArea
 
         private enum class GoalType(val item: Item, display: String) {
-            FRUIT_DIGGING(Item.getItemFromBlock(Blocks.sand), "§6Fruit Digging"),
-            CATCH_A_FISH(Items.fish, "§3Catch a Fish"),
-            ZOMBIE_SHOOTOUT(Items.arrow, "§cZombie Shootout");
+            FRUIT_DIGGING(Item.byBlock(Blocks.SAND), "§6Fruit Digging"),
+            CATCH_A_FISH(Items.COD, "§3Catch a Fish"),
+            ZOMBIE_SHOOTOUT(Items.ARROW, "§cZombie Shootout");
 
             val singleDisplay by lazy {
-                Renderable.horizontalContainer(
-                    listOf(
-                        Renderable.itemStack(ItemStack(item)),
-                        Renderable.string(display),
-                    ),
+                Renderable.horizontal(
+                    Renderable.item(ItemStack(item)),
+                    Renderable.text(display),
                 )
             }
 
@@ -233,7 +225,7 @@ enum class CarnivalGoal(
                 get() {
                     val goals = getGoals.filterNot { it.isReached }
                     if (goals.isEmpty()) return emptyList()
-                    return listOf(singleDisplay) + goals.map { Renderable.string(" " + it.display) }
+                    return listOf(singleDisplay) + goals.map { Renderable.text(" " + it.display) }
                 }
 
             val getGoals get() = CarnivalGoal.entries.filter { it.type == this }

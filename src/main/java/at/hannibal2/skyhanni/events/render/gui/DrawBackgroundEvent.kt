@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.events.render.gui
 
 import at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
+import net.minecraft.client.gui.GuiGraphics
 
-class DrawBackgroundEvent(context: DrawContext) : RenderingSkyHanniEvent(context)
+@PrimaryFunction("onBackgroundDraw")
+class DrawBackgroundEvent(context: GuiGraphics) : RenderingSkyHanniEvent(context)

@@ -39,20 +39,13 @@ object ColorFormattingHelper {
     }
 
     private fun printColorCodesExtra() {
-        ChatUtils.chat("§c================= Formatting Extra ==================", false)
+        ChatUtils.chat("§c================= Formatting Extra ==================", prefix = false)
         ChatUtils.clickableLinkChat(
             "§#§6§a§e§e§4§8§/[Click here to view codes on minecraft.wiki]",
             "https://minecraft.wiki/w/Formatting_codes#Color_codes",
             "§eOpen §cminecraft.wiki§e!",
-            false,
-            false,
-        )
-        ChatUtils.chat(
-            "§eYou can also uses SkyHanni's system for any colors. " +
-                "This is different from chroma. " +
-                "Simply type §6&#&f&f&9&a&2&e&/ §efor color §#§f§f§9§a§2§e§/#ff9a2e§e " +
-                "(adds §6& §ebefore every characters including §6#§e, ends with '§6&/§e').",
-            false,
+            autoOpen = false,
+            prefix = false,
         )
         ChatUtils.clickableLinkChat(
             "§z[Click here to open color picker color-hex.com]",
@@ -60,7 +53,7 @@ object ColorFormattingHelper {
             "§eOpen §ccolor-hex.com§e!",
             prefix = false,
         )
-        ChatUtils.chat("§c===================================================", false)
+        ChatUtils.chat("§c===================================================", prefix = false)
     }
 
     @HandleEvent

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.gui
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig
@@ -20,7 +21,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class GuiConfig {
     @Expose
@@ -39,15 +40,20 @@ class GuiConfig {
 
     @ConfigOption(
         name = "Edit GUI Locations",
-        desc = "Opens the Position Editor, allows changing the position of SkyHanni's overlays."
+        desc = "Opens the Position Editor, allows changing the position of SkyHanni's overlays.",
     )
     @ConfigEditorButton(buttonText = "Edit")
     val positions: Runnable = Runnable { openGuiPositionEditor(true) }
 
     @Expose
     @ConfigOption(name = "Open Hotkey", desc = "Press this key to open the GUI Editor.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var keyBindOpen: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var keyBindOpen: Int = GLFW.GLFW_KEY_UNKNOWN
+
+    @Expose
+    @ConfigOption(name = "Reset Hotkey", desc = "Key to press hovering a gui element to reset it's position and scale in the GUI Editor.")
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_R)
+    var keyBindReset: Int = GLFW.GLFW_KEY_R
 
     @Expose
     @ConfigOption(name = "Global GUI Scale", desc = "Globally scale all SkyHanni GUIs.")
@@ -74,6 +80,16 @@ class GuiConfig {
     @ConfigOption(name = "XP Bar", desc = "Settings for adjusting the XP bar.")
     @Accordion
     val xpBar: XPBarConfig = XPBarConfig()
+
+    @Expose
+    @ConfigOption(name = "Action Bar", desc = "Settings for adjusting the action bar.")
+    @Accordion
+    val actionBar: ActionBarConfig = ActionBarConfig()
+
+    @Expose
+    @ConfigOption(name = "Held Item Tooltip", desc = "Settings for adjusting the held item tooltip.")
+    @Accordion
+    val heldItemTooltip: HeldItemTooltipConfig = HeldItemTooltipConfig()
 
     @Expose
     @ConfigOption(name = "Mayor Overlay", desc = "Settings for the mayor overlay.")
@@ -111,6 +127,7 @@ class GuiConfig {
     @FeatureToggle
     var beaconPower: Boolean = false
 
+    // TODO move beacon power options into an accordion and into their own config file
     @Expose
     @ConfigOption(name = "Show Beacon Stat", desc = "Show what stat is being boosted by your beacon.")
     @ConfigEditorBoolean
@@ -123,7 +140,7 @@ class GuiConfig {
     @Expose
     @ConfigOption(
         name = "Real Time",
-        desc = "Display the current computer time, a handy feature when playing in full-screen mode."
+        desc = "Display the current computer time, a handy feature when playing in full-screen mode.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -132,7 +149,7 @@ class GuiConfig {
     @Expose
     @ConfigOption(
         name = "Real Time 12h Format",
-        desc = "Display the current computer time in 12hr Format rather than 24h Format."
+        desc = "Display the current computer time in 12hr Format rather than 24h Format.",
     )
     @ConfigEditorBoolean
     var realTimeFormatToggle: Boolean = false
@@ -161,19 +178,20 @@ class GuiConfig {
     val tpsDisplayPosition: Position = Position(10, 10)
 
     @Expose
-    @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var configButtonOnPause: Boolean = true
-
-    @Expose
     @ConfigOption(name = "Widen Config", desc = "Make SkyHanni's config window wider. (~1.5x)")
     @ConfigEditorBoolean
     val widenConfig: Property<Boolean> = Property.of(false)
 
     @Expose
+    @NoConfigLink
     val titlePosition: Position = Position(0, 160)
 
     @Expose
+    @NoConfigLink
     val titleIntentionPositions: MutableMap<TitleManager.TitleLocation, MutableMap<String, Position>> = mutableMapOf()
+
+    @Expose
+    @ConfigOption(name = "Legion/Bobbin Overlay", desc = "")
+    @Accordion
+    val legionBobbinOverlay: LegionBobbinOverlayConfig = LegionBobbinOverlayConfig()
 }

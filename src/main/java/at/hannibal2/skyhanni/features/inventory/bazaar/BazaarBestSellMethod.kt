@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.bazaar.BazaarOpenedProductEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarDataOrError
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
@@ -15,7 +16,8 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
+import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object BazaarBestSellMethod {
@@ -43,6 +45,13 @@ object BazaarBestSellMethod {
     fun onBazaarOpenedProduct(event: BazaarOpenedProductEvent) {
         if (!isEnabled()) return
         display = updateDisplay(event.openedProduct)
+
+        // on 1.21 NeuInternalName.getAmountInInventory() does not include the item currently clicked at
+        DelayedRun.runDelayed(300.milliseconds) {
+            if (display.isEmpty()) {
+                display = updateDisplay(event.openedProduct)
+            }
+        }
     }
 
     private fun updateDisplay(internalName: NeuInternalName?): String {
@@ -52,13 +61,13 @@ object BazaarBestSellMethod {
         var having = internalName.getAmountInInventory()
         lastClickedItem?.let {
             if (it.getInternalName() == internalName) {
-                having += it.stackSize
+                having += it.count
             }
         }
         if (having <= 0) return ""
 
         val data = internalName.getBazaarDataOrError()
-        val totalDiff = (data.sellOfferPrice - data.instantBuyPrice) * having
+        val totalDiff = (data.instantBuyPrice - data.instantSellPrice) * having
         val result = totalDiff.toInt().shortFormat()
 
         val name = internalName.repoItemName
@@ -66,7 +75,7 @@ object BazaarBestSellMethod {
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (display.isEmpty()) return
 
@@ -75,7 +84,7 @@ object BazaarBestSellMethod {
 
     @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        lastClickedItem = event.slot?.stack
+        lastClickedItem = event.slot?.item
         nextCloseWillResetItem = false
     }
 

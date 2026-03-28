@@ -22,10 +22,12 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.tileentity.TileEntityBeacon
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.world.level.block.entity.BeaconBlockEntity
+import net.minecraft.world.phys.AABB
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -57,7 +59,7 @@ object CrimsonMinibossRespawnTimer {
     private var display: Renderable? = null
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         val message = event.message
         downPattern.matchMatcher(message) {
@@ -112,7 +114,7 @@ object CrimsonMinibossRespawnTimer {
 
         val isBossInArea = MobData.skyblockMobs.filter {
             it.name == boss.displayName
-        }.any { boss.area.isInside(it.baseEntity.position.toLorenzVec()) }
+        }.any { boss.area.isInside(it.baseEntity.blockPosition().toLorenzVec()) }
         if (isBossInArea) {
             boss.spawned = true
             boss.foundBeacon = null
@@ -121,8 +123,8 @@ object CrimsonMinibossRespawnTimer {
         }
         boss.spawned = false
 
-        val isThereBeacon = EntityUtils.getAllTileEntities().filter { it is TileEntityBeacon }.any {
-            boss.area.isInside(it.pos.toLorenzVec())
+        val isThereBeacon = EntityUtils.getAllTileEntities().filter { it is BeaconBlockEntity }.any {
+            boss.area.isInside(it.blockPos.toLorenzVec())
         }
         if (boss.foundBeacon == true && !isThereBeacon) {
             boss.foundBeacon = false
@@ -150,7 +152,7 @@ object CrimsonMinibossRespawnTimer {
         val lines = MiniBoss.entries.map {
             val timer = it.nextSpawnTime
             val possibleTimer = it.possibleSpawnTime
-            Renderable.string(
+            Renderable.text(
                 buildString {
                     append("§b${it.displayName}: ")
                     if (it.isSpawned()) append("§aSPAWNED!")
@@ -170,7 +172,7 @@ object CrimsonMinibossRespawnTimer {
                 },
             )
         }
-        return Renderable.verticalContainer(lines)
+        return Renderable.vertical(lines)
     }
 
     @HandleEvent
@@ -212,7 +214,7 @@ object CrimsonMinibossRespawnTimer {
 
     enum class MiniBoss(
         val displayName: String,
-        val area: AxisAlignedBB,
+        val area: AABB,
         var nextSpawnTime: SimpleTimeMark? = null,
         var possibleSpawnTime: Pair<SimpleTimeMark, SimpleTimeMark>? = null,
         var foundBeacon: Boolean? = null,

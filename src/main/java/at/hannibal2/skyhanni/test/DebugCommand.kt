@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -8,8 +9,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.repo.RepoManager
-import at.hannibal2.skyhanni.data.repo.RepoManager.hasDefaultSettings
+import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.features.misc.TpsCounter
@@ -23,9 +23,7 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -52,7 +50,6 @@ object DebugCommand {
         // calling default debug stuff
         player(event)
         repoData(event)
-        globalRender(event)
         skyblockStatus(event)
         networkInfo(event)
         profileName(event)
@@ -146,52 +143,50 @@ object DebugCommand {
             add("on Hypixel SkyBlock")
             add("skyBlockIsland: ${SkyBlockUtils.currentIsland}")
             add("skyBlockArea:")
-            add("  scoreboard: '${SkyBlockUtils.graphArea}'")
+            add("  scoreboard: '${SkyBlockUtils.scoreboardArea}'")
             add("  graph network: '${SkyBlockUtils.graphArea}'")
-            with(MinecraftCompat.localPlayer.position.toLorenzVec().roundTo(1)) {
-                add(" /shtestwaypoint $x $y $z pathfind")
-            }
+            val location = PlayerUtils.blockPosition().toLocalFormat()
+            add(" /shtestwaypoint $location pathfind")
             add("isOnAlphaServer: '${SkyBlockUtils.isOnAlphaServer}'")
         }
     }
 
-    private fun globalRender(event: DebugDataCollectEvent) {
-        event.title("Global Render")
-        if (SkyHanniDebugsAndTests.globalRender) {
-            event.addIrrelevant("normal enabled")
-        } else {
-            event.addData {
-                add("Global renderer is disabled!")
-                add("No renderable elements from SkyHanni will show up anywhere!")
-            }
-        }
-    }
-
+    // todo clean this up so that it commonly reports on any AbstractRepoManager
     private fun repoData(event: DebugDataCollectEvent) {
         event.title("Repo Information")
-        val config = SkyHanniMod.feature.dev.repo
+        val config = DevApi.config.repo
 
         val hasDefaultSettings = config.location.hasDefaultSettings()
+        val unsuccessfulConstants = SkyHanniRepoManager.getFailedConstants()
         val list = buildList {
             add(" repoAutoUpdate: ${config.repoAutoUpdate}")
-            add(" usingBackupRepo: ${RepoManager.usingBackupRepo}")
+            add(" usingBackupRepo: ${SkyHanniRepoManager.isUsingBackup}")
             if (hasDefaultSettings) {
                 add((" repo location: default"))
             } else {
-                add(" non-default repo location: '${RepoManager.getRepoLocation()}'")
+                add(" non-default repo location: '${SkyHanniRepoManager.getGitHubRepoPath()}'")
             }
 
-            if (RepoManager.unsuccessfulConstants.isNotEmpty()) {
+            if (unsuccessfulConstants.isNotEmpty()) {
                 add(" unsuccessful constants:")
-                for (constant in RepoManager.unsuccessfulConstants) {
+                for (constant in unsuccessfulConstants) {
                     add("  - $constant")
                 }
             }
 
-            add(" loaded neu items: ${NeuItems.allNeuRepoItems().size}")
+            val neuRepoConfig = DevApi.config.neuRepo
+            add(" neuRepoAutoUpdate: ${neuRepoConfig.repoAutoUpdate}")
+
+            if (!neuRepoConfig.location.hasDefaultSettings()) {
+                add(" neu repo location: '${EnoughUpdatesRepoManager.getGitHubRepoPath()}'")
+            } else {
+                add(" neu repo location: default")
+            }
+
+            add(" loaded neu items: ${NeuItems.allNeuRepoInternalNames().size}")
         }
 
-        val isRelevant = RepoManager.usingBackupRepo || RepoManager.unsuccessfulConstants.isNotEmpty() || !hasDefaultSettings
+        val isRelevant = SkyHanniRepoManager.isUsingBackup || unsuccessfulConstants.isNotEmpty() || !hasDefaultSettings
         if (isRelevant) {
             event.addData(list)
         } else {
@@ -213,7 +208,7 @@ object DebugCommand {
     private fun networkInfo(event: DebugDataCollectEvent) {
         event.title("Network Information")
         val tps = TpsCounter.tps ?: 0.0
-        val pingEnabled = SkyHanniMod.feature.dev.hypixelPingApi
+        val pingEnabled = DevApi.mainToggles.pingApi
 
         val list = buildList {
             add("tps: $tps")

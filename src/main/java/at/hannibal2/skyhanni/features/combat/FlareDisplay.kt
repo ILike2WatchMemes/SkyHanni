@@ -7,32 +7,31 @@ import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
+import at.hannibal2.skyhanni.utils.ColorUtils.rgb
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereInWorld
-import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCircleWireframe
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereInWorld
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.math.sin
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -48,7 +47,7 @@ object FlareDisplay {
 
     private var activeWarning = false
 
-    class Flare(val type: FlareType, val entity: EntityArmorStand, val location: LorenzVec = entity.getLorenzVec())
+    class Flare(val type: FlareType, val entity: ArmorStand, val location: LorenzVec = entity.getLorenzVec())
 
     private val MAX_FLARE_TIME = 3.minutes
 
@@ -71,9 +70,8 @@ object FlareDisplay {
                 0,
                 GuiScreenUtils.displayWidth,
                 GuiScreenUtils.displayHeight,
-                (alpha shl 24) or (config.flashColor.toSpecialColorInt() and 0xFFFFFF),
+                (alpha shl 24) or (config.flashColor.rgb and 0xFFFFFF),
             )
-            GlStateManager.color(1F, 1F, 1F, 1F)
         }
 
         if (config.displayType == FlareConfig.DisplayType.WORLD) return
@@ -81,18 +79,21 @@ object FlareDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
+    fun onEntitySpawn(event: EntityEquipmentChangeEvent<ArmorStand>) {
+        if (!enabled) return
+        val entity = event.entity
+        if (entity.tickCount.ticks > MAX_FLARE_TIME) return
+        if (isAlreadyKnownFlare(entity)) return
+        getFlareTypeForTexture(entity)?.let {
+            flares.add(Flare(it, entity))
+        }
+        activeWarning = false
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!enabled) return
-        flares.removeIf { !it.entity.isEntityAlive }
-        for (entity in EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()) {
-            if (!entity.canBeSeen()) continue
-            if (entity.ticksExisted.ticks > MAX_FLARE_TIME) continue
-            if (isAlreadyKnownFlare(entity)) continue
-            getFlareTypeForTexture(entity)?.let {
-                flares.add(Flare(it, entity))
-            }
-            activeWarning = false
-        }
+        flares.removeIf { !it.entity.isAlive }
         var newDisplay: List<Renderable>? = null
         for (type in FlareType.entries) {
             val flare = getFlareForType(type) ?: continue
@@ -102,10 +103,10 @@ object FlareDisplay {
             if (newDisplay == null) {
                 newDisplay = buildList {
                     val displayTime = if (remainingTime.isNegative()) "§eSoon" else "§b${remainingTime.format()}"
-                    add(Renderable.string("$name: $displayTime"))
+                    addString("$name: $displayTime")
                     if (config.showManaBuff) {
                         type.manaBuff?.let {
-                            add(Renderable.string(" §b$it §7mana regen"))
+                            addString(" §b$it §7mana regen")
                         }
                     }
                 }
@@ -138,18 +139,18 @@ object FlareDisplay {
 
     private fun getRemainingTime(flare: Flare): Duration {
         val entity = flare.entity
-        val aliveTime = entity.ticksExisted.ticks
+        val aliveTime = entity.tickCount.ticks
         val remainingTime = (MAX_FLARE_TIME - aliveTime)
         return remainingTime
     }
 
     private fun getFlareForType(type: FlareType): Flare? = flares.firstOrNull { it.type == type }
 
-    private fun getFlareTypeForTexture(entity: EntityArmorStand): FlareType? =
+    private fun getFlareTypeForTexture(entity: ArmorStand): FlareType? =
         flareSkins.entries.firstOrNull { entity.hasSkullTexture(it.key) }?.value
 
-    private fun isAlreadyKnownFlare(entity: EntityArmorStand): Boolean =
-        flares.any { it.entity.entityId == entity.entityId }
+    private fun isAlreadyKnownFlare(entity: ArmorStand): Boolean =
+        flares.any { it.entity.id == entity.id }
 
     @HandleEvent
     fun onWorldChange() {
@@ -166,8 +167,8 @@ object FlareDisplay {
                 val location = flare.location.add(-0.5, 0.0, -0.5)
                 val name = flare.type.displayName
                 val time = "§b${getRemainingTime(flare).format()}"
-                event.drawDynamicText(location, name, 1.5, ignoreBlocks = false)
-                event.drawDynamicText(location, time, 1.5, yOff = 10f, ignoreBlocks = false)
+                event.drawDynamicText(location, name, 1.5, seeThroughBlocks = false)
+                event.drawDynamicText(location, time, 1.5, yOff = 10f, seeThroughBlocks = false)
             }
         }
 
@@ -181,7 +182,7 @@ object FlareDisplay {
                 FlareType.WARNING -> config.warningColor
                 FlareType.ALERT -> config.alertColor
                 FlareType.SOS -> config.sosColor
-            }.toSpecialColor()
+            }.toColor()
 
             when (config.outlineType) {
                 FlareConfig.OutlineType.FILLED -> {
@@ -209,7 +210,7 @@ object FlareDisplay {
         val location = event.location
         val distance = flares.minOfOrNull { it.location.distance(location) } ?: return
         if (distance < 2.5) {
-            if (event.type == EnumParticleTypes.FLAME) {
+            if (event.type == ParticleTypes.FLAME) {
                 event.cancel()
             }
         }

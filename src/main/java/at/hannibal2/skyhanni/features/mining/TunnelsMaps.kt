@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.Graph
-import at.hannibal2.skyhanni.data.model.GraphNode
+import at.hannibal2.skyhanni.data.model.graph.Graph
+import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -17,10 +17,12 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
@@ -40,17 +42,21 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotNullKeys
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DPathWithWaypoint
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
+import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
+import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import java.awt.Color
@@ -62,7 +68,7 @@ object TunnelsMaps {
 
     private val config get() = SkyHanniMod.feature.mining.tunnelMaps
 
-    private var graph: Graph = Graph(emptyList())
+    private var graph: Graph = Graph()
     private lateinit var campfire: GraphNode
 
     private var goalReached = false
@@ -211,9 +217,10 @@ object TunnelsMaps {
     }
 
     @HandleEvent
-    fun onTooltip(event: ToolTipEvent) {
+    fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
-        clickTranslate[event.slot.slotIndex]?.let {
+        event.slot ?: return
+        clickTranslate[event.slot.containerSlot]?.let {
             event.toolTip.add("§e§lRight Click §r§eto for Tunnel Maps.")
         }
     }
@@ -285,14 +292,13 @@ object TunnelsMaps {
         } ?: return display
 
         if (active.isEmpty()) return buildList {
-            addString("")
-            addString("")
+            add(Renderable.placeholder(0, 20))
             addAll(locationDisplay)
         }
 
         return buildList {
             if (goal == campfire && active != campfire.name) {
-                add(Renderable.string("§6Override for ${campfire.name}"))
+                addString("§6Override for ${campfire.name}")
                 add(Renderable.clickable("§eMake §f$active §eactive", onLeftClick = ::setNextGoal))
             } else {
                 add(
@@ -303,7 +309,7 @@ object TunnelsMaps {
                     ),
                 )
                 if (hasNext()) add(Renderable.clickable("§eNext Spot", onLeftClick = ::setNextGoal))
-                else addString("")
+                else Renderable.emptyText()
             }
             addAll(locationDisplay)
         }
@@ -311,7 +317,7 @@ object TunnelsMaps {
 
     init {
         RenderDisplayHelper(
-            condition = { isEnabled() },
+            condition = ::isEnabled,
             inOwnInventory = true,
         ) {
             display = drawDisplay()
@@ -321,7 +327,7 @@ object TunnelsMaps {
 
     private fun generateLocationsDisplay() = buildList {
         val campfireName = campfire.name ?: return@buildList
-        add(Renderable.string("§6Locations:"))
+        addString("§6Locations:")
         add(
             Renderable.clickable(
                 campfireName,
@@ -338,13 +344,13 @@ object TunnelsMaps {
         if (!config.excludeFairy.get()) {
             add(
                 Renderable.hoverable(
-                    Renderable.horizontalContainer(
-                        listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
+                    Renderable.horizontal(
+                        listOf(Renderable.text("§dFairy Souls")) + fairySouls.map {
                             val name = it.key.removePrefix("§dFairy Soul ")
-                            Renderable.clickable(Renderable.string("§d[$name]"), onLeftClick = guiSetActive(it.key))
+                            Renderable.clickable(Renderable.text("§d[$name]"), onLeftClick = guiSetActive(it.key))
                         },
                     ),
-                    Renderable.string("§dFairy Souls"),
+                    Renderable.text("§dFairy Souls"),
                 ),
             )
         }
@@ -356,11 +362,14 @@ object TunnelsMaps {
     }
 
     private fun Map<String, List<GraphNode>>.toRenderables() = map {
-        Renderable.clickable(Renderable.string(it.key), onLeftClick = guiSetActive(it.key))
+        Renderable.clickable(
+            Renderable.text(it.key),
+            onLeftClick = guiSetActive(it.key),
+        )
     }
 
     private fun toCompactGemstoneName(it: Map.Entry<String, List<GraphNode>>): Renderable = Renderable.clickable(
-        Renderable.string(
+        Renderable.text(
             (it.key.getFirstColorCode()?.let { "§$it" }.orEmpty()) + (
                 "ROUGH_".plus(
                     it.key.removeColor().removeSuffix("stone"),
@@ -392,7 +401,7 @@ object TunnelsMaps {
         if (!isEnabled()) return
         if (checkGoalReached()) return
         val prevClosest = closestNode
-        closestNode = graph.minBy { it.position.distanceSqToPlayer() }
+        closestNode = graph.getNearestNode()
         val closest = closestNode ?: return
         val goal = goal ?: return
         if (closest == prevClosest && goal == prevGoal) return
@@ -473,12 +482,12 @@ object TunnelsMaps {
         goal?.name?.getFirstColorCode()?.toLorenzColor()?.takeIf { it != LorenzColor.WHITE }?.toColor()
     } else {
         null
-    } ?: config.pathColor.toSpecialColor()
+    } ?: config.pathColor.toColor()
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (Minecraft.getInstance().screen != null) return
         campfireKey(event)
         nextSpotKey(event)
     }
@@ -528,5 +537,7 @@ object TunnelsMaps {
 
     private val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")
 
-    private fun isEnabled() = IslandType.DWARVEN_MINES.isCurrent() && config.enable && SkyBlockUtils.graphArea in areas
+    private fun isEnabled() =
+        IslandType.DWARVEN_MINES.isCurrent() && config.enable &&
+            (SkyBlockUtils.graphArea in areas || SkyBlockUtils.scoreboardArea in areas)
 }

@@ -5,24 +5,21 @@ import java.util.Properties
 
 enum class MultiVersionStage(val label: String) {
     OFF("off"),
-    PREPROCESS_ONLY("preprocess-only"),
     FULL("compile")
     ;
 
     fun shouldCompile(projectTarget: ProjectTarget): Boolean {
-        if (projectTarget == ProjectTarget.MAIN) return true
+        if (projectTarget == ProjectTarget.MODERN_12110) return true
         return when (this) {
             OFF -> false
-            PREPROCESS_ONLY -> false
-            FULL -> projectTarget == ProjectTarget.MODERN
+            FULL -> true
         }
     }
 
     fun shouldCreateProject(projectTarget: ProjectTarget): Boolean {
-        if (projectTarget == ProjectTarget.MAIN) return true
+        if (projectTarget == ProjectTarget.MODERN_12110) return true
         return when (this) {
             OFF -> false
-            PREPROCESS_ONLY -> true
             FULL -> true
         }
     }
@@ -35,7 +32,7 @@ enum class MultiVersionStage(val label: String) {
                 file.inputStream().use(prop::load)
             }
             val multiVersion = prop["skyhanni.multi-version"]
-            activeState = MultiVersionStage.values().find { it.label == multiVersion } ?: OFF
+            activeState = MultiVersionStage.values().find { it.label == multiVersion } ?: FULL
             println("SkyHanni multi version stage loaded: $activeState")
         }
     }

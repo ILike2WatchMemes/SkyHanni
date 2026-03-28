@@ -7,16 +7,15 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiContainer
-import net.minecraft.client.renderer.GlStateManager
-import org.lwjgl.opengl.GL11
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -25,7 +24,6 @@ data class TitleIntention(
     val internalName: String,
 )
 
-// todo 1.21 impl needed
 open class TitleContext(
     private var titleText: String = "",
     private var subtitleText: String? = null,
@@ -46,9 +44,11 @@ open class TitleContext(
             endTime = now() + duration
         }
     }
+
     open fun stop() {
         endTime = farPast()
     }
+
     open fun processRequeue(): Boolean {
         if (hasBeenReQueued) return false
         hasBeenReQueued = true
@@ -79,17 +79,15 @@ open class TitleContext(
         val mainScalar = position.scale * 3.0
         val subScalar = mainScalar * 0.75f
 
-        GlStateManager.enableBlend()
-        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         DrawContextUtils.pushPop {
-            val mainTextRenderable = StringRenderable(
+            val mainTextRenderable = Renderable.text(
                 getTitleText(),
                 scale = mainScalar,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             )
 
             val subtitleRenderable: Renderable? = getSubtitleText()?.let {
-                StringRenderable(
+                Renderable.text(
                     it,
                     scale = subScalar,
                     horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
@@ -97,8 +95,9 @@ open class TitleContext(
             }
 
             val targetRenderable = if (subtitleRenderable == null) mainTextRenderable
-            else VerticalContainerRenderable(
-                listOf(mainTextRenderable, subtitleRenderable),
+            else Renderable.vertical(
+                mainTextRenderable,
+                subtitleRenderable,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             )
@@ -106,17 +105,14 @@ open class TitleContext(
             val renderableWidth = targetRenderable.width
             val renderableHeight = targetRenderable.height
 
-            val posX = (guiWidth - renderableWidth) / 2
-            var posY = position.y
+            val translationX = (guiWidth - renderableWidth) / 2
             // moving the display to the bottom half of your screen is futile
-            if (posY < 0) {
-                posY = 100
-            }
-            if (posX != position.x || posY != position.y) {
-                position.set(Position(posX, posY, scale = position.scale))
+            val translationY = position.y.takeIf { it >= 0 } ?: 100
+            if (translationX != position.x || translationY != position.y) {
+                position.set(Position(translationX, translationY, scale = position.scale))
             }
 
-            DrawContextUtils.translate(posX.toFloat(), posY.toFloat(), 0f)
+            DrawContextUtils.translate(translationX.toFloat(), translationY.toFloat())
             targetRenderable.renderXYAligned(0, 0, renderableWidth, renderableHeight)
 
             if (intentionPosition != null) {
@@ -131,26 +127,26 @@ open class TitleContext(
     }
 
     fun tryRenderInventoryTitle() {
-        val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
+        val gui = Minecraft.getInstance().screen as? SkyHanniGuiContainer ?: return
 
-        val stringRenderable = VerticalContainerRenderable(
-            listOfNotNull(
-                StringRenderable(
+        val stringRenderable = with(Renderable) {
+            vertical(horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) {
+                addString(
                     getTitleText(),
                     1.5,
-                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
-                ),
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                )
                 getSubtitleText()?.let {
-                    StringRenderable(it, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
+                    addString(it, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
                 }
-            ),
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-        )
+            }
+        }
 
         val translation = stringRenderable.height.toFloat() + 125f
 
         DrawContextUtils.pushPop {
-            DrawContextUtils.translate(0f, -translation, 500f)
+            DrawContextUtils.translate(0f, -translation)
+            // TODO use Renderable.withMousePosition
             Renderable.drawInsideRoundedRect(
                 stringRenderable,
                 ColorUtils.TRANSPARENT_COLOR,
@@ -158,7 +154,7 @@ open class TitleContext(
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             ).renderXYAligned(0, 125, gui.width, gui.height)
 
-            DrawContextUtils.translate(0f, translation, -500f)
+            DrawContextUtils.translate(0f, translation)
         }
     }
 

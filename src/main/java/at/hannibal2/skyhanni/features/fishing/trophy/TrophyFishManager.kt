@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishInfo
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
+import at.hannibal2.skyhanni.events.ProfileViewerDataLoadedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -15,9 +15,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.setHoverShowText
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.util.ChatStyle
+import net.minecraft.network.chat.Style
 
 @SkyHanniModule
 object TrophyFishManager {
@@ -41,29 +42,43 @@ object TrophyFishManager {
         "§.(?<rarity>.*) §c✖",
     )
 
+    fun loadMissingTrophyFish(): Int {
+        val savedFishes = fish ?: return 0
+        var updatedFishes = 0
+        for (internalName in trophyFishInfo.keys) {
+            savedFishes.getOrPut(internalName) {
+                updatedFishes += 1
+                mutableMapOf()
+            }
+        }
+        return updatedFishes
+    }
+
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<TrophyFishJson>("TrophyFish")
         trophyFishInfo = data.trophyFish
+        loadMissingTrophyFish()
+        TrophyFishDisplay.update()
     }
 
     val fish: MutableMap<String, MutableMap<TrophyRarity, Int>>?
         get() = ProfileStorageData.profileSpecific?.crimsonIsle?.trophyFishes
 
-    private var loadedNeu = false
+    private var loadedPV = false
 
     @HandleEvent
-    fun onNeuProfileDataLoaded(event: NeuProfileDataLoadedEvent) {
-        if (loadedNeu || !config.loadFromNeuPV) return
+    fun onProfileViewerDataLoaded(event: ProfileViewerDataLoadedEvent) {
+        if (loadedPV || !config.loadFromNeuPV) return
 
         val caughtTrophyFish = event.getCurrentPlayerData()?.trophyFish?.caught ?: return
 
-        loadedNeu = true
+        loadedPV = true
 
         val savedFishes = fish ?: return
         var changed = false
 
-        val neuData = mutableListOf<Triple<String, TrophyRarity, Int>>()
+        val pvData = mutableListOf<Triple<String, TrophyRarity, Int>>()
         for ((fishName, apiAmount) in caughtTrophyFish) {
             val rarity = TrophyRarity.getByName(fishName) ?: continue
             val name = fishName.split("_").dropLast(1).joinToString("")
@@ -71,16 +86,18 @@ object TrophyFishManager {
             val savedFishData = savedFishes.getOrPut(name) { mutableMapOf() }
 
             val currentSavedAmount = savedFishData[rarity] ?: 0
-            neuData.add(Triple(name, rarity, apiAmount))
+            pvData.add(Triple(name, rarity, apiAmount))
             if (apiAmount > currentSavedAmount) {
                 changed = true
             }
         }
         if (changed) {
+            val message = "Click here to load Trophy Fishing data from SkyBlock Profile Viewer!"
+
             ChatUtils.clickableChat(
-                "Click here to load Trophy Fishing data from NEU PV!",
+                message,
                 onClick = {
-                    updateFromNeuPv(savedFishes, neuData)
+                    updateFromPv(savedFishes, pvData)
                 },
                 "§eClick to load!",
                 oneTimeClick = true,
@@ -93,17 +110,17 @@ object TrophyFishManager {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Trophy Fishing") return
 
+        var updatedFishes = loadMissingTrophyFish()
         val savedFishes = fish ?: return
-        var updatedFishes = 0
         for (stack in event.inventoryItems.values) {
-            val internalName = TrophyFishApi.getInternalName(stack.displayName.replace("§k", ""))
+            val internalName = TrophyFishApi.getInternalName(stack.hoverName.string.replace("§k", ""))
 
             fun getRarity(rawRarity: String, line: String): TrophyRarity =
                 TrophyRarity.getByName(rawRarity) ?: ErrorManager.skyHanniError(
                     "unknown trophy fish rarity in odger inventory",
                     "rawRarity" to rawRarity,
                     "line" to line,
-                    "stack.name" to stack.displayName,
+                    "stack.name" to stack.hoverName.formattedTextCompatLeadingWhiteLessResets(),
                     "internalName" to internalName,
                 )
 
@@ -135,21 +152,23 @@ object TrophyFishManager {
         }
     }
 
-    private fun updateFromNeuPv(
+    private fun updateFromPv(
         savedFishes: Map<String, MutableMap<TrophyRarity, Int>>,
-        neuData: List<Triple<String, TrophyRarity, Int>>,
+        pvData: List<Triple<String, TrophyRarity, Int>>,
     ) {
-        for ((name, rarity, newValue) in neuData) {
+        for ((name, rarity, newValue) in pvData) {
             val saved = savedFishes[name] ?: continue
 
             val current = saved[rarity] ?: 0
             if (newValue > current) {
                 saved[rarity] = newValue
-                ChatUtils.debug("Updated trophy fishing data from NEU PV:  $name $rarity: $current -> $newValue")
+                val message = "Updated trophy fishing data from SkyBlock Profile Viewer:  $name $rarity: $current -> $newValue"
+                ChatUtils.debug(message)
             }
         }
         TrophyFishDisplay.update()
-        ChatUtils.chat("Updated Trophy Fishing data via NEU PV!")
+        val message = "Updated Trophy Fishing data via SkyBlock Profile Viewer!"
+        ChatUtils.chat(message)
     }
 
     private var trophyFishInfo = mapOf<String, TrophyFishInfo>()
@@ -162,7 +181,7 @@ object TrophyFishManager {
         return fillet.getOrDefault(rarity, -1)
     }
 
-    fun getTooltip(internalName: String): ChatStyle? {
+    fun getTooltip(internalName: String): Style? {
         val display = TrophyFishApi.hoverInfo(internalName) ?: return null
         return defaultStyleConstructor.setHoverShowText(display)
     }

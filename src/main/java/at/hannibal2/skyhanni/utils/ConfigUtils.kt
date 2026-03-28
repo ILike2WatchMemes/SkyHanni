@@ -2,67 +2,21 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager
-import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
-import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
+import io.github.notenoughupdates.moulconfig.common.text.StructuredText
+import io.github.notenoughupdates.moulconfig.gui.GuiContext
+import io.github.notenoughupdates.moulconfig.gui.GuiElementComponent
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
+import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
+import net.minecraft.client.Minecraft
+import net.minecraft.network.chat.Component
+import kotlin.jvm.internal.CallableReference
 import kotlin.reflect.KProperty0
-import kotlin.reflect.jvm.javaField
 
 object ConfigUtils {
-
-    /**
-     * Migrates an Int ArrayList to an Enum ArrayList.
-     * The new enum class should implement HasLegacyId and have a getter for LegacyId
-     *
-     * @param element The JsonElement to migrate
-     * @param enumClass The enum class to migrate to
-     * @return The migrated JsonElement
-     */
-    fun <T> migrateIntArrayListToEnumArrayList(element: JsonElement, enumClass: Class<T>): JsonElement
-        where T : Enum<T>, T : HasLegacyId {
-        require(element is JsonArray) { "Expected a JsonArray but got ${element.javaClass.simpleName}" }
-
-        // An array of enum constants that are to be migrated
-        val migratedArray = element.mapNotNull { jsonElement ->
-            val index = jsonElement.asInt
-            getEnumConstantFromLegacyId(index, enumClass)?.name
-        }.map { JsonPrimitive(it) }
-
-        // Return a JsonArray of the migrated enum constants
-        return JsonArray().apply {
-            migratedArray.forEach { add(it) }
-        }
-    }
-
-    /**
-     * Gets an enum constant from a legacy id
-     * @param legacyId The legacy id to get the enum constant from
-     * @param enumClass The enum class to get the enum constant from
-     * @return The enum constant, or null if not found
-     */
-    private fun <T> getEnumConstantFromLegacyId(
-        legacyId: Int,
-        enumClass: Class<T>,
-    ): T? where T : Enum<T>, T : HasLegacyId = enumClass.getEnumConstants().firstOrNull { it.legacyId == legacyId }
-
-    /**
-     * Migrates an Int to an Enum Constant.
-     * The new enum class should implement HasLegacyId and have a getter for LegacyId
-     *
-     * @param element The JsonElement to migrate
-     * @param enumClass The enum class to migrate to
-     * @return The migrated JsonElement
-     */
-    fun <T> migrateIntToEnum(element: JsonElement, enumClass: Class<T>): JsonElement
-        where T : Enum<T>, T : HasLegacyId {
-        require(element is JsonPrimitive) { "Expected a JsonPrimitive but got ${element.javaClass.simpleName}" }
-        return JsonPrimitive(getEnumConstantFromLegacyId(element.asInt, enumClass)?.name)
-    }
 
     /**
      * Migrates a Boolean to an Enum Constant.
@@ -78,7 +32,16 @@ object ConfigUtils {
     }
 
     private fun KProperty0<*>.tryFindEditor(editor: MoulConfigEditor<*>): ProcessedOption? {
-        return editor.getOptionFromField(this.javaField ?: return null)
+        // Java reflection is used because MoulConfig is relocated at build time, causing Kotlin reflection
+        // (this.javaField) to fail to resolve property descriptors in the production build.
+        val receiver = (this as? CallableReference)?.boundReceiver
+            ?.takeIf { it !== CallableReference.NO_RECEIVER }
+            ?: return null
+        val field = generateSequence(receiver.javaClass as Class<*>?) { it.superclass }
+            .firstNotNullOfOrNull { clazz ->
+                runCatching { clazz.getDeclaredField(name) }.getOrNull()
+            } ?: return null
+        return editor.getOptionFromField(field)
     }
 
     fun KProperty0<*>.jumpToEditor() {
@@ -98,7 +61,16 @@ object ConfigUtils {
         val option = tryFindEditor(editor) ?: return false
         editor.search("")
         if (!editor.goToOption(option)) return false
-        SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
+        openEditor(editor)
         return true
     }
+
+    fun openEditor(editor: MoulConfigEditor<*>) {
+        SkyHanniMod.screenToOpen = MoulConfigScreenComponent(Component.empty(), GuiContext(GuiElementComponent(editor)), null)
+    }
+
+    val configScreenCurrentlyOpen: Boolean
+        get() = Minecraft.getInstance().screen is MoulConfigScreenComponent
+
+    fun String.asStructuredText() = StructuredText.of(this)
 }

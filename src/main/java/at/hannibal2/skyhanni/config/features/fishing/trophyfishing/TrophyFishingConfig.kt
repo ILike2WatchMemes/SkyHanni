@@ -56,7 +56,7 @@ class TrophyFishingConfig {
     var odgerLocation: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Load from NEU PV", desc = "Load Trophy fishing data when opening NEU PV.")
+    @ConfigOption(name = "Load from SkyBlock PV", desc = "Load Trophy fishing data when opening the SkyBlock Profile Viewer mod.")
     @ConfigEditorBoolean
     @FeatureToggle
     var loadFromNeuPV: Boolean = true

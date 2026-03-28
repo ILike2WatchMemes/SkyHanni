@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.NeuCalculator
+import at.hannibal2.skyhanni.utils.Calculator
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CircularList
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -93,7 +94,7 @@ object TheGreatSpook {
         } else {
             "§5§lPrimal Fear Ready!"
         }
-        displayMobCooldown = Renderable.string(mobCooldownString)
+        displayMobCooldown = Renderable.text(mobCooldownString)
 
         if (config.primalFearNotification && mobCooldown.isInPast()) {
             SoundUtils.playPlingSound()
@@ -110,7 +111,7 @@ object TheGreatSpook {
         } else {
             "§5§lThe Great Spook has ended!"
         }
-        displayGreatSpookEnd = Renderable.string(timeLeftString)
+        displayGreatSpookEnd = Renderable.text(timeLeftString)
     }
 
     @HandleEvent
@@ -149,7 +150,7 @@ object TheGreatSpook {
         if (!isGreatSpookActive) return
 
         if (config.primalFearTimer) {
-            displayMobCooldown.let {
+            displayMobCooldown?.let {
                 config.positionTimer.renderRenderable(it, posLabel = "Primal Fear Timer")
             }
         }
@@ -159,14 +160,14 @@ object TheGreatSpook {
             }
         }
         if (config.greatSpookTimeLeft) {
-            displayGreatSpookEnd.let {
+            displayGreatSpookEnd?.let {
                 config.positionTimeLeft.renderRenderable(it, posLabel = "Great Spook Time Left")
             }
         }
     }
 
     private fun mathSolver(query: String?) {
-        val answer = query?.let { NeuCalculator.calculateOrNull(it)?.toInt() } ?: run {
+        val answer = query?.let { Calculator.calculateOrNull(it)?.toInt() } ?: run {
             ChatUtils.userError("Failed to solve $query!")
             return
         }
@@ -194,7 +195,7 @@ object TheGreatSpook {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isGreatSpookActive) return
 
         if (primalFearSpawnPattern.matches(event.message)) {

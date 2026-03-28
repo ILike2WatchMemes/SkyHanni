@@ -2,16 +2,17 @@ package at.hannibal2.skyhanni.features.rift.area.livingcave.snake
 
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.area.livingcave.LivingCaveSnakeFeatures
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
-import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.render.LineDrawer
-import net.minecraft.init.Blocks
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
+import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -32,19 +33,19 @@ class LivingCaveSnake(
         a.distance(b) > 3
     }
 
-    private fun invalidHeadRightNow(): Boolean = head.getBlockAt() != Blocks.lapis_block
+    private fun invalidHeadRightNow(): Boolean = head.getBlockAt() != Blocks.LAPIS_BLOCK
 
     fun invalidHead(): Boolean = invalidHeadSince?.let { it.passedSince() > 1.seconds } ?: false
 
     private fun isNotTouchingAir(): Boolean = blocks.any { it.isNotTouchingAir() }
 
-    private fun LorenzVec.isNotTouchingAir(): Boolean = LorenzVec.directions.none { plus(it).getBlockAt() == Blocks.air }
+    private fun LorenzVec.isNotTouchingAir(): Boolean = LorenzVec.directions.none { plus(it).getBlockAt() == Blocks.AIR }
 
     private fun isSelected() = LivingCaveSnakeFeatures.selectedSnake == this
 
     fun render(event: SkyHanniRenderWorldEvent, currentRole: LivingCaveSnakeFeatures.Role) {
         if (blocks.isEmpty()) return
-        if (SkyHanniDebugsAndTests.enabled) {
+        if (SkyBlockUtils.debug) {
             event.drawString(head.add(0.5, 0.8, 0.5), "§fstate = $state", isSelected())
         }
 
@@ -66,14 +67,14 @@ class LivingCaveSnake(
                 if (block == head && lastAddTime.passedSince() < 200.milliseconds) {
                     continue
                 }
-                drawEdges(block, state.color.toColor())
+                drawEdges(block, state.chromaColor.toColor())
             }
         }
     }
 
     private fun SkyHanniRenderWorldEvent.renderBlock(location: LorenzVec) {
         val isSelected = isSelected()
-        drawColor(location, state.color.toColor(), alpha = 1f, seeThroughBlocks = isSelected)
+        drawColor(location, state.chromaColor, alpha = 1f, seeThroughBlocks = isSelected)
         if (isSelected) {
             drawString(location.add(0.5, 0.5, 0.5), state.display, seeThroughBlocks = true)
             drawString(location.add(0.5, 0.2, 0.5), "§b${blocks.size} blocks", seeThroughBlocks = true)
@@ -114,7 +115,7 @@ class LivingCaveSnake(
         return false
     }
 
-    enum class State(val color: LorenzColor, label: String) {
+    enum class State(private val color: LorenzColor, label: String) {
         SPAWNING(LorenzColor.AQUA, "Spawning"),
         ACTIVE(LorenzColor.YELLOW, "Active"),
         NOT_TOUCHING_AIR(LorenzColor.RED, "Not touching air"),
@@ -122,5 +123,7 @@ class LivingCaveSnake(
         ;
 
         val display = "${color.getChatColor()}$label snake"
+
+        val chromaColor = color.toChromaColor()
     }
 }

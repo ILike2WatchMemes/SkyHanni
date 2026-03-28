@@ -11,16 +11,15 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.ParkourHelper
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
-import net.minecraft.entity.Entity
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.phys.AABB
 
 @SkyHanniModule
 object TubulatorParkour {
 
     private val config get() = RiftApi.config.area.mirrorverse.tubulatorConfig
     private var parkourHelper: ParkourHelper? = null
-    private val puzzleRoom = AxisAlignedBB(-298.0, 0.0, -112.0, -309.0, 63.0, -101.0)
+    private val puzzleRoom = AABB(-298.0, 0.0, -112.0, -309.0, 63.0, -101.0)
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -56,7 +55,7 @@ object TubulatorParkour {
     private fun updateConfig() {
         parkourHelper?.run {
             rainbowColor = config.rainbowColor.get()
-            monochromeColor = config.monochromeColor.get().toSpecialColor()
+            monochromeColor = config.monochromeColor.get()
             lookAhead = config.lookAhead.get() + 1
             outline = config.outline
         }

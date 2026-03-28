@@ -1,7 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import java.time.Instant
 import kotlin.time.Duration
 
 /**
@@ -52,15 +50,16 @@ data class SkyBlockTime(
         private const val SKYBLOCK_MINUTE_MILLIS = SKYBLOCK_HOUR_MILLIS / 60
         private const val SKYBLOCK_SECOND_MILLIS = SKYBLOCK_MINUTE_MILLIS / 60
 
-        @Deprecated("Use fromTimeMark() instead")
-        fun fromInstant(instant: Instant): SkyBlockTime =
-            calculateSkyBlockTime(instant.toEpochMilli() - SKYBLOCK_EPOCH_START_MILLIS)
-
         fun fromTimeMark(timeMark: SimpleTimeMark): SkyBlockTime =
             calculateSkyBlockTime(timeMark.toMillis() - SKYBLOCK_EPOCH_START_MILLIS)
 
         fun fromSBYear(year: Int): SkyBlockTime =
             fromTimeMark(SimpleTimeMark(SKYBLOCK_EPOCH_START_MILLIS + (SKYBLOCK_YEAR_MILLIS * year)))
+
+        fun fromAbsoluteDay(absDay: Int): SkyBlockTime {
+            val millis = SKYBLOCK_EPOCH_START_MILLIS + absDay * SKYBLOCK_DAY_MILLIS
+            return fromTimeMark(SimpleTimeMark(millis))
+        }
 
         fun fromSeason(year: Int, season: SkyblockSeason, modifier: SkyblockSeasonModifier? = null): SkyBlockTime {
             return fromTimeMark(
@@ -140,7 +139,7 @@ data class SkyBlockTime(
             }
         }
 
-        fun isDay(): Boolean = MinecraftCompat.localWorld.worldTime % 24000 in 1..12000
+        fun isDay(): Boolean = ServerTime.dayTime % 24000 in 1..12000
 
         fun getSBMonthByName(month: String): Int {
             var monthNr = 0

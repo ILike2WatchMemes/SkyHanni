@@ -3,9 +3,6 @@ package at.hannibal2.skyhanni.features.fame
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.EntityMovementData
-import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -16,7 +13,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -24,9 +20,12 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -96,14 +95,14 @@ object UpgradeReminder {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        inInventory = event.inventoryName == "Community Shop"
+        inInventory = event.inventoryName == "Community Shop" &&
+            event.inventoryItems[11]?.isStainedGlassPane(ColoredBlockCompat.LIME) == true
         if (!inInventory) return
 
-        if (currentProfileUpgrade == null && currentAccountUpgrade == null) return
-        detectWrongAccountUpgradeData(event.inventoryItems)
+        handleItems(event.inventoryItems)
     }
 
-    private fun detectWrongAccountUpgradeData(items: Map<Int, ItemStack>) {
+    private fun handleItems(items: Map<Int, ItemStack>) {
         val hasProfileUpgrade = foundActiveUpgrade(items, 27..35)
         if (!hasProfileUpgrade && currentProfileUpgrade != null) {
             ChatUtils.chat("§eRemoved invalid Profile Upgrade information.")
@@ -120,11 +119,15 @@ object UpgradeReminder {
     private fun foundActiveUpgrade(items: Map<Int, ItemStack>, slots: IntRange): Boolean {
         for (slot in slots) {
             val item = items[slot] ?: continue
-            val isUpgrading = item.getLore().any { it == "§aCurrently upgrading!" }
-            val isDone = item.getLore().any { it == "§cClick to claim!" }
-            val isReadyForUpgrade = item.getLore().any { it == "§eClick to start upgrade!" }
-            if (isUpgrading || isDone) return true
-            if (isReadyForUpgrade) return false
+            val lore = item.getLore()
+            val isUpgrading = lore.any { it == "§aCurrently upgrading!" }
+            val isDone = lore.any { it == "§cClick to claim!" }
+            val isReadyForUpgrade = lore.any { it == "§eClick to start upgrade!" }
+            if (isUpgrading || isDone) {
+                startUpgrade(UpgradeType.fromItem(item), CommunityShopUpgrade.fromItem(item))
+                return true
+            }
+            if (isReadyForUpgrade) continue
         }
         return false
     }
@@ -142,15 +145,19 @@ object UpgradeReminder {
         clickedUpgrade = CommunityShopUpgrade.fromItem(item) ?: return
     }
 
+    private fun startUpgrade(type: UpgradeType?, upgrade: CommunityShopUpgrade?) {
+        upgrade?.start() ?: return
+        when (type) {
+            UpgradeType.PROFILE -> currentProfileUpgrade = upgrade
+            UpgradeType.ACCOUNT -> currentAccountUpgrade = upgrade
+            else -> return
+        }
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (upgradeStartedPattern.matches(event.message)) {
-            clickedUpgrade?.start()
-            when (clickedUpgradeType) {
-                UpgradeType.PROFILE -> currentProfileUpgrade = clickedUpgrade
-                UpgradeType.ACCOUNT -> currentAccountUpgrade = clickedUpgrade
-                null -> {}
-            }
+            startUpgrade(clickedUpgradeType, clickedUpgrade)
             return
         }
 
@@ -195,23 +202,16 @@ object UpgradeReminder {
             ChatUtils.clickToActionOrDisable(
                 "The §a$name §eupgrade has completed!",
                 config::accountUpgradeReminder,
-                actionName = "warp to Hub",
+                actionName = "warp to Elizabeth",
                 action = {
-                    HypixelCommands.warp("hub")
-                    EntityMovementData.onNextTeleport(IslandType.HUB) {
-                        IslandGraphs.pathFind(
-                            LorenzVec(-2.6, 73.0, -101.6),
-                            "§eCommunity Shop",
-                            condition = { config.accountUpgradeReminder },
-                        )
-                    }
+                    HypixelCommands.warp("elizabeth")
                 },
             )
         }
 
         companion object {
             fun fromItem(item: ItemStack): CommunityShopUpgrade? {
-                val name = item.displayName
+                val name = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
                 val lore = item.getLore()
                 val upgrade = CommunityShopUpgrade(name)
                 upgrade.duration = upgradeDurationPattern.firstMatcher(lore) {

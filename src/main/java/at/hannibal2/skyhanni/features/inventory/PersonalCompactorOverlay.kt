@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -22,10 +22,11 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPersonalCompactorActive
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableInventory
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
+import at.hannibal2.skyhanni.utils.renderables.container.RenderableInventory.fakeInventory
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object PersonalCompactorOverlay {
@@ -56,7 +57,7 @@ object PersonalCompactorOverlay {
     private val compactorEnabledMap = mutableMapOf<String, Boolean>()
 
     @HandleEvent
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         if (!shouldShow()) return
 
@@ -83,13 +84,12 @@ object PersonalCompactorOverlay {
                 skyblockId?.let { getInternalNameFromHypixelIdOrNull(it) }?.getItemStack()
             }
 
-            RenderableInventory.fakeInventory(itemList, MAX_ITEMS_PER_ROW, 1.0)
+            Renderable.fakeInventory(itemList, MAX_ITEMS_PER_ROW, 1.0)
         }
 
-        val title = Renderable.string(name)
-        val status = Renderable.string(
-            "§7Status: " + if (enabled) "§aEnabled" else "§cDisabled",
-        )
+        val title = Renderable.text(name)
+        val statusFormat = "§7Status: " + if (enabled) "§aEnabled" else "§cDisabled"
+        val status = Renderable.text(statusFormat)
 
         RenderableTooltips.setTooltipForRender(listOf(title, status, fakeInventory), spacedTitle = true)
         event.cancel()

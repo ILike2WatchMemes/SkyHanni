@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 
 @SkyHanniModule
 object GardenStartLocation {
@@ -55,6 +55,7 @@ object GardenStartLocation {
     fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != ClickType.LEFT_CLICK || !GardenApi.hasFarmingToolInHand()) return
+        if (GardenApi.onUnfarmablePlot) return
         val startLocations = GardenApi.storage?.cropStartLocations ?: return
         val lastFarmedLocations = GardenApi.storage?.cropLastFarmedLocations ?: return
         val crop = GardenApi.getCurrentlyFarmedCrop() ?: return
@@ -65,7 +66,7 @@ object GardenStartLocation {
             ChatUtils.chat("Auto updated your Crop Start Location for ${crop.cropName}")
         }
 
-        lastFarmedLocations[crop] = LocationUtils.playerLocation().roundLocationToBlock()
+        lastFarmedLocations[crop] = LocationUtils.playerLocation().roundToBlock()
         shouldShowLastFarmedWaypoint = false
     }
 
@@ -76,7 +77,7 @@ object GardenStartLocation {
 
         if (showStartWaypoint()) {
             GardenApi.storage?.cropStartLocations?.get(crop)
-                ?.roundLocationToBlock()
+                ?.roundToBlock()
                 ?.also {
                     event.drawWaypointFilled(it, LorenzColor.WHITE.toColor())
                     event.drawDynamicText(it, "§b${crop.cropName}", 1.5)
@@ -105,10 +106,10 @@ object GardenStartLocation {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shcropstartlocation") {
+        event.registerBrigadier("shcropstartlocation") {
             description = "Manually sets the crop start location"
             category = CommandCategory.USERS_ACTIVE
-            callback { setLocationCommand() }
+            simpleCallback { setLocationCommand() }
         }
     }
 

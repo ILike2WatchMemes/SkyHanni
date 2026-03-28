@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.ChocolateAmount
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
@@ -29,9 +30,12 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.addStrikethorugh
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object CFShopPrice {
@@ -92,7 +96,9 @@ object CFShopPrice {
         if (!callUpdate) {
             products.forEach { it.slot = null }
         }
-        update()
+        DelayedRun.runOrNextTick {
+            update()
+        }
     }
 
     private fun updateProducts() {
@@ -153,23 +159,23 @@ object CFShopPrice {
             }
             table.add(
                 DisplayTableEntry(
-                    product.name.addStrikethorugh(!product.canBeBought),
-                    "§6§l$perFormat",
+                    product.name.addStrikethorugh(!product.canBeBought).asComponent(),
+                    "§6§l$perFormat".asComponent(),
                     factor,
                     product.item,
-                    hover,
+                    hover.mapToComponents(),
                     highlightsOnHoverSlots = product.slot?.let { listOf(it) }.orEmpty(),
                 ),
             )
         }
 
         display = buildList {
-            add(Renderable.string("§e§lCoins per million chocolate§f:"))
+            addString("§e§lCoins per million chocolate§f:")
             // TODO update this value every second
             // TODO add time until can afford
-            add(Renderable.string("§eChocolate available: §6${ChocolateAmount.CURRENT.formatted}"))
+            addString("§eChocolate available: §6${ChocolateAmount.CURRENT.formatted}")
             // TODO add chocolate spend needed for next milestone
-            add(Renderable.string("§eChocolate spent: §6${chocolateSpent.addSeparators()}"))
+            addString("§eChocolate spent: §6${chocolateSpent.addSeparators()}")
             add(RenderableUtils.fillTable(table, padding = 5, itemScale = config.itemScale.toDouble()))
         }
     }
@@ -181,7 +187,7 @@ object CFShopPrice {
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (inInventory) {
             config.position.renderRenderables(
                 display,
@@ -192,7 +198,7 @@ object CFShopPrice {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!inInventory) return
         itemBoughtPattern.matchMatcher(event.message) {
             val item = group("item")

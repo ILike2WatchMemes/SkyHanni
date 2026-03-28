@@ -8,16 +8,17 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonBlockClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.rgb
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
-import at.hannibal2.skyhanni.utils.RenderUtils.drawString
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
-import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import java.awt.Color
+import io.github.notenoughupdates.moulconfig.ChromaColour
+import net.minecraft.network.chat.Component
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -54,7 +55,7 @@ object DungeonHighlightClickedBlocks {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         if (leverPattern.matches(event.message)) {
@@ -62,7 +63,7 @@ object DungeonHighlightClickedBlocks {
         }
 
         if (lockedPattern.matches(event.message)) {
-            blocks.values.lastOrNull { it.displayText.contains("Chest") }?.color = config.lockedChestColor.toSpecialColor()
+            blocks.values.lastOrNull { it.displayText.string.contains("Chest") }?.color = config.lockedChestColor
         }
     }
 
@@ -73,8 +74,8 @@ object DungeonHighlightClickedBlocks {
 
         val type = event.blockType
 
-        val color = if (config.randomColor) getRandomColor().toColor() else getBlockProperties(type).color.toSpecialColor()
-        val displayText = ExtendedChatColor(color.rgb, false).toString() + "Clicked " + getBlockProperties(type).name
+        val color = if (config.randomColor) getRandomColor().toChromaColor() else getBlockProperties(type).color
+        val displayText = ExtendedChatColor(color.rgb).asText("Clicked ${getBlockProperties(type).name}")
         blocks[event.position] = ClickedBlock(displayText, color)
 
     }
@@ -105,8 +106,8 @@ object DungeonHighlightClickedBlocks {
         event.move(56, "dungeon.highlightClickedBlocks", "dungeon.clickedBlocks.enabled")
     }
 
-    private data class ClickedBlock(val displayText: String, var color: Color)
-    private data class BlockProperties(val name: String, val color: String)
+    private data class ClickedBlock(val displayText: Component, var color: ChromaColour)
+    private data class BlockProperties(val name: String, val color: ChromaColour)
 
     private fun isEnabled() = !DungeonApi.inBossRoom && DungeonApi.inDungeon() && config.enabled
 

@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.crimsonisle
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -11,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class ReputationHelperConfig {
     @Expose
@@ -32,8 +31,8 @@ class ReputationHelperConfig {
 
     @Expose
     @ConfigOption(name = "Hotkey", desc = "Press this hotkey to show the Reputation Helper.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var hotkey: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var hotkey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigLink(owner = ReputationHelperConfig::class, field = "enabled")
@@ -49,12 +48,11 @@ class ReputationHelperConfig {
     @Accordion
     val rescueMission: RescueMissionConfig = RescueMissionConfig()
 
-    enum class ShowLocationEntry(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
-        ALWAYS("Always", 0),
-        ONLY_HOTKEY("Only With Hotkey", 1),
-        NEVER("Never", 2);
+    enum class ShowLocationEntry(private val displayName: String) {
+        ALWAYS("Always"),
+        ONLY_HOTKEY("Only With Hotkey"),
+        NEVER("Never");
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 }

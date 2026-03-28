@@ -4,19 +4,26 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.client.entity.EntityOtherPlayerMP
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.client.player.RemotePlayer
 
 @SkyHanniModule
 object MarkedPlayerManager {
@@ -24,39 +31,44 @@ object MarkedPlayerManager {
     val config get() = SkyHanniMod.feature.gui.markedPlayers
 
     private val playerNamesToMark = mutableListOf<String>()
-    private val markedPlayers = mutableMapOf<String, EntityOtherPlayerMP>()
+    private val markedPlayers = mutableMapOf<String, RemotePlayer>()
 
-    private fun command(args: Array<String>) {
-        if (args.size != 1) {
-            ChatUtils.userError("Usage: /shmarkplayer <name>")
-            return
-        }
+    private val patternGroup = RepoPattern.group("misc.markedplayer")
 
-        val displayName = args[0]
-        val name = displayName.lowercase()
+    /**
+     * REGEX-TEST: [400] HiZe_ ▒
+     * REGEX-TEST: [318] wings_wacr ᛝ
+     * REGEX-TEST: [321] botbob21 ᛝ
+     * REGEX-TEST: [42] VoidW_
+     * REGEX-TEST: [151] Phoenix_325
+     */
+    private val tabPlayerName by patternGroup.pattern(
+        "tabplayername-no-color",
+        "\\[(?<level>.*)] (?<name>[A-z0-9_]+)(?<symbol>.*)?",
+    )
 
-        if (name == PlayerUtils.getName().lowercase()) {
-            ChatUtils.userError("You can't add or remove yourself this way! Go to the settings and toggle 'Mark your own name'.")
-            return
-        }
+    private val notifyList = mutableSetOf<String>()
+    private val currentLobbyPlayers = mutableSetOf<String>()
+    private var personOfInterest = listOf<String>()
 
-        if (name !in playerNamesToMark) {
-            playerNamesToMark.add(name)
-            findPlayers()
-            ChatUtils.chat("§aMarked §eplayer §b$displayName§e!")
-        } else {
-            playerNamesToMark.remove(name)
-            markedPlayers[name]?.let { RenderLivingEntityHelper.removeCustomRender(it) }
-            markedPlayers.remove(name)
-            ChatUtils.chat("§cUnmarked §eplayer §b$displayName§e!")
+    @HandleEvent
+    fun onEntityEnterWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
+        if (!isEnabled()) return
+        val entity = event.entity
+        val name = entity.name.formattedTextCompatLessResets().lowercase()
+        if (name in playerNamesToMark) {
+            markedPlayers[name] = entity
+            entity.setColor()
         }
     }
 
+    // only gets called on command or on config change, so performance impact is minimal
+    @OptIn(AllEntitiesGetter::class)
     private fun findPlayers() {
-        for (entity in EntityUtils.getEntities<EntityOtherPlayerMP>()) {
+        for (entity in EntityUtils.getPlayerEntities()) {
             if (entity in markedPlayers.values) continue
 
-            val name = entity.name.lowercase()
+            val name = entity.name.formattedTextCompatLessResets().lowercase()
             if (name in playerNamesToMark) {
                 markedPlayers[name] = entity
                 entity.setColor()
@@ -69,8 +81,8 @@ object MarkedPlayerManager {
             it.value.setColor()
         }
 
-    private fun EntityOtherPlayerMP.setColor() {
-        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+    private fun RemotePlayer.setColor() {
+        RenderLivingEntityHelper.setEntityColor(
             this,
             config.entityColor.get().toColor().addAlpha(127),
             ::isEnabled,
@@ -80,7 +92,7 @@ object MarkedPlayerManager {
     fun isMarkedPlayer(player: String): Boolean = player.lowercase() in playerNamesToMark
 
     private fun isEnabled() = (SkyBlockUtils.inSkyBlock || OutsideSBFeature.MARKED_PLAYERS.isSelected()) &&
-        config.highlightInWorld
+        config.highlightInWorld.get()
 
     fun replaceInChat(string: String): String {
         if (!config.highlightInChat) return string
@@ -106,13 +118,10 @@ object MarkedPlayerManager {
             }
         }
         config.entityColor.onToggle(::refreshColors)
-    }
-
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isEnabled()) return
-
-        findPlayers()
+        config.joinLeaveMessage.playersList.onToggle {
+            personOfInterest = config.joinLeaveMessage.playersList.get().split(",").map { it.trim() }
+        }
+        config.highlightInWorld.onToggle(::findPlayers)
     }
 
     @HandleEvent
@@ -120,11 +129,48 @@ object MarkedPlayerManager {
         if (!MinecraftCompat.localPlayerExists) return
 
         markedPlayers.clear()
+        notifyList.clear()
+        currentLobbyPlayers.clear()
         if (config.markOwnName.get()) {
             val name = PlayerUtils.getName()
             if (!playerNamesToMark.contains(name)) {
                 playerNamesToMark.add(name)
             }
+        }
+    }
+
+    @HandleEvent
+    fun onTablistUpdate(event: WidgetUpdateEvent) {
+        if (!isEnabled()) return
+        if (!config.joinLeaveMessage.enabled) return
+        if (!event.isWidget(TabWidget.PLAYER_LIST)) return
+
+        currentLobbyPlayers.clear()
+
+        tabPlayerName.matchAll(event.lines.map { it.string }) {
+            val name = group("name")
+            if (name != PlayerUtils.getName()) {
+                currentLobbyPlayers.add(name)
+            }
+        }
+
+        val playerJoined = currentLobbyPlayers.filter { it in personOfInterest && it !in notifyList }.toSet()
+        val playerLeft = personOfInterest.filter { it in notifyList && it !in currentLobbyPlayers }.toSet()
+
+        if (playerJoined.isNotEmpty()) {
+            ChatUtils.chat(
+                String.format(config.joinLeaveMessage.joinMessage.replace("&&", "§"), playerJoined.joinToString(", ")),
+                prefix = config.joinLeaveMessage.usePrefix,
+            )
+            notifyList.addAll(playerJoined)
+        }
+
+        if (playerLeft.isNotEmpty()) {
+            ChatUtils.chat(
+                String.format(config.joinLeaveMessage.leftMessage.replace("&&", "§"), playerLeft.joinToString(", ")),
+                prefix = config.joinLeaveMessage.usePrefix,
+            )
+            notifyList.removeAll(playerLeft)
         }
     }
 
@@ -135,9 +181,30 @@ object MarkedPlayerManager {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shmarkplayer") {
+        event.registerBrigadier("shmarkplayer") {
             description = "Add a highlight effect to a player for better visibility"
-            callback { command(it) }
+            argCallback("name", BrigadierArguments.string()) { displayName ->
+                val name = displayName.lowercase()
+
+                if (name == PlayerUtils.getName().lowercase()) {
+                    ChatUtils.userError("You can't add or remove yourself this way! Go to the settings and toggle 'Mark your own name'.")
+                    return@argCallback
+                }
+
+                if (name !in playerNamesToMark) {
+                    playerNamesToMark.add(name)
+                    findPlayers()
+                    ChatUtils.chat("§aMarked §eplayer §b$displayName§e!")
+                } else {
+                    playerNamesToMark.remove(name)
+                    markedPlayers[name]?.let { RenderLivingEntityHelper.removeEntityColor(it) }
+                    markedPlayers.remove(name)
+                    ChatUtils.chat("§cUnmarked §eplayer §b$displayName§e!")
+                }
+            }
+            simpleCallback {
+                ChatUtils.userError("Usage: /shmarkplayer <name>")
+            }
         }
     }
 }

@@ -3,13 +3,14 @@ package at.hannibal2.skyhanni.config.features.dev
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class DebugConfig {
     @Expose
@@ -20,7 +21,7 @@ class DebugConfig {
     @Expose
     @ConfigOption(
         name = "Command Logging",
-        desc = "Logs stack trace information into the console when a command gets sent to Hypixel. (by any mod or the player)"
+        desc = "Logs stack trace information into the console when a command gets sent to Hypixel. (by any mod or the player)",
     )
     @ConfigEditorBoolean
     var commandLogs: Boolean = false
@@ -29,10 +30,18 @@ class DebugConfig {
     @ConfigOption(
         name = "Mod Menu Log",
         desc = "Enable debug messages when the currently opened GUI changes, with the path to the gui class. " +
-            "Useful for adding more mods to quick mod menu switch."
+            "Useful for adding more mods to quick mod menu switch.",
     )
     @ConfigEditorBoolean
     var modMenuLog: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "ApiUtils Never Silent",
+        desc = "Forces ApiUtils' `silentError` to always be false, so that errors always debug to ErrorManager.",
+    )
+    @ConfigEditorBoolean
+    var apiUtilsNeverSilent: Boolean = false
 
     @Expose
     @ConfigOption(name = "Show Internal Name", desc = "Show internal names in item lore.")
@@ -61,8 +70,8 @@ class DebugConfig {
 
     @Expose
     @ConfigOption(name = "Copy Internal Name", desc = "Copies the internal name of an item on key press in the clipboard.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var copyInternalName: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var copyInternalName: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Show NPC Price", desc = "Show NPC price in item lore.")
@@ -85,24 +94,29 @@ class DebugConfig {
     var showBZPrice: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Show Bin Price", desc = "Show Bin price in item lore.")
+    @ConfigEditorBoolean
+    var showBinPrice: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Show Item UUID", desc = "Show the Unique Identifier of items in the lore.")
     @ConfigEditorBoolean
     var showItemUuid: Boolean = false
 
     @Expose
     @ConfigOption(name = "Copy Item Data", desc = "Copies item NBT data on key press in a GUI to clipboard.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var copyItemData: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var copyItemData: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Copy Compressed Item Data", desc = "Copies compressed item NBT data on key press in a GUI to clipboard.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var copyItemDataCompressed: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var copyItemDataCompressed: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(
         name = "Copy RNG Meter",
-        desc = "Copies internal names and maxed XP needed from RNG meter inventories as json to clipboard."
+        desc = "Copies internal names and maxed XP needed from RNG meter inventories as json to clipboard.",
     )
     @ConfigEditorBoolean
     var copyRngMeter: Boolean = false
@@ -115,15 +129,26 @@ class DebugConfig {
     @Expose
     @ConfigOption(
         name = "Highlight Missing Repo Items",
-        desc = "Highlights each item in the current inventory that is not in your current NEU repo."
+        desc = "Highlights each item in the current inventory that is not in your current NEU repo.",
     )
     @ConfigEditorBoolean
     var highlightMissingRepo: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Hot Swap Detection", desc = "Show chat messages when Hot Swap starts and ends.")
+    @ConfigOption(
+        name = "Log Repo Errors",
+        desc = "Log errors that occur while reloading/fetching any AbstractRepoManager",
+    )
     @ConfigEditorBoolean
-    var hotSwapDetection: Boolean = false
+    var logRepoErrors: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Print Missing Bazaar Items",
+        desc = "Print unknown Bazaar items to the console.",
+    )
+    @ConfigEditorBoolean
+    var printMissingBazaarItems: Boolean = false
 
     @Expose
     @ConfigOption(name = "Always Outdated", desc = "For the sake of the auto updater, act like you are always outdated.")
@@ -133,7 +158,7 @@ class DebugConfig {
     @Expose
     @ConfigOption(
         name = "SkyHanni Event Counter",
-        desc = "Count once per second how many skyhanni events gets triggered, show the total amount in console output."
+        desc = "Count once per second how many skyhanni events gets triggered, show the total amount in console output.",
     )
     @ConfigEditorBoolean
     var eventCounter: Boolean = false
@@ -141,21 +166,10 @@ class DebugConfig {
     @Expose
     @ConfigOption(
         name = "Bypass Advanced Tab List",
-        desc = "The Advanced Player Tab list is disabled while pressing this hotkey."
+        desc = "The Advanced Player Tab list is disabled while pressing this hotkey.",
     )
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var bypassAdvancedPlayerTabList: Int = Keyboard.KEY_NONE
-
-    @Expose
-    @ConfigOption(name = "SkyBlock Area", desc = "Show your current area in SkyBlock while F3 is open.")
-    @ConfigEditorBoolean
-    var currentAreaDebug: Boolean = true
-
-    // TODO rename to rayTracedOreBlock
-    @Expose
-    @ConfigOption(name = "OreBlock Name", desc = "Show the OreBlock you are currently looking at.")
-    @ConfigEditorBoolean
-    var raytracedOreblock: Boolean = true
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var bypassAdvancedPlayerTabList: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Ore Event Messages", desc = "Shows debug messages every time the Ore Event happens.")
@@ -171,6 +185,16 @@ class DebugConfig {
     @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
     @ConfigEditorDropdown
     val assumeMayor: Property<ElectionCandidate> = Property.of(ElectionCandidate.DISABLED)
+
+    @Expose
+    @ConfigOption(name = "Set Mayor on Start", desc = "Set assumed mayor to disabled on game start.")
+    @ConfigEditorBoolean
+    var disableAssumeMayor: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Always Year of Pig", desc = "Assumes the Year of the Pig is always active, even if it is not.")
+    @ConfigEditorBoolean
+    var alwaysYearOfThePig: Boolean = false
 
     @Expose
     @ConfigOption(name = "Always April Fools", desc = "Always show April fools jokes.")
@@ -193,46 +217,26 @@ class DebugConfig {
     val forceGreatSpook: Property<Boolean> = Property.of(false)
 
     @Expose
-    @ConfigOption(name = "DVD Logo", desc = "Enable the test DVD Logo Renderable")
+    @ConfigOption(name = "Moonglade Beacon", desc = "Add more debug information to the beacon solver.")
     @ConfigEditorBoolean
-    var dvdLogo: Boolean = false
+    var moongladeBeacon: Boolean = false
 
     @Expose
-    @ConfigLink(owner = DebugConfig::class, field = "dvdLogo")
-    val dvdLogoPosition: Position = Position(100, 100)
-
-    @Expose
-    @ConfigOption(name = "Orbital", desc = "Enable the test Orbital System renderable.")
+    @ConfigOption(name = "Addons Debug", desc = "Enable extra Superpairs Addons debug info.")
     @ConfigEditorBoolean
-    var orbital: Boolean = false
+    var addonsDebug: Boolean = false
 
     @Expose
-    @ConfigLink(owner = DebugConfig::class, field = "orbital")
-    val orbitalPosition: Position = Position(200, 200)
+    @ConfigLink(owner = DebugConfig::class, field = "addonsDebug")
+    val addonsDebugPosition: Position = Position(300, 300)
 
     @Expose
-    @ConfigOption(name = "Item Stack Renderable", desc = "Enable the test Item Stack Renderable")
-    @ConfigEditorBoolean
-    var itemStack: Boolean = false
+    @ConfigOption(name = "Track Sound", desc = "")
+    @Accordion
+    val trackSound: TrackCommandConfig = TrackCommandConfig()
 
     @Expose
-    @ConfigLink(owner = DebugConfig::class, field = "itemStack")
-    val itemStackPosition: Position = Position(-200, 300)
-
-    @Expose
-    @ConfigOption(name = "Animated Item Stack", desc = "Enable the test Animated Item Stack Renderable")
-    @ConfigEditorBoolean
-    var animatedItemStack: Boolean = false
-
-    @Expose
-    @ConfigLink(owner = DebugConfig::class, field = "animatedItemStack")
-    val animatedItemStackPosition: Position = Position(-300, 300)
-
-    // Does not have a config element!
-    @Expose
-    val trackSoundPosition: Position = Position(0, 0)
-
-    // Also does not have a config element!
-    @Expose
-    val trackParticlePosition: Position = Position(0, 0)
+    @ConfigOption(name = "Track Particle", desc = "")
+    @Accordion
+    val trackParticle: TrackCommandConfig = TrackCommandConfig()
 }

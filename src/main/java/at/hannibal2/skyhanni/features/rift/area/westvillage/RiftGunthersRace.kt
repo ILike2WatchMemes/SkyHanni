@@ -14,10 +14,9 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.entity.Entity
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.entity.Entity
 
 @SkyHanniModule
 object RiftGunthersRace {
@@ -86,13 +85,13 @@ object RiftGunthersRace {
     private fun updateConfig() {
         parkourHelper?.run {
             rainbowColor = config.rainbowColor.get()
-            monochromeColor = config.monochromeColor.get().toSpecialColor()
+            monochromeColor = config.monochromeColor.get()
             lookAhead = config.lookAhead.get() + 1
         }
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         raceStartedPattern.matchMatcher(event.message) {
@@ -115,7 +114,7 @@ object RiftGunthersRace {
         if (!RiftApi.inRiftRace) return
 
         val entity = event.entity
-        if (entity is EntityOtherPlayerMP && !entity.isNpc()) {
+        if (entity is RemotePlayer && !entity.isNpc()) {
             event.cancel()
         }
     }

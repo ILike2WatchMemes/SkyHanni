@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
-import at.hannibal2.skyhanni.data.model.GraphNodeTag
+import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -18,12 +18,12 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import net.minecraft.util.EnumParticleTypes
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
+import net.minecraft.core.particles.ParticleTypes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -43,7 +43,7 @@ object FishingHotspotRadar {
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         val type = event.type
-        if (type != EnumParticleTypes.FLAME) return
+        if (type != ParticleTypes.FLAME) return
         if (event.count != 1 || event.speed != 0f) return
 
         lastParticle = SimpleTimeMark.now()
@@ -107,9 +107,7 @@ object FishingHotspotRadar {
         IslandGraphs.reportLocation(
             location,
             userFacingReason = "Found no path to fishing hotspot",
-            additionalInternalInfo = "no node with tag 'fishing hotspot' found near the radar hotspot target",
-            ignoreCache = true,
-            betaOnly = true,
+            technicalInfo = "no node with tag 'fishing hotspot' found near the radar hotspot target",
         )
     }
 
@@ -118,7 +116,7 @@ object FishingHotspotRadar {
         val location = hotspotLocation ?: return
         val distance = location.distance(event.exactPlayerEyeLocation())
         if (config.lineToHotspot) {
-            event.drawLineToEye(location, LorenzColor.LIGHT_PURPLE.toColor(), lineWidth = 3, depth = false)
+            event.drawLineToEye(location, LorenzColor.LIGHT_PURPLE.toChromaColor(), lineWidth = 3, depth = false)
         }
         if (distance > 10) {
             val formattedDistance = distance.toInt().addSeparators()

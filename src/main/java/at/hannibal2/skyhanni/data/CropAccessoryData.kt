@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object CropAccessoryData {
@@ -37,7 +37,7 @@ object CropAccessoryData {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!accessoryBagNamePattern.matches(event.inventoryName)) return
 
-        val items = event.inventoryItems.mapNotNull { it.value }
+        val items = event.inventoryItems.values
         val bestInPage = bestCropAccessory(items)
         if (bestInPage > accessoryInBag) {
             accessoryInBag = bestInPage
@@ -56,7 +56,7 @@ object CropAccessoryData {
         }
     }
 
-    private fun bestCropAccessory(items: List<ItemStack>) =
+    private fun bestCropAccessory(items: Collection<ItemStack>) =
         items.mapNotNull { item -> CropAccessory.getByName(item.getInternalName()) }
             .maxOrNull() ?: CropAccessory.NONE
 

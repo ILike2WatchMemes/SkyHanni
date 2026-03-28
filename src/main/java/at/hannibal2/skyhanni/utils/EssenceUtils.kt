@@ -14,7 +14,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import net.minecraft.item.ItemStack
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object EssenceUtils {
@@ -22,7 +23,7 @@ object EssenceUtils {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val unformattedData = event.getConstant<Map<String, NeuEssenceCostJson>>("essencecosts", NeuEssenceCostJson.TYPE)
+        val unformattedData = event.getConstant<Map<String, NeuEssenceCostJson>>("essencecosts")
         this.itemPrices = reformatData(unformattedData)
     }
 
@@ -146,7 +147,7 @@ object EssenceUtils {
         for (value in inventoryItems.values) {
             // Right now Carnival and Essence Upgrade patterns are 'in-sync'
             // This may change in the future, and this would then need its own pattern
-            essenceUpgradePattern.matchMatcher(value.displayName) {
+            essenceUpgradePattern.matchMatcher(value.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 val upgradeName = groupOrNull("upgrade") ?: continue
                 val nextUpgradeRoman = groupOrNull("tier") ?: continue
                 val nextUpgrade = nextUpgradeRoman.romanToDecimal()

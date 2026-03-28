@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -21,7 +23,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import net.minecraft.client.Minecraft
 
 @SkyHanniModule
@@ -47,17 +51,28 @@ object CollectionTracker {
     private val OBSOLITE = "OBSOLITE".toInternalName()
     private val TIMITE = "TIMITE".toInternalName()
 
-    private fun command(args: Array<String>) {
-        if (args.isEmpty()) {
-            if (internalName == null) {
-                ChatUtils.userError("/shtrackcollection <item name> [goal amount]")
-                return
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shtrackcollection") {
+            description = "Tracks your collection gain over time"
+            category = CommandCategory.USERS_ACTIVE
+            arg(
+                "args", BrigadierArguments.greedyString(),
+            ) { args ->
+                callback { command(getArg(args).split(" ").toTypedArray()) }
             }
-            ChatUtils.chat("Stopped collection tracker.")
-            resetData()
-            return
+            simpleCallback {
+                if (internalName == null) {
+                    ChatUtils.userError("/shtrackcollection <item name> [goal amount]")
+                } else {
+                    ChatUtils.chat("Stopped collection tracker.")
+                    resetData()
+                }
+            }
         }
+    }
 
+    private fun command(args: Array<String>) {
         val lastArg = args.last()
 
         val nameArgs = if (lastArg.isFormatNumber()) {
@@ -93,7 +108,7 @@ object CollectionTracker {
             ChatUtils.userError("Item '$rawName' does not exist!")
             return
         }
-        setNewCollection(foundInternalName, stack.displayName.removeColor())
+        setNewCollection(foundInternalName, stack.hoverName.string.removeColor())
     }
 
     // TODO repo
@@ -164,7 +179,7 @@ object CollectionTracker {
             itemAmount.percentWithColorCode(goalAmount, 1)
         }§f)"
 
-        display = Renderable.line {
+        display = Renderable.horizontal {
             internalName?.let {
                 addItemStack(it.getItemStack())
             }
@@ -183,12 +198,11 @@ object CollectionTracker {
         name == internalName
     }
 
-
     fun handleTabComplete(command: String): List<String>? {
         if (command != "shtrackcollection") return null
 
         return CollectionApi.collectionValue.keys.mapNotNull { it.getItemStackOrNull() }
-            .map { it.displayName.removeColor().replace(" ", "_") }
+            .map { it.hoverName.string.removeColor().replace(" ", "_") }
     }
 
     @HandleEvent
@@ -199,7 +213,7 @@ object CollectionTracker {
 
     private fun compareInventory() {
         if (lastAmountInInventory == -1) return
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (Minecraft.getInstance().screen != null) return
 
         val currentlyInInventory = countCurrentlyInInventory()
         val diff = currentlyInInventory - lastAmountInInventory
@@ -233,14 +247,6 @@ object CollectionTracker {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         display?.let {
             SkyHanniMod.feature.misc.collectionCounterPos.renderRenderable(it, posLabel = "Collection Tracker")
-        }
-    }
-
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtrackcollection") {
-            description = "Tracks your collection gain over time"
-            callback { command(it) }
         }
     }
 }

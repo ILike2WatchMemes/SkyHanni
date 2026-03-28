@@ -1,28 +1,34 @@
 package at.hannibal2.skyhanni.data.mob
 
-import at.hannibal2.skyhanni.data.mob.Mob.Type
 import at.hannibal2.skyhanni.data.mob.MobFilter.summonOwnerPattern
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
-import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.getBoxCenter
 import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.MobUtils
+import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
+import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.monster.EntityZombie
-import net.minecraft.util.AxisAlignedBB
+import at.hannibal2.skyhanni.utils.getLorenzVec
+import io.github.notenoughupdates.moulconfig.ChromaColour
+import io.github.notenoughupdates.moulconfig.observer.Property
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.monster.zombie.Zombie
+import net.minecraft.world.phys.AABB
 import java.awt.Color
 import java.util.UUID
 
@@ -32,7 +38,7 @@ import java.util.UUID
  * @property baseEntity The main entity representing the Mob.
  *
  * Avoid caching, as it may change without notice.
- * @property mobType The type of the Mob.
+ * @property category The category of the Mob.
  * @property armorStand The armor stand entity associated with the Mob, if it has one.
  *
  * Avoid caching, as it may change without notice.
@@ -40,49 +46,58 @@ import java.util.UUID
  * @property extraEntities Additional entities associated with the Mob.
  *
  * Avoid caching, as they may change without notice.
- * @property owner Valid for: [Type.SUMMON], [Type.SLAYER]
+ * @property owner Valid for: [MobCategory.SUMMON], [MobCategory.SLAYER]
  *
  * The owner of the Mob.
- * @property hasStar Valid for: [Type.DUNGEON]
+ * @property hasStar Valid for: [MobCategory.DUNGEON]
  *
  * Indicates whether the Mob has a star.
- * @property attribute Valid for: [Type.DUNGEON]
+ * @property attribute Valid for: [MobCategory.DUNGEON]
  *
  * The attribute of the Mob.
- * @property levelOrTier Valid for: [Type.BASIC], [Type.SLAYER]
+ * @property levelOrTier Valid for: [MobCategory.BASIC], [MobCategory.SLAYER]
  *
  * The level or tier of the Mob.
- * @property hologram1 Valid for: [Type.BASIC], [Type.SLAYER]
+ * @property hologram1 Valid for: [MobCategory.BASIC], [MobCategory.SLAYER]
  *
  * Gives back the first additional armor stand.
  *
  *   (should be called in the [MobEvent.Spawn] since it is a lazy)
- * @property hologram2 Valid for: [Type.BASIC], [Type.SLAYER]
+ * @property hologram2 Valid for: [MobCategory.BASIC], [MobCategory.SLAYER]
  *
  * Gives back the second additional armor stand.
  *
  *   (should be called in the [MobEvent.Spawn] since it is a lazy)
  * @property uniqueId Unique identifier for each Mob instance
+ *
+ * @property hypixelTypes The types hypixel has assigned for that mob as the icons
  */
 @Suppress("TooManyFunctions")
 class Mob(
-    var baseEntity: EntityLivingBase,
-    val mobType: Type,
-    var armorStand: EntityArmorStand? = null,
+    var baseEntity: LivingEntity,
+    val category: MobCategory,
+    var armorStand: ArmorStand? = null,
     val name: String = "",
-    additionalEntities: List<EntityLivingBase>? = null,
+    additionalEntities: List<LivingEntity>? = null,
     ownerName: String? = null,
     val hasStar: Boolean = false,
     val attribute: MobFilter.DungeonAttribute? = null,
     val levelOrTier: Int = -1,
+    val hypixelTypes: String = "",
 ) {
 
     private val uniqueId: UUID = UUID.randomUUID()
-    val id = baseEntity.entityId
+    val id = baseEntity.id
 
     val owner: MobUtils.OwnerShip?
 
-    fun belongsToPlayer(): Boolean = owner?.equals(PlayerUtils.getName()) ?: false
+    val ownerNameOrEmpty: String get() = owner?.ownerName.orEmpty()
+
+    companion object {
+
+        fun Entity?.belongsToPlayer(): Boolean = this?.mob.belongsToPlayer()
+        fun Mob?.belongsToPlayer(): Boolean = this?.owner?.equals(PlayerUtils.getName()) ?: false
+    }
 
     val hologram1Delegate = lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 1) }
     val hologram2Delegate = lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 2) }
@@ -91,43 +106,40 @@ class Mob(
     val hologram2 by hologram2Delegate
 
     private val extraEntitiesList = additionalEntities?.toMutableList() ?: mutableListOf()
-    private var relativeBoundingBox: AxisAlignedBB?
+    private var relativeBoundingBox: AABB?
 
-    val extraEntities: List<EntityLivingBase> = extraEntitiesList
+    val extraEntities: List<LivingEntity> = extraEntitiesList
 
-    enum class Type {
-        DISPLAY_NPC,
-        SUMMON,
-        BASIC,
-        DUNGEON,
-        BOSS,
-        SLAYER,
-        PLAYER,
-        PROJECTILE,
-        SPECIAL,
-        ;
+    /**
+     * @property isCorrupted can change.
+     */
+    val isCorrupted get() = !RiftApi.inRift() && baseEntity.isCorrupted()
 
-        fun isSkyblockMob() = when (this) {
-            BASIC, DUNGEON, BOSS, SLAYER -> true
-            else -> false
-        }
-    }
-
-    val isCorrupted get() = !RiftApi.inRift() && baseEntity.isCorrupted() // Can change
-    val isRunic = !RiftApi.inRift() && baseEntity.isRunic() // Does not Change
+    /**
+     * @property isRunic does not change.
+     */
+    val isRunic = !RiftApi.inRift() && armorStand?.name.formattedTextCompatLessResets().startsWith("§5") && category == MobCategory.BASIC
 
     fun isInRender() = baseEntity.distanceToPlayer() < MobData.ENTITY_RENDER_RANGE_IN_BLOCKS
 
     fun canBeSeen(viewDistance: Number = 150) = baseEntity.canBeSeen(viewDistance)
 
-    fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.getAllEquipment().isNullOrEmpty()
+    fun isInvisible() = baseEntity !is Zombie && baseEntity.isInvisible && baseEntity.getAllEquipment().isEmpty()
 
     private var highlightColor: Color? = null
     private var condition: () -> Boolean = { true }
 
-    /** If [color] has no alpha or alpha is set to 255 it will set the alpha to 127
-     * If [color] is set to null it removes a highlight*/
-    fun highlight(color: Color?) {
+    /** If [color] has no alpha or alpha is set to 255 it will set the alpha to 127*/
+    fun highlight(color: ChromaColour) {
+        highlight(color.toColor())
+    }
+
+    fun removeHighlight() {
+        internalRemoveColor()
+        highlightColor = null
+    }
+
+    fun highlight(color: Color) {
         if (color == highlightColor) return
         if (color == null) {
             internalRemoveColor()
@@ -138,7 +150,14 @@ class Mob(
         }
     }
 
-    // TODO add support for moulconfig.ChromaColour, and eventually removed awt.Color support
+    fun highlight(color: Property<ChromaColour>, condition: () -> Boolean) {
+        highlight(color.get(), condition)
+    }
+
+    fun highlight(color: ChromaColour, condition: () -> Boolean) {
+        highlight(color.toColor(), condition)
+    }
+
     fun highlight(color: Color, condition: () -> Boolean) {
         highlightColor = color.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
         this.condition = condition
@@ -147,26 +166,26 @@ class Mob(
 
     private fun internalHighlight() {
         highlightColor?.let { color ->
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { !this.isInvisible() && condition() }
+            RenderLivingEntityHelper.setEntityColor(baseEntity, color) { !this.isInvisible() && condition() }
             extraEntities.forEach {
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { !this.isInvisible() && condition() }
+                RenderLivingEntityHelper.setEntityColor(it, color) { !this.isInvisible() && condition() }
             }
         }
     }
 
     private fun internalRemoveColor() {
         if (highlightColor == null) return
-        RenderLivingEntityHelper.removeCustomRender(baseEntity)
+        RenderLivingEntityHelper.removeEntityColor(baseEntity)
         extraEntities.forEach {
-            RenderLivingEntityHelper.removeCustomRender(it)
+            RenderLivingEntityHelper.removeEntityColor(it)
         }
     }
 
-    val boundingBox: AxisAlignedBB
-        get() = relativeBoundingBox?.offset(baseEntity.posX, baseEntity.posY, baseEntity.posZ)
-            ?: baseEntity.entityBoundingBox
+    val boundingBox: AABB
+        get() = relativeBoundingBox?.move(baseEntity.position().x, baseEntity.position().y, baseEntity.position().z)
+            ?: baseEntity.boundingBox
 
-    val health: Float get() = baseEntity.health
+    val health: Float get() = baseEntity.findHealthReal()
     val maxHealth: Int get() = baseEntity.baseMaxHealth
 
     init {
@@ -175,14 +194,14 @@ class Mob(
             if (extraEntities.isNotEmpty()) makeRelativeBoundingBox() else null // Inlined updateBoundingBox()
 
         owner = (
-            ownerName ?: if (mobType == Type.SLAYER) hologram2?.let {
+            ownerName ?: if (category == MobCategory.SLAYER) hologram2?.let {
                 summonOwnerPattern.matchMatcher(it.cleanName()) { group("name") }
             } else null
             )?.let { MobUtils.OwnerShip(it) }
     }
 
     private fun removeExtraEntitiesFromChecking() =
-        extraEntities.count { MobData.retries[it.entityId] != null }.also {
+        extraEntities.count { MobData.retries[it.id] != null }.also {
             MobData.externRemoveOfRetryAmount += it
         }
 
@@ -191,11 +210,11 @@ class Mob(
     }
 
     private fun makeRelativeBoundingBox() = (
-        baseEntity.entityBoundingBox.union(
-            extraEntities.filter { it !is EntityArmorStand }
-                .mapNotNull { it.entityBoundingBox },
+        baseEntity.boundingBox.union(
+            extraEntities.filter { it !is ArmorStand }
+                .mapNotNull { it.boundingBox },
         )
-        )?.offset(-baseEntity.posX, -baseEntity.posY, -baseEntity.posZ)
+        )?.move(-baseEntity.position().x, -baseEntity.position().y, -baseEntity.position().z)
 
     fun fullEntityList() =
         baseEntity.toSingletonListOrEmpty() +
@@ -205,9 +224,9 @@ class Mob(
     fun makeEntityToMobAssociation() =
         fullEntityList().associateWith { this }
 
-    internal fun internalAddEntity(entity: EntityLivingBase) {
+    internal fun internalAddEntity(entity: LivingEntity) {
         internalRemoveColor()
-        if (baseEntity.entityId > entity.entityId) {
+        if (baseEntity.id > entity.id) {
             extraEntitiesList.add(0, baseEntity)
             baseEntity = entity
         } else {
@@ -218,7 +237,7 @@ class Mob(
         MobData.entityToMob[entity] = this
     }
 
-    internal fun internalAddEntity(entities: Collection<EntityLivingBase>) {
+    internal fun internalAddEntity(entities: Collection<LivingEntity>) {
         val list = entities.drop(1).toMutableList().apply { add(baseEntity) }
         internalRemoveColor()
         extraEntitiesList.addAll(0, list)
@@ -229,14 +248,14 @@ class Mob(
         MobData.entityToMob.putAll(entities.associateWith { this })
     }
 
-    internal fun internalUpdateOfEntity(entity: EntityLivingBase) {
+    internal fun internalUpdateOfEntity(entity: LivingEntity) {
         internalRemoveColor()
-        when (entity.entityId) {
-            baseEntity.entityId -> {
+        when (entity.id) {
+            baseEntity.id -> {
                 baseEntity = entity
             }
 
-            armorStand?.entityId ?: Int.MIN_VALUE -> armorStand = entity as EntityArmorStand
+            armorStand?.id ?: Int.MIN_VALUE -> armorStand = entity as ArmorStand
             else -> {
                 extraEntitiesList.remove(entity)
                 extraEntitiesList.add(entity)
@@ -250,7 +269,7 @@ class Mob(
 
     override fun hashCode() = uniqueId.hashCode()
 
-    override fun toString(): String = "$name - ${baseEntity.entityId}"
+    override fun toString(): String = "$name - ${baseEntity.id}"
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -260,10 +279,30 @@ class Mob(
     }
 
     // TODO add max distance
-    fun lineToPlayer(color: Color, lineWidth: Int = 2, depth: Boolean = true, condition: () -> Boolean) =
+    fun lineToPlayer(color: ChromaColour, lineWidth: Int = 2, depth: Boolean = true, condition: () -> Boolean) =
         LineToMobHandler.register(this, color, lineWidth, depth, condition)
 
     fun distanceToPlayer(): Double = baseEntity.distanceToPlayer()
 
-    val isAlive: Boolean get() = baseEntity.isEntityAlive
+    val isAlive: Boolean get() = baseEntity.isAlive
+
+    fun getLorenzVec() = baseEntity.getLorenzVec()
+}
+
+enum class MobCategory {
+    DISPLAY_NPC,
+    SUMMON,
+    BASIC,
+    DUNGEON,
+    BOSS,
+    SLAYER,
+    PLAYER,
+    PROJECTILE,
+    SPECIAL,
+    ;
+
+    fun isSkyblockMob() = when (this) {
+        BASIC, DUNGEON, BOSS, SLAYER -> true
+        else -> false
+    }
 }

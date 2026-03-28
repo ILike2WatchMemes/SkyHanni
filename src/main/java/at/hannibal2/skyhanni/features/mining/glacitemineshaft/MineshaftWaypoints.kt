@@ -9,12 +9,12 @@ import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -37,14 +37,14 @@ object MineshaftWaypoints {
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland != IslandType.MINESHAFT) return
 
-        val playerLocation = LorenzVec.getBlockBelowPlayer()
+        val playerLocation = LocationUtils.getBlockBelowPlayer()
 
         if (config.mineshaftWaypoints.entranceLocation) {
             waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.ENTRANCE, location = playerLocation))
         }
 
         if (config.mineshaftWaypoints.ladderLocation) {
-            val vec = MinecraftCompat.localPlayer.horizontalFacing.directionVec
+            val vec = MinecraftCompat.localPlayer.direction.unitVec3i
             val location = playerLocation
                 // Move 7 blocks in front of the player to be in the ladder shaft
                 .add(x = vec.x * BLOCKS_FORWARD, z = vec.z * BLOCKS_FORWARD)
@@ -58,7 +58,7 @@ object MineshaftWaypoints {
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (Minecraft.getInstance().screen != null) return
         if (event.keyCode != config.shareWaypointLocation) return
         if (timeLastShared.passedSince() < 500.milliseconds) return
 
@@ -66,11 +66,9 @@ object MineshaftWaypoints {
             .minByOrNull { it.location.distanceToPlayer() } ?: return
 
         timeLastShared = SimpleTimeMark.now()
-        val location = closestWaypoint.location
-        val (x, y, z) = location.toDoubleArray().map { it.toInt() }
+        val location = closestWaypoint.location.toChatFormat()
         val type = closestWaypoint.waypointType.displayText
-
-        val message = "x: $x, y: $y, z: $z | ($type)"
+        val message = "$location | ($type)"
 
         if (PartyApi.partyMembers.isNotEmpty()) {
             HypixelCommands.partyChat(message)

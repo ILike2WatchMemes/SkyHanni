@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.SackData
+import at.hannibal2.skyhanni.config.StorageData
+import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
 import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -18,7 +20,6 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.TabListData
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -27,6 +28,7 @@ object ProfileStorageData {
     var playerSpecific: PlayerSpecificStorage? = null
     var profileSpecific: ProfileSpecificStorage? = null
     var loaded = false
+    private var firstLoad = true
     private var noTabListTime = SimpleTimeMark.farPast()
 
     private var sackPlayers: SackData.PlayerSpecific? = null
@@ -34,14 +36,21 @@ object ProfileStorageData {
 
     private var hypixelDataLoaded = false
 
+    private var storagePlayer: StorageData.PlayerSpecific? = null
+    var storageProfiles: StorageData.ProfileSpecific? = null
+
     private var petPlayers: PetDataStorage.PlayerSpecific? = null
     var petProfiles: PetDataStorage.ProfileSpecific? = null
+
+    var orderedWaypointsRoutes: OrderedWaypointsRoutes? = null
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onProfileJoin(event: ProfileJoinEvent) {
         val playerSpecific = playerSpecific
         val sackPlayers = sackPlayers
+        val storagePlayer = storagePlayer
         val petPlayers = petPlayers
+        val orderedWaypointsRoutes = orderedWaypointsRoutes
         val profileName = event.name
         if (playerSpecific == null) {
             DelayedRun.runDelayed(10.seconds) {
@@ -52,19 +61,26 @@ object ProfileStorageData {
         if (sackPlayers == null) {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
         }
+        if (storagePlayer == null) {
+            ErrorManager.skyHanniError("storagePlayer is null in ProfileJoinEvent!")
+        }
         if (petPlayers == null) {
             ErrorManager.skyHanniError("petPlayers is null in ProfileJoinEvent!")
         }
-
-        loadProfileSpecific(playerSpecific, sackPlayers, petPlayers, profileName)
-        ConfigLoadEvent.post()
+        if (orderedWaypointsRoutes == null) {
+            ErrorManager.skyHanniError("orderedWaypointRoutes is null in ProfileJoinEvent!")
+        }
+        loadProfileSpecific(playerSpecific, sackPlayers, storagePlayer, petPlayers, profileName)
+        postConfigLoadEvent()
     }
 
     private fun workaroundIn10SecondsProfileStorage(profileName: String) {
         println("workaroundIn10SecondsProfileStorage")
         val playerSpecific = playerSpecific
         val sackPlayers = sackPlayers
+        val storagePlayer = storagePlayer
         val petPlayers = petPlayers
+        val orderedWaypointsRoutes = orderedWaypointsRoutes
 
         if (playerSpecific == null) {
             ErrorManager.skyHanniError(
@@ -78,12 +94,18 @@ object ProfileStorageData {
         if (sackPlayers == null) {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
         }
+        if (storagePlayer == null) {
+            ErrorManager.skyHanniError("storagePlayer is null in ProfileJoinEvent!")
+        }
         if (petPlayers == null) {
             ErrorManager.skyHanniError("petPlayers is null in ProfileJoinEvent!")
         }
+        if (orderedWaypointsRoutes == null) {
+            ErrorManager.skyHanniError("orderedWaypointRoutes is null in ProfileJoinEvent!")
+        }
 
-        loadProfileSpecific(playerSpecific, sackPlayers, petPlayers, profileName)
-        ConfigLoadEvent.post()
+        loadProfileSpecific(playerSpecific, sackPlayers, storagePlayer, petPlayers, profileName)
+        postConfigLoadEvent()
     }
 
     @HandleEvent
@@ -93,21 +115,20 @@ object ProfileStorageData {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick() {
-        if (noTabListTime.isFarPast()) return
+    fun onSecondPassed() {
+        if (noTabListTime.isFarPast() || noTabListTime.passedSince() < 10.seconds) return
 
         playerSpecific?.let {
-            // do not try to load the data when hypixel has not yet send the profile loaded message
+            // Do not try to load the data when Hypixel has not yet sent the profile loaded message
             if (it.multipleProfiles && !hypixelDataLoaded) return
         }
 
-        if (noTabListTime.passedSince() < 3.seconds) return
         noTabListTime = SimpleTimeMark.now()
-        val foundSkyBlockTabList = TabListData.getTabList().any { it.contains("§b§lArea:") }
+        val foundSkyBlockTabList = TabWidget.AREA.isActive
         if (foundSkyBlockTabList) {
             ChatUtils.clickableChat(
-                "§cCan not read profile name from tab list! Open /widget and enable Profile Widget. " +
-                    "This is needed for the mod to function! And therefore this warning cannot be disabled",
+                "§cCannot read profile name from tab list! Open /widget and make sure the Profile Widget " +
+                    "is enabled and visible.",
                 onClick = {
                     HypixelCommands.widget()
                 },
@@ -123,18 +144,25 @@ object ProfileStorageData {
         }
     }
 
+    private fun postConfigLoadEvent() {
+        ConfigLoadEvent(firstLoad).post()
+        firstLoad = false
+    }
+
     private fun loadProfileSpecific(
         playerSpecific: PlayerSpecificStorage,
-        sackPlayer: SackData.PlayerSpecific,
+        sackProfile: SackData.PlayerSpecific,
+        storagePlayer: StorageData.PlayerSpecific,
         petPlayer: PetDataStorage.PlayerSpecific,
         profileName: String,
     ) {
         noTabListTime = SimpleTimeMark.farPast()
         profileSpecific = playerSpecific.profiles.getOrPut(profileName) { ProfileSpecificStorage() }
-        sackProfiles = sackPlayer.profiles.getOrPut(profileName) { SackData.ProfileSpecific() }
+        sackProfiles = sackProfile.profiles.getOrPut(profileName) { SackData.ProfileSpecific() }
+        storageProfiles = storagePlayer.profiles.getOrPut(profileName) { StorageData.ProfileSpecific() }
         petProfiles = petPlayer.profiles.getOrPut(profileName) { PetDataStorage.ProfileSpecific() }
         loaded = true
-        ConfigLoadEvent.post()
+        postConfigLoadEvent()
     }
 
     @HandleEvent
@@ -142,8 +170,10 @@ object ProfileStorageData {
         val playerUuid = PlayerUtils.getRawUuid()
         playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { PlayerSpecificStorage() }
         sackPlayers = SkyHanniMod.sackData.players.getOrPut(playerUuid) { SackData.PlayerSpecific() }
+        storagePlayer = SkyHanniMod.storageData.players.getOrPut(playerUuid) { StorageData.PlayerSpecific() }
         petPlayers = SkyHanniMod.petData.players.getOrPut(playerUuid) { PetDataStorage.PlayerSpecific() }
-        ConfigLoadEvent.post()
+        orderedWaypointsRoutes = SkyHanniMod.orderedWaypointsRoutesData
+        postConfigLoadEvent()
     }
 
     @HandleEvent

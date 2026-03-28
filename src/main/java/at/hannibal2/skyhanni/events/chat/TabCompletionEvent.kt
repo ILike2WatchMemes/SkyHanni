@@ -5,23 +5,19 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 class TabCompletionEvent(
     val leftOfCursor: String,
     val fullText: String,
-    val originalCompletions: List<String>,
+    private val originalCompletions: List<String>,
 ) : SkyHanniEvent() {
     val lastWord = leftOfCursor.substringAfterLast(' ')
-    val additionalSuggestions = mutableSetOf<String>()
-    val suppressedSuggestions = mutableSetOf<String>()
+    private val additionalSuggestions = mutableSetOf<String>()
 
     fun addSuggestion(suggestion: String) {
-        if (suggestion.startsWith(lastWord, ignoreCase = true))
-            additionalSuggestions.add(suggestion)
+        if (!suggestion.startsWith(lastWord, ignoreCase = true)) return
+        val adjustedSuggestion = suggestion.removePrefix("/")
+        additionalSuggestions.add(adjustedSuggestion)
     }
 
     fun addSuggestions(suggestions: Iterable<String>) {
         suggestions.forEach(this::addSuggestion)
-    }
-
-    fun excludeAllDefault() {
-        suppressedSuggestions.addAll(originalCompletions)
     }
 
     val command = if (leftOfCursor.startsWith("/"))
@@ -33,7 +29,7 @@ class TabCompletionEvent(
     }
 
     fun intoSuggestionArray(): Array<String>? {
-        if (additionalSuggestions.isEmpty() && suppressedSuggestions.isEmpty()) return null
-        return (originalCompletions - suppressedSuggestions + additionalSuggestions).toTypedArray()
+        if (additionalSuggestions.isEmpty()) return null
+        return (originalCompletions + additionalSuggestions).toTypedArray()
     }
 }

@@ -4,47 +4,49 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.player.EntityPlayer
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.getInventoryItems
+import net.minecraft.client.resources.language.I18n
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.player.Player
 
 @SkyHanniModule
 object MobUtils {
 
-    /**
-     * REGEX-TEST: Armor Stand
-     * REGEX-TEST: Armour Stand
-     */
-    private val defaultArmorStandName by RepoPattern.pattern("armorstand.default", "Armou?r Stand")
+    private val defaultArmorStandName get() = I18n.get("entity.minecraft.armor_stand")
 
     // The corresponding ArmorStand for a mob has always the ID + 1 (with some exceptions)
-    fun getArmorStand(entity: Entity, offset: Int = 1) = getNextEntity(entity, offset) as? EntityArmorStand
+    fun getArmorStand(entity: Entity, offset: Int = 1) = getNextEntity(entity, offset) as? ArmorStand
 
-    fun getNextEntity(entity: Entity, offset: Int): Entity? = EntityUtils.getEntityByID(entity.entityId + offset)
+    fun getNextEntity(entity: Entity, offset: Int): Entity? = EntityUtils.getEntityByID(entity.id + offset)
 
     fun getArmorStandByRangeAll(entity: Entity, range: Double) =
-        EntityUtils.getEntitiesNearby<EntityArmorStand>(entity.getLorenzVec(), range)
+        entity.getLorenzVec().getEntitiesNearby<ArmorStand>(range)
 
     fun getClosestArmorStand(entity: Entity, range: Double) =
-        getArmorStandByRangeAll(entity, range).sortedBy { it.distanceTo(entity) }.firstOrNull()
+        getArmorStandByRangeAll(entity, range).minByOrNull { it.distanceTo(entity) }
 
     fun getClosestArmorStandWithName(entity: Entity, range: Double, name: String) =
-        getArmorStandByRangeAll(entity, range).filter { it.cleanName().startsWith(name) }
-            .sortedBy { it.distanceTo(entity) }.firstOrNull()
+        getArmorStandByRangeAll(entity, range).filter { it.cleanName().startsWith(name) }.minByOrNull { it.distanceTo(entity) }
 
-    fun EntityArmorStand.isDefaultValue() = defaultArmorStandName.matches(this.name)
+    fun ArmorStand.isDefaultValue() = this.name.formattedTextCompatLessResets() == defaultArmorStandName
 
-    fun EntityArmorStand?.takeNonDefault() = this?.takeIf { !it.isDefaultValue() }
+    fun ArmorStand?.takeNonDefault() = this?.takeIf { !it.isDefaultValue() }
+
+    fun ArmorStand.hasEmptyInventory() = getInventoryItems().none { it.isNotEmpty() }
+
+    fun ArmorStand.isCompletelyDefault() = isDefaultValue() && hasEmptyInventory()
 
     class OwnerShip(val ownerName: String) {
         val ownerPlayer = MobData.players.firstOrNull { it.name == ownerName }
         override fun equals(other: Any?): Boolean {
-            if (other is EntityPlayer) return ownerPlayer == other || ownerName == other.name
+            if (other is Player) return ownerPlayer == other || ownerName == other.name.formattedTextCompatLessResets()
             if (other is String) return ownerName == other
             return false
         }
@@ -73,25 +75,20 @@ object MobUtils {
         rayTraceForMobs(entity, partialTicks, offset)?.firstOrNull()
 
     fun rayTraceForMobs(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()): List<Mob>? {
-        //#if MC < 1.21
-        val pos = entity.getPositionEyes(partialTicks).toLorenzVec() + offset
-        val look = entity.getLook(partialTicks).toLorenzVec().normalize()
-        //#else
-        //$$ val look = entity.rotationVector.toLorenzVec().normalize()
-        //$$ val pos = entity.eyePos.toLorenzVec() + offset
-        //#endif
+        val look = entity.lookAngle.toLorenzVec().normalize()
+        val pos = entity.eyePosition.toLorenzVec() + offset
         val possibleEntities = MobData.entityToMob.filterKeys {
-            it !is EntityArmorStand &&
-                it.entityBoundingBox.rayIntersects(
-                    pos, look
+            it !is ArmorStand &&
+                it.boundingBox.rayIntersects(
+                    pos, look,
                 )
         }.values
         if (possibleEntities.isEmpty()) return null
         return possibleEntities.distinct().sortedBy { it.baseEntity.distanceTo(pos) }
     }
 
-    val EntityLivingBase.mob: Mob? get() = MobData.entityToMob[this]
+    val LivingEntity.mob: Mob? get() = MobData.entityToMob[this]
 
-    val Entity.mob: Mob? get() = (this as? EntityLivingBase)?.mob
+    val Entity.mob: Mob? get() = (this as? LivingEntity)?.mob
 
 }

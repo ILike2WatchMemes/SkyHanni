@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import kotlinx.coroutines.launch
-import net.minecraft.util.IChatComponent
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object ActionBarData {
@@ -30,7 +30,7 @@ object ActionBarData {
     }
 
     private fun debugCommand() {
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchCoroutine("action bar debug command") {
             val clipboard = OSUtils.readFromClipboard()
             if (debugActionBar == clipboard) {
                 debugActionBar = null
@@ -63,14 +63,14 @@ object ActionBarData {
     /**
      * If the action bar is modified return the new one, otherwise return null.
      */
-    fun onChatReceive(component: IChatComponent): IChatComponent? {
-        val message = debugActionBar ?: component.formattedText.stripHypixelMessage()
+    fun onChatReceive(component: Component): Component? {
+        val message = debugActionBar ?: component.formattedTextCompat().stripHypixelMessage()
 
         actionBar = message
         val actionBarEvent = ActionBarUpdateEvent(actionBar, component)
         actionBarEvent.post()
 
-        if (component.formattedText != actionBarEvent.chatComponent.formattedText) {
+        if (component.formattedTextCompat() != actionBarEvent.chatComponent.formattedTextCompat()) {
             return actionBarEvent.chatComponent
         }
         return null

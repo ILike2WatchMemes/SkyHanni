@@ -1,11 +1,14 @@
 package at.hannibal2.skyhanni.config.features.mining
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.features.mining.PowderPerHotmPerk.PowderSpentDesign
+import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.data.hotx.CurrencyPerHotxPerk.CurrencySpentDesign
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class HotmConfig {
     @Expose
@@ -16,6 +19,16 @@ class HotmConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var highlightEnabledPerks: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Sky Mall Display", desc = "Display your current Sky Mall perk in a GUI element.")
+    @ConfigEditorDropdown
+    @SearchTag("skymall")
+    var skyMallDisplay: SkyMallDisplayVisibility = SkyMallDisplayVisibility.OFF
+
+    @Expose
+    @ConfigLink(owner = HotmConfig::class, field = "skyMallDisplay")
+    val skyMallPosition: Position = Position(100, 100)
 
     @Expose
     @ConfigOption(name = "Level Stack", desc = "Show the level of a perk as item stacks.")
@@ -38,7 +51,7 @@ class HotmConfig {
     @Expose
     @ConfigOption(name = "Powder Spent Design", desc = "Change the design of the powder spent display.")
     @ConfigEditorDropdown
-    var powderSpentDesign: PowderSpentDesign = PowderSpentDesign.NUMBER_AND_PERCENTAGE
+    var powderSpentDesign: CurrencySpentDesign = CurrencySpentDesign.NUMBER_AND_PERCENTAGE
 
     @Expose
     @ConfigOption(
@@ -57,4 +70,12 @@ class HotmConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var currentPowder: Boolean = true
+
+    enum class SkyMallDisplayVisibility(val display: String) {
+        OFF("Off"),
+        MINING_ONLY("Mining Islands Only"),
+        EVERYWHERE("Everywhere");
+
+        override fun toString() = display
+    }
 }

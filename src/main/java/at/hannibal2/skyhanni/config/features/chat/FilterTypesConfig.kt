@@ -18,6 +18,16 @@ class FilterTypesConfig {
     val crystalNucleus: CrystalNucleusConfig = CrystalNucleusConfig()
 
     @Expose
+    @ConfigOption(name = "Foraging", desc = "")
+    @Accordion
+    val foraging: ForagingFilterConfig = ForagingFilterConfig()
+
+    @Expose
+    @ConfigOption(name = "Hunting", desc = "")
+    @Accordion
+    val hunting: HuntingFilterConfig = HuntingFilterConfig()
+
+    @Expose
     @ConfigOption(name = "Stash Messages", desc = "")
     @Accordion
     val stashMessages: StashConfig = StashConfig()
@@ -51,10 +61,10 @@ class FilterTypesConfig {
     var welcome: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Guild EXP", desc = "Hide Guild EXP messages.")
+    @ConfigOption(name = "Guild/Event EXP", desc = "Hide Guild and Event EXP messages.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var guildExp: Boolean = false
+    var guildEventExp: Boolean = false
 
     @Expose
     @ConfigOption(name = "Friend Join/Left", desc = "Hide friend join/left messages.")
@@ -77,7 +87,7 @@ class FilterTypesConfig {
     @Expose
     @ConfigOption(
         name = "Watchdog",
-        desc = "Hide the message where Hypixel flexes about how many players they have banned over the last week."
+        desc = "Hide the message where Hypixel flexes about how many players they have banned over the last week.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -96,6 +106,12 @@ class FilterTypesConfig {
     var fireSale: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Reward Bundles", desc = "Hide the reminders to claim seasonal reward bundles.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var rewardBundles: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Event Level Up", desc = "Hide event level up messages.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -104,7 +120,7 @@ class FilterTypesConfig {
     @Expose
     @ConfigOption(
         name = "Diana",
-        desc = "Hide chat messages around griffin burrow chains, griffin feather drops, and coin drops."
+        desc = "Hide chat messages around griffin burrow chains, griffin feather drops, and coin drops.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -114,11 +130,23 @@ class FilterTypesConfig {
     @ConfigOption(
         name = "Factory Upgrade",
         desc = "Hide §nHypixel's§r Chocolate Factory upgrade and employee promotion messages.\n" +
-            "§eTo turn off SkyHanni's upgrade messages, search §lUpgrade Warning"
+            "§eTo turn off SkyHanni's upgrade messages, search §lUpgrade Warning",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var factoryUpgrade: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Hoppity's Hunt Begin", desc = "Hide \"Hoppity's Hunt has begun\" messages.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hoppityBegun: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Hoppity's Hunt Eggs", desc = "Hide \"An egg has appeared!\" messages during hoppity's hunt.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hoppityEggs: Boolean = false
 
     @Expose
     @ConfigOption(name = "Sacrifice", desc = "Hide other players' sacrifice messages.")
@@ -147,7 +175,7 @@ class FilterTypesConfig {
     @Expose
     @ConfigOption(
         name = "Parkour Messages",
-        desc = "Hide parkour messages (starting, stopping, reaching a checkpoint)."
+        desc = "Hide parkour messages (starting, stopping, reaching a checkpoint).",
     )
     @ConfigEditorBoolean
     @FeatureToggle

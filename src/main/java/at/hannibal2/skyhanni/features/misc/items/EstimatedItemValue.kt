@@ -6,19 +6,21 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemValueCalculationDataJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
@@ -29,15 +31,12 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
-import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import net.minecraft.client.Minecraft
-import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
-import org.lwjgl.input.Keyboard
+import net.minecraft.world.item.ItemStack
+import org.lwjgl.glfw.GLFW
 import kotlin.math.roundToLong
 
 @SkyHanniModule
@@ -55,12 +54,15 @@ object EstimatedItemValue {
     var itemValueCalculationData: ItemValueCalculationDataJson? = null
         private set
 
-    fun isCurrentlyShowing() = currentlyShowing && Minecraft.getMinecraft().currentScreen != null
+    var stackingEnchants: Map<String, StackingEnchantData> = emptyMap()
+        private set
+
+    fun isCurrentlyShowing() = currentlyShowing && Minecraft.getInstance().screen != null
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         gemstoneUnlockCosts =
-            event.readConstant<HashMap<NeuInternalName, HashMap<String, List<String>>>>("gemstonecosts")
+            event.getConstant<HashMap<NeuInternalName, HashMap<String, List<String>>>>("gemstonecosts")
     }
 
     @HandleEvent
@@ -69,50 +71,7 @@ object EstimatedItemValue {
         bookBundleAmount = data.bookBundleAmount
         itemValueCalculationData = data.valueCalculationData
         crimsonPrestigeCosts = data.crimsonPrestigeCosts
-    }
-
-    private fun isInNeuOverlay(): Boolean {
-        val inPv = Minecraft.getMinecraft().currentScreen is GuiProfileViewer
-        val inTrade = InventoryUtils.openInventoryName().startsWith("You  ")
-
-        // Use reflection to make sure tradeMenu exists
-        val neuConfig = NotEnoughUpdates.INSTANCE.config
-        val tradeField = neuConfig.javaClass.getDeclaredField("tradeMenu")
-        val trade = tradeField[neuConfig]
-
-        val booleanField = trade.javaClass.getDeclaredField("enableCustomTrade")
-        val customTradeEnabled = booleanField[trade] as Boolean
-
-        val inNeuTrade = inTrade && customTradeEnabled
-        val inStorage = InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled
-
-        return inPv || inNeuTrade || inStorage
-    }
-
-    fun onNeuDrawEquipment(stack: ItemStack) {
-        renderedItems++
-        updateItem(stack)
-    }
-
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onTooltip(event: ItemHoverEvent) {
-        if (!config.enabled) return
-        if (!PlatformUtils.isNeuLoaded()) return
-        if (!isInNeuOverlay()) return
-
-        if (renderedItems == 0) {
-            updateItem(event.itemStack)
-        }
-        val inStorage = InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled
-        // we use renderInNeuStorageOverlay() for this
-        if (inStorage) return
-
-        // render the estimated item value over NEU PV
-        DrawContextUtils.translate(0f, 0f, 200f)
-        tryRendering()
-        DrawContextUtils.translate(0f, 0f, -200f)
-
-        renderedItems++
+        stackingEnchants = event.getConstant<StackingEnchantsJson>("StackingEnchants").enchants
     }
 
     /**
@@ -132,11 +91,11 @@ object EstimatedItemValue {
         currentlyShowing = checkCurrentlyVisible()
         if (!currentlyShowing) return
 
-        if (SkyHanniDebugsAndTests.enabled) {
-            if (Keyboard.KEY_RIGHT.isKeyClicked()) {
+        if (SkyBlockUtils.debug) {
+            if (GLFW.GLFW_KEY_RIGHT.isKeyClicked()) {
                 EstimatedItemValueCalculator.starChange += 1
                 cache.clear()
-            } else if (Keyboard.KEY_LEFT.isKeyClicked()) {
+            } else if (GLFW.GLFW_KEY_LEFT.isKeyClicked()) {
                 EstimatedItemValueCalculator.starChange -= 1
                 cache.clear()
             }
@@ -144,7 +103,7 @@ object EstimatedItemValue {
 
         try {
             // TODO this code needs to be changed around
-            config.itemPriceDataPos.renderRenderables(display, posLabel = "Estimated Item Value")
+            config.position.renderRenderables(display, posLabel = "Estimated Item Value")
         } catch (ex: RuntimeException) {
             // "No OpenGL context found in the current thread." - caused indiscriminately by any other mod
             // that tries to over-render the tooltip, and is not explicitly something we can solve here?
@@ -159,7 +118,7 @@ object EstimatedItemValue {
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         tryRendering()
     }
 
@@ -242,9 +201,9 @@ object EstimatedItemValue {
 
     private fun ItemStack.shouldIgnoreDraw(): Boolean {
         this.getInternalNameOrNull()?.let { internalName ->
-            val name = this.displayName
+            val name = this.hoverName.formattedTextCompatLeadingWhiteLessResets()
             return (
-                this.item == Items.enchanted_book ||
+                this.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK ||
                     name.contains("Salesperson") ||
                     name == "§6☘ Category: Item Ability (Passive)" ||
                     internalName.isRune() ||
@@ -279,11 +238,7 @@ object EstimatedItemValue {
         }
         list.add("§aTotal: §6§l$numberFormat coins")
 
-        val newDisplay = mutableListOf<Renderable>()
-        for (line in list) {
-            newDisplay.add(Renderable.string(line))
-        }
-        return newDisplay
+        return list.map(StringRenderable::from)
     }
 
     @HandleEvent
@@ -296,17 +251,7 @@ object EstimatedItemValue {
         event.move(3, "misc.itemPriceDataPos", "misc.estimatedItemValues.itemPriceDataPos")
 
         event.move(31, "misc.estimatedItemValues", "inventory.estimatedItemValues")
-    }
 
-    fun renderInNeuStorageOverlay() {
-        if (!config.enabled) return
-
-        //#if MC < 1.16
-        // render the estimated item value over NEU Storage
-        DrawContextUtils.translate(0f, 0f, 200f)
-        tryRendering()
-        DrawContextUtils.translate(0f, 0f, -200f)
-        renderedItems++
-        //#endif
+        event.move(94, "inventory.estimatedItemValues.itemPriceDataPos", "inventory.estimatedItemValues.position")
     }
 }

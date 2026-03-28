@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.fishing
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -22,6 +23,15 @@ class TotemOfCorruptionConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     val showOverlay: Property<Boolean> = Property.of(true)
+
+    @Expose
+    @ConfigOption(
+        name = "Own Totem Only",
+        desc = "Ignore totems from other players, since they won't affect your sea creatures.\n" +
+            "§eMay break if you are nicked!"
+    )
+    @ConfigEditorBoolean
+    var ownTotemOnly: Boolean = true
 
     @Expose
     @ConfigOption(
@@ -62,7 +72,7 @@ class TotemOfCorruptionConfig {
     @Expose
     @ConfigOption(name = "Color of the area", desc = "The color of the area of the Totem of Corruption.")
     @ConfigEditorColour
-    var color: String = "0:153:18:159:85"
+    var color: ChromaColour = ChromaColour.fromStaticRGB(18, 159, 85, 153)
 
     @Expose
     @ConfigOption(

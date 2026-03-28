@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.optionalEmpty
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import java.lang.reflect.Method
 
@@ -93,41 +94,37 @@ object SkyHanniEvents {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
-        disabledHandlers = data.disabledHandlers
-        disabledHandlerInvokers = data.disabledInvokers
+        disabledHandlers = data.disabledHandlers.optionalEmpty()
+        disabledHandlerInvokers = data.disabledInvokers.optionalEmpty()
     }
 
     val seconds = listOf(10, 60, 60 * 5)
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        //#if MC > 1.21
-        //$$ try {
-        //#endif
-        val list = handlers.values.toMutableList()
+        try {
+            val list = handlers.values.toMutableList()
 
-        for (second in seconds) {
-            if (event.repeatSeconds(second)) {
+            for (second in seconds) {
+                if (event.repeatSeconds(second)) {
 
-                for (handler in list) {
-                    val log = handler.invokeLog
-                    val current = log.invokeCount
+                    for (handler in list) {
+                        val log = handler.invokeLog
+                        val current = log.invokeCount
 
-                    val storage = log.overTimeLog[second]
-                    if (storage == null) {
-                        log.overTimeLog[second] = EventInvokeData(current, 0)
-                    } else {
-                        storage.diff = current - storage.oldValue
-                        storage.oldValue = current
+                        val storage = log.overTimeLog[second]
+                        if (storage == null) {
+                            log.overTimeLog[second] = EventInvokeData(current, 0)
+                        } else {
+                            storage.diff = current - storage.oldValue
+                            storage.oldValue = current
+                        }
                     }
                 }
             }
+        } catch (_: Exception) {
+            // ignore this error on 1.21 for now
         }
-        //#if MC > 1.21
-        //$$ } catch (_: Exception) {
-        //$$ // ignore this error on 1.21 for now
-        //$$ }
-        //#endif
     }
 
     class EventInvokeData(var oldValue: Long, var diff: Long)

@@ -11,7 +11,6 @@ import java.util.regex.Matcher
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-// todo 1.21 impl needed
 enum class HoppityEggType(
     val mealName: String,
     val mealColor: String,
@@ -32,7 +31,8 @@ enum class HoppityEggType(
     BOUGHT_ABIPHONE("✆ Bought", "§a", -1),
     CHOCOLATE_SHOP_MILESTONE("Shop Milestone", "§6§l", -1),
     CHOCOLATE_FACTORY_MILESTONE("Chocolate Milestone", "§6§l", -1),
-    STRAY("Stray", "§a", -1)
+    STRAY("Stray", "§a", -1),
+    VISITOR("Visitor", "§d", -1),
     ;
 
     val isResetting get() = resettingEntries.contains(this)
@@ -123,7 +123,7 @@ enum class HoppityEggType(
         fun anyEggsUnclaimed(): Boolean = resettingEntries.any { !it.claimed }
         fun allEggsUnclaimed(): Boolean = resettingEntries.all { !it.claimed }
 
-        internal fun Matcher.getEggType(event: SkyHanniChatEvent): HoppityEggType =
+        internal fun Matcher.getEggType(event: SkyHanniChatEvent.Allow): HoppityEggType =
             entries.find { it.mealName == group("meal") } ?: run {
                 ErrorManager.skyHanniError(
                     "Unknown meal: ${group("meal")}",

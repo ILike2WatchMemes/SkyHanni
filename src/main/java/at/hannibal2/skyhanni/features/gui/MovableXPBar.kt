@@ -22,19 +22,19 @@ object MovableXPBar {
 
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
-        if (event.type != RenderLayer.EXPERIENCE || !isEnabled()) return
+        if ((event.type != RenderLayer.EXPERIENCE_BAR && event.type != RenderLayer.EXPERIENCE_NUMBER) || !isEnabled()) return
         post = true
         DrawContextUtils.pushMatrix()
         val x = GuiScreenUtils.scaledWindowWidth / 2 - 91
         val y = GuiScreenUtils.scaledWindowHeight - 29
         config.position.transform()
-        DrawContextUtils.translate(-x.toFloat(), -y.toFloat(), 0f) // Must be after transform to work with scaling
+        DrawContextUtils.translate(-x.toFloat(), -y.toFloat()) // Must be after transform to work with scaling
         GuiEditManager.add(config.position, "XP Bar", 182 - 1, 5 - 1) // -1 since the editor for some reason add +1
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
-        if (event.type != RenderLayer.EXPERIENCE || !post) return
+        if ((event.type != RenderLayer.EXPERIENCE_BAR && event.type != RenderLayer.EXPERIENCE_NUMBER) || !post) return
         DrawContextUtils.popMatrix()
         post = false
     }

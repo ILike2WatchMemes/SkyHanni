@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -9,14 +8,13 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import java.util.*
 
 class MoneyPerHourConfig {
     @Expose
     @ConfigOption(
         name = "Show Money per Hour",
         desc = "Display the money per hour YOU get with YOUR crop/minute value when selling the item to bazaar.\n" +
-            "Supports Bountiful, Mushroom Cow Perk, Armor Crops and Dicer Drops. Their toggles are below."
+            "Supports Bountiful, Mushroom Cow Perk, Armor Crops. Their toggles are below."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -69,16 +67,12 @@ class MoneyPerHourConfig {
         CustomFormatEntry.NPC_PRICE
     )
 
-    enum class CustomFormatEntry(
-        private val displayName: String,
-        private val legacyId: Int = -1,
-    ) : HasLegacyId {
-        SELL_OFFER("§eSell Offer", 0),
-        INSTANT_SELL("§eInstant Sell", 1),
-        NPC_PRICE("§eNPC Price", 2),
+    enum class CustomFormatEntry(private val displayName: String) {
+        SELL_OFFER("§eSell Offer"),
+        INSTANT_SELL("§eInstant Sell"),
+        NPC_PRICE("§eNPC Price"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 
@@ -104,11 +98,6 @@ class MoneyPerHourConfig {
     @ConfigOption(name = "Include Armor Drops", desc = "Include the average coins/hr from your armor.")
     @ConfigEditorBoolean
     var armor: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Include Dicer Drops", desc = "Include the average coins/hr from your melon or pumpkin dicer.")
-    @ConfigEditorBoolean
-    var dicer: Boolean = true
 
     @Expose
     @ConfigOption(name = "Hide Title", desc = "Hide the first line of 'Money Per Hour' entirely.")

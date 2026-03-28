@@ -3,7 +3,8 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.BitsApi
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcherWithIndex
 import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -21,32 +23,44 @@ object BitsPerCookieVisual {
 
     private val boosterCookie = "BOOSTER_COOKIE".toInternalName()
 
-    private val patternGroup = RepoPattern.group("cookie.bits")
-
-    private val wrongCookiePattern by patternGroup.pattern("wrong", "§[de]Booster Cookie")
+    private val patternGroup = RepoPattern.group("cookie.bits.new")
 
     /**
-     * REGEX-TEST: §5§o§7Amount: §a1§7x
-     * REGEX-TEST: §5§o§6Booster Cookie §8x6
+     * REGEX-TEST: §dBooster Cookie
+     * REGEX-FAIL: §6Booster Cookie
      */
-    private val amountPattern by patternGroup.pattern("amount", "§5§o(?:§6Booster Cookie §8x|§7Amount: §a)(?<amount>\\d+).*")
+    private val wrongCookiePattern by patternGroup.pattern(
+        "wrong", "§[de]Booster Cookie",
+    )
 
-    /** REGEX-TEST: §5§o§7§b4 §7days:
-     * */
-    private val timePattern by patternGroup.pattern("time", "§5§o§7§b4 §7days:")
+    /**
+     * REGEX-TEST: Amount: 1x
+     * REGEX-TEST: Amount: 1x
+     * REGEX-TEST: Booster Cookie x6
+     */
+    private val amountPattern by patternGroup.pattern(
+        "amount", "(?:Booster Cookie x|Amount: )(?<amount>\\d+).*",
+    )
+
+    /**
+     * REGEX-TEST: 4 days:
+     */
+    private val timePattern by patternGroup.pattern(
+        "time", "4 days:",
+    )
 
     @HandleEvent
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         if (event.itemStack.getInternalNameOrNull() != boosterCookie) return
-        if (wrongCookiePattern.matches(event.itemStack.displayName)) return
+        if (wrongCookiePattern.matches(event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets())) return
         var timeReplaced = false
 
         val toolTip = event.toolTip
-        val (cookieAmount, loreIndex) = amountPattern.firstMatcherWithIndex(toolTip) {
+        val (cookieAmount, loreIndex) = amountPattern.firstMatcherWithIndex(toolTip.map { it.string }) {
             group("amount").toInt() to it
         } ?: (1 to 0)
-        val positionIndex = timePattern.indexOfFirstMatch(toolTip)?.also {
+        val positionIndex = timePattern.indexOfFirstMatch(toolTip.map { it.string })?.also {
             timeReplaced = true
             if (config.bulkBuyCookieTime) {
                 toolTip.removeAt(it)

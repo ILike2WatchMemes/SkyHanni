@@ -1,66 +1,44 @@
 package at.skyhanni.sharedvariables
 
-private fun yarn(version: String): String = "net.fabricmc:yarn:${version}:v2"
-
 enum class ProjectTarget(
     val projectName: String,
     val minecraftVersion: MinecraftVersion,
     val mappingDependency: String,
     val mappingStyle: MappingStyle,
-    val forgeDep: String?,
-    linkTo: String?,
+    val fabricLoaderVersion: String? = null,
+    val fabricApiVersion: String? = null,
+    val modMenuVersion: String? = null,
+    val modrinthInfo: ModrinthInfo? = null,
 ) {
-    MAIN(
-        "1.8.9",
-        MinecraftVersion.MC189,
-        "de.oceanlabs.mcp:mcp_stable:22-1.8.9@zip",
-        MappingStyle.SEARGE,
-        "net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9",
-        "BRIDGE116FORGE",
-    ),
-    BRIDGE116FORGE(
-        "1.16.5-forge",
-        MinecraftVersion.MC11605,
+    MODERN_12110(
+        "1.21.10",
+        MinecraftVersion.MC12110,
         "official",
         MappingStyle.SEARGE,
-        "net.minecraftforge:forge:1.16.5-36.2.39",
-        "BRIDGE116FABRIC",
+        fabricLoaderVersion = "net.fabricmc:fabric-loader:0.18.4",
+        fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.138.4+1.21.10",
+        modMenuVersion = "16.0.0-rc.1",
+        modrinthInfo = ModrinthInfo.FABRIC_1_21_10,
     ),
-    BRIDGE116FABRIC(
-        "1.16.5-fabric",
-        MinecraftVersion.MC11605,
-        yarn("1.16.5+build.10"),
-        MappingStyle.YARN,
-        null,
-        "MODERN",
+    MODERN_12111(
+        "1.21.11",
+        MinecraftVersion.MC12111,
+        "official",
+        MappingStyle.SEARGE,
+        fabricLoaderVersion = "net.fabricmc:fabric-loader:0.18.4",
+        fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.141.2+1.21.11",
+        modMenuVersion = "17.0.0-beta.2",
+        modrinthInfo = ModrinthInfo.FABRIC_1_21_11,
     ),
-    MODERN(
-        "1.21.5",
-        MinecraftVersion.MC12105,
-        yarn("1.21.5+build.1"),
-        MappingStyle.YARN,
-        null,
-        null,
-    )
     ;
-
-    val isBridge get() = name.contains("bridge")
-
-    val linkTo by lazy {
-        if (linkTo == null) null
-        else {
-            ProjectTarget.values().find { it.name == linkTo }!!
-        }
-    }
-    val parent by lazy {
-        values().find { it.linkTo == this }
-    }
-    val isForge get() = forgeDep != null
-    val isFabric get() = forgeDep == null
 
     val projectPath get() = ":$projectName"
 
     companion object {
         fun activeVersions() = values().filter { MultiVersionStage.activeState.shouldCreateProject(it) }
+
+        fun findByMcVersion(mcVersion: String): ProjectTarget? {
+            return values().find { it.minecraftVersion.versionName == mcVersion }
+        }
     }
 }

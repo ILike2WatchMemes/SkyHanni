@@ -49,7 +49,7 @@ class IslandTypeTag internal constructor(name: String, private val types: EnumSe
         @HandleEvent
         fun onRepoReload(event: RepositoryReloadEvent) {
             IslandTypeTags // Make sure the object is initialized
-            event.getConstant<Map<String, List<String>>>("IslandTypeTags", type).forEach { (name, values) ->
+            event.getConstant<Map<String, List<String>>>("IslandTypeTags").forEach { (name, values) ->
                 tags[name]?.update(values)
             }
         }
@@ -106,6 +106,11 @@ object IslandTypeTags {
     )
 
     // Foraging
+    val FORAGING = IslandTypeTag(
+        "foraging",
+        IslandType.THE_PARK,
+        IslandType.GALATEA,
+    )
     val FORAGING_CUSTOM_TREES = IslandTypeTag(
         "foraging_custom_trees",
         IslandType.GALATEA,

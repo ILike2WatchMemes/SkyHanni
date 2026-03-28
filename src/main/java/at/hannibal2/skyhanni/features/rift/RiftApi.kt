@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.wasRiftTransferred
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object RiftApi {
@@ -38,7 +38,7 @@ object RiftApi {
 
     fun ItemStack.motesNpcPrice(): Double? {
         if (isRiftExportable() && wasRiftTransferred()) return null
-        return getInternalName().motesNpcPrice()?.times(stackSize)
+        return getInternalName().motesNpcPrice()?.times(count)
     }
 
     fun NeuInternalName.motesNpcPrice(): Double? {
@@ -87,7 +87,7 @@ object RiftApi {
         IslandGraphs.disabledNodesReason?.let {
             IslandGraphs.enableAllNodes()
             if (temporalPillars.isEmpty()) {
-                IslandGraphs.update(force = true)
+                IslandGraphs.refreshNavigation(force = true)
             }
         }
 
@@ -96,7 +96,7 @@ object RiftApi {
                 val location = mob.baseEntity.getLorenzVec()
                 IslandGraphs.disableNodes("Temporal Pillar", location, 7.0)
             }
-            IslandGraphs.update(force = true)
+            IslandGraphs.refreshNavigation(force = true)
         }
 
     }

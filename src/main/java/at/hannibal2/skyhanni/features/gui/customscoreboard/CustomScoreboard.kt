@@ -37,6 +37,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -60,16 +62,17 @@ object CustomScoreboard {
 
     private var dirty = false
 
-    @HandleEvent
+    private var lastLines: List<ScoreboardLine> = emptyList()
+
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         display ?: return
 
-        val render =
-            if (SkyBlockUtils.inSkyBlock && !TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache != null) cache
-            else display
-
-        render ?: return
+        val render = cache?.let {
+            if (!TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch) it
+            else null
+        } ?: display ?: return
 
         // We want to update the background every time, so we can have a smooth transition when using chroma as the color
         val finalRenderable = RenderBackground.addBackground(render)
@@ -110,9 +113,13 @@ object CustomScoreboard {
         if (dirty || nextScoreboardUpdate.isInPast()) {
             nextScoreboardUpdate = 250.milliseconds.fromNow()
             dirty = false
-            display = createLines().removeEmptyLinesFromEdges().createRenderable()
-            if (TabListData.fullyLoaded) {
-                cache = display
+            val newLines = createLines().removeEmptyLinesFromEdges()
+            if (newLines != lastLines) {
+                lastLines = newLines
+                display = newLines.createRenderable()
+                if (TabListData.fullyLoaded) {
+                    cache = display
+                }
             }
         }
 
@@ -164,8 +171,8 @@ object CustomScoreboard {
         }
     }
 
-    private fun List<ScoreboardLine>.createRenderable() = Renderable.verticalContainer(
-        map { Renderable.string(it.display, horizontalAlign = it.alignment) },
+    private fun List<ScoreboardLine>.createRenderable() = Renderable.vertical(
+        map { Renderable.text(it.display, horizontalAlign = it.alignment) },
         displayConfig.lineSpacing - 10,
         horizontalAlign = HorizontalAlignment.CENTER,
         verticalAlign = VerticalAlignment.CENTER,

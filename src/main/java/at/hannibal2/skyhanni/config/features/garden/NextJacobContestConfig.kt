@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.garden.CropType
 import com.google.gson.annotations.Expose
@@ -40,7 +39,7 @@ class NextJacobContestConfig {
     @Expose
     @ConfigOption(
         name = "Fetch Contests",
-        desc = "Automatically fetch Contests from elitebot.dev for the current year if they're uploaded already.",
+        desc = "Automatically fetch Contests from eliteskyblock.com for the current year if they're uploaded already.",
     )
     @ConfigEditorBoolean
     var fetchAutomatically: Boolean = true
@@ -64,21 +63,17 @@ class NextJacobContestConfig {
     @Expose
     @ConfigOption(
         name = "Share Contests",
-        desc = "Share the list of upcoming Contests to elitebot.dev for everyone else to then fetch automatically.",
+        desc = "Share the list of upcoming Contests to eliteskyblock.com for everyone else to then fetch automatically.",
     )
     @ConfigEditorDropdown
     var shareAutomatically: ShareContestsEntry = ShareContestsEntry.ASK
 
-    enum class ShareContestsEntry(
-        private val displayName: String,
-        private val legacyId: Int = -1,
-    ) : HasLegacyId {
-        ASK("Ask When Needed", 0),
-        AUTO("Share Automatically", 1),
-        DISABLED("Disabled", 2),
+    enum class ShareContestsEntry(private val displayName: String) {
+        ASK("Ask When Needed"),
+        AUTO("Share Automatically"),
+        DISABLED("Disabled"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 
@@ -105,8 +100,11 @@ class NextJacobContestConfig {
     @ConfigEditorDraggableList
     val warnFor: MutableList<CropType> = CropType.entries.toMutableList()
 
-    // Todo rename to position
     @Expose
     @ConfigLink(owner = NextJacobContestConfig::class, field = "display")
-    val pos: Position = Position(-200, 10)
+    val position: Position = Position(-200, 10)
+
+    @Expose
+    @ConfigLink(owner = NextJacobContestConfig::class, field = "display")
+    val inventoryPosition: Position = Position(394, 124)
 }

@@ -6,27 +6,52 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
+import java.io.BufferedReader
+import java.io.BufferedWriter
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 import java.io.Reader
+import java.nio.charset.StandardCharsets
 import kotlin.reflect.jvm.javaType
 import kotlin.reflect.typeOf
 
 inline fun <reified T : Any> Gson.fromJson(string: String): T = this.fromJson(string, typeOf<T>().javaType)
+
+inline fun <reified T : Any> Gson.fromJsonOrNull(string: String): T? = runCatching {
+    this.fromJson<T>(string)
+}.getOrNull()
+
+inline fun <reified T : Any> Gson.fromJsonOrNull(jsonElement: JsonElement): T? = runCatching {
+    this.fromJson<T>(jsonElement)
+}.getOrNull()
 
 inline fun <reified T : Any> Gson.fromJson(jsonElement: JsonElement): T =
     this.fromJson(jsonElement, typeOf<T>().javaType)
 
 inline fun <reified T : Any> Gson.fromJson(reader: Reader): T = this.fromJson(reader, typeOf<T>().javaType)
 
-fun File.getJson(): JsonObject? {
-    return try {
-        this.inputStream().use {
-            ConfigManager.gson.fromJson(it.reader(), JsonObject::class.java)
-        }
-    } catch (e: Exception) {
-        null
-    }
-}
+fun File.getJson(gson: Gson = ConfigManager.gson): JsonElement? = runCatching {
+    BufferedReader(
+        InputStreamReader(
+            FileInputStream(this),
+            StandardCharsets.UTF_8,
+        ),
+    ).use { gson.fromJson(it, JsonElement::class.java) }
+}.getOrNull()
+
+fun File.writeJson(json: JsonElement, gson: Gson = ConfigManager.gson): Boolean = runCatching {
+    if (!this.exists()) this.createNewFile()
+    BufferedWriter(
+        OutputStreamWriter(
+            FileOutputStream(this),
+            StandardCharsets.UTF_8,
+        )
+    ).use { it.write(gson.toJson(json)) }
+    true
+}.getOrElse { return false }
 
 /**
  * Straight forward deep copy. This is included in gson as well, but different versions have it exposed privately instead of publicly,
@@ -47,6 +72,26 @@ fun JsonElement.shDeepCopy(): JsonElement {
 
         else -> this
     }
+}
+
+fun JsonElement.addElementsAfter(elements: Array<out Enum<*>>, after: Enum<*>? = null): JsonArray {
+    val newArray = JsonArray()
+    var found = false
+    this.asJsonArray.forEach {
+        newArray.add(it)
+        if (!found && it.asString == after?.name) {
+            found = true
+            elements.forEach { element ->
+                newArray.add(JsonPrimitive(element.name))
+            }
+        }
+    }
+    if (!found) {
+        elements.forEach { element ->
+            newArray.add(JsonPrimitive(element.name))
+        }
+    }
+    return newArray
 }
 
 fun Iterable<JsonElement>.toJsonArray(): JsonArray = JsonArray().also {

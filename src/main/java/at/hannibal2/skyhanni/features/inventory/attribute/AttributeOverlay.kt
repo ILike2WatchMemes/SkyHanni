@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.width
-import at.hannibal2.skyhanni.utils.TimeLimitedCache
-import net.minecraft.item.ItemStack
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule

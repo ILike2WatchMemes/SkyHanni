@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.EntityUtils
-import net.minecraft.entity.Entity
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.item.EntityItemFrame
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.decoration.ItemFrame
+import java.awt.Color
 
 class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity>?) : SkyHanniEvent() {
 
@@ -16,7 +18,7 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
     /**
      * The entities to outline. This is progressively cumulated from [.entitiesToChooseFrom]
      */
-    var entitiesToOutline: HashMap<Entity, Int>? = null
+    var entitiesToOutline: HashMap<Entity, Color>? = null
 
     /**
      * The entities we can outline. Note that this set and [.entitiesToOutline] are disjoint at all times.
@@ -50,7 +52,7 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
      *
      * @param outlineColor a function to test
      */
-    fun queueEntitiesToOutline(outlineColor: ((entity: Entity) -> Int?)? = null) {
+    fun queueEntitiesToOutline(outlineColor: ((entity: Entity) -> Color?)? = null) {
         if (outlineColor == null) {
             return
         }
@@ -60,7 +62,7 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
         val itr: MutableIterator<Entity> = entitiesToChooseFrom!!.iterator()
         while (itr.hasNext()) {
             val e: Entity = itr.next()
-            val i: Int? = outlineColor(e)
+            val i: Color? = outlineColor(e)
             if (i != null) {
                 entitiesToOutline!![e] = i
                 itr.remove()
@@ -74,7 +76,7 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
      * @param entity       the entity to add
      * @param outlineColor the color with which to outline
      */
-    fun queueEntityToOutline(entity: Entity?, outlineColor: Int) {
+    fun queueEntityToOutline(entity: Entity?, outlineColor: Color) {
         if (entity == null) {
             return
         }
@@ -92,12 +94,13 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
      * Used for on-the-fly generation of entities. Driven by event handlers in a decentralized fashion
      */
     private fun computeAndCacheEntitiesToChooseFrom() {
+        @OptIn(AllEntitiesGetter::class)
         val entities: List<Entity> = EntityUtils.getAllEntities().toList()
         // Only render outlines around non-null entities within the camera frustum
         entitiesToChooseFrom = HashSet(entities.size)
         // Only consider entities that aren't invisible armorstands to increase FPS significantly
         for (entity in entities) {
-            if (!(entity is EntityArmorStand && entity.isInvisible()) && entity !is EntityItemFrame) {
+            if (!(entity is ArmorStand && entity.isInvisible) && entity !is ItemFrame) {
                 entitiesToChooseFrom!!.add(entity)
             }
         }

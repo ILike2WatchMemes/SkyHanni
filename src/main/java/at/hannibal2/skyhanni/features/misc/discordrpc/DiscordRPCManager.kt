@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.features.misc.discordrpc
 
-// This entire file was taken from SkyblockAddons code, ported to SkyHanni
+// originally adapted from SkyblockAddons
 
-import at.hannibal2.skyhanni.SkyHanniMod.coroutineScope
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.feature
+import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -11,86 +12,121 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.LineEntry
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantsJson
+import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.ConnectionRetryHelper
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import dev.cbyrne.kdiscordipc.KDiscordIPC
+import dev.cbyrne.kdiscordipc.core.error.ConnectionError
 import dev.cbyrne.kdiscordipc.core.event.data.ErrorEventData
 import dev.cbyrne.kdiscordipc.core.event.impl.DisconnectedEvent
 import dev.cbyrne.kdiscordipc.core.event.impl.ErrorEvent
-import dev.cbyrne.kdiscordipc.core.event.impl.ReadyEvent
 import dev.cbyrne.kdiscordipc.data.activity.Activity
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object DiscordRPCManager {
 
-    private const val APPLICATION_ID = 1093298182735282176L
+    private const val APPLICATION_ID = "1093298182735282176"
 
     val config get() = feature.gui.discordRPC
 
     private var client: KDiscordIPC? = null
-    private var startTimestamp: Long = 0
+    private var startTimestamp: SimpleTimeMark = SimpleTimeMark.farPast()
     private var started = false
     private var nextUpdate: SimpleTimeMark = SimpleTimeMark.farPast()
-
-    var stackingEnchants: Map<String, StackingEnchantData> = emptyMap()
+    private var presenceJob: Job? = null
 
     private var debugError = false
     private var debugStatusMessage = "nothing"
 
-    fun start(fromCommand: Boolean = false) {
-        coroutineScope.launch {
-            try {
-                if (isConnected()) return@launch
+    private val progressCategory = ChatProgressUpdates.category("Discord RPC")
 
-                updateDebugStatus("Starting...")
-                startTimestamp = System.currentTimeMillis()
-                client = KDiscordIPC(APPLICATION_ID.toString())
-                setup(fromCommand)
-            } catch (e: Throwable) {
-                updateDebugStatus("Unexpected error: ${e.message}", error = true)
-                ErrorManager.logErrorWithData(e, "Discord RPC has thrown an unexpected error while trying to start")
+    private val retryHelper = ConnectionRetryHelper(listOf(10.seconds, 20.seconds, 30.seconds))
+    private var retryJob: Job? = null
 
+    suspend fun start(progress: ChatProgressUpdates, fromCommand: Boolean = false) {
+        progress.update("call start")
+        if (isConnected()) {
+            progress.end("alr connected")
+            return
+        }
+        progress.update("Starting...")
+        updateDebugStatus("Starting...")
+        startTimestamp = SimpleTimeMark.now()
+        progress.update("calling KDiscordIPC")
+        client = KDiscordIPC(APPLICATION_ID)
+        progress.update("done init client")
+        try {
+            progress.update("calling setup")
+            setup(progress, fromCommand)
+            retryJob?.cancel()
+            retryHelper.reset()
+        } catch (e: ConnectionError) {
+            progress.end("discord not detected: ${e.message}")
+            val retryDelay = retryHelper.onFailure()
+            if (retryDelay != null) {
+                updateDebugStatus("Discord not detected, retrying in ${retryDelay.inWholeSeconds}s ${retryHelper.retriesLabel}")
+
+                retryJob = SkyHanniMod.launchNoScopeCoroutine("discord rpc retry", timeout = Duration.INFINITE) {
+                    delay(retryDelay)
+                    val retryProgress = progressCategory.start("discord rpc autoretry ${retryHelper.currentRetry}")
+                    start(retryProgress)
+                }
+            } else {
+                updateDebugStatus("Discord not detected after all retries")
+                ChatUtils.clickableChat(
+                    message = "Discord RPC could not connect automatically. Click to retry!",
+                    onClick = ::startCommand,
+                    hover = "§eClick to run /shrpcstart!",
+                )
             }
+        } catch (e: Throwable) {
+            progress.end("error: ${e.message}")
+            updateDebugStatus("Unexpected error: ${e.message}", error = true)
+            ErrorManager.logErrorWithData(
+                e,
+                "Discord RPC has thrown an unexpected error while trying to start",
+            )
         }
     }
 
     private fun stop() {
-        coroutineScope.launch {
-            if (isConnected()) {
-                updateDebugStatus("Stopped")
-                client?.disconnect()
-                started = false
-            }
-        }
+        if (!isConnected()) return
+        updateDebugStatus("Stopped")
+        client?.disconnect()
+        started = false
     }
 
-    private suspend fun setup(fromCommand: Boolean) {
+    private suspend fun setup(progress: ChatProgressUpdates, fromCommand: Boolean) {
         try {
-            client?.on<ReadyEvent> { onReady() }
+            progress.update("on<DisconnectedEvent>")
             client?.on<DisconnectedEvent> { onIPCDisconnect() }
+            progress.update("on<ErrorEvent>")
             client?.on<ErrorEvent> { onError(data) }
+            progress.update("connect")
             client?.connect()
+            progress.update("call setupPresenceJob")
+            setupPresenceJob(progress)
+            progress.end("Successfully started")
             updateDebugStatus("Successfully started")
             if (!fromCommand) return
 
-            // confirm that /shrpcstart worked
             ChatUtils.chat("Successfully started Rich Presence!", prefixColor = "§a")
         } catch (e: Exception) {
             updateDebugStatus("Failed to connect: ${e.message}", error = true)
@@ -101,9 +137,9 @@ object DiscordRPCManager {
                     "Please report this and ping NetheriteMiner.",
             )
             ChatUtils.clickableChat(
-                "Click here to retry.",
-                onClick = { startCommand() },
-                "§eClick to run /shrpcstart!",
+                message = "Click here to retry!",
+                onClick = ::startCommand,
+                hover = "§eClick to run /shrpcstart!",
             )
         }
     }
@@ -113,76 +149,90 @@ object DiscordRPCManager {
     @HandleEvent(ConfigLoadEvent::class)
     fun onConfigLoad() {
         ConditionalUtils.onToggle(config.firstLine, config.secondLine, config.customText) {
+            val progress = progressCategory.start("onToggle")
             if (isConnected()) {
-                coroutineScope.launch {
-                    updatePresence()
-                }
-            }
+                setupPresenceJob(progress)
+                progress.end("Successfully updated")
+            } else presenceJob?.cancel()
         }
         config.enabled.whenChanged { _, new ->
-            if (!new) {
-                stop()
+            if (!new) stop()
+        }
+    }
+
+    private fun setupPresenceJob(progress: ChatProgressUpdates) {
+        progress.update("in setupPresenceJob")
+        var updatePresenceProgress: ChatProgressUpdates? = progressCategory.start("discord rpc updatePresence")
+        presenceJob = SkyHanniMod.launchNoScopeCoroutine("discord rpc updatePresence", timeout = Duration.INFINITE) {
+            updatePresenceProgress?.update("started update presence loop first run")
+            while (isConnected()) {
+                updatePresence(updatePresenceProgress)
+                updatePresenceProgress?.end("update presence loop finished first run, not logging further updates")
+                updatePresenceProgress = null
+                delay(5.seconds)
             }
         }
     }
 
-    @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        stackingEnchants = event.getConstant<StackingEnchantsJson>("StackingEnchants").enchants
-    }
-
-    private suspend fun updatePresence() {
+    private suspend fun updatePresence(progress: ChatProgressUpdates?) {
+        progress?.update("start in updatePresence")
         val location = DiscordStatus.LOCATION.getDisplayString()
         val discordIconKey = DiscordLocationKey.getDiscordIconKey(location)
         val buttons = mutableListOf<Activity.Button>()
+        progress?.update("start creating buttons")
         if (config.showEliteBotButton.get()) {
             buttons.add(
                 Activity.Button(
-                    label = "Open EliteBot",
-                    url = "https://elitebot.dev/@${PlayerUtils.getName()}/${HypixelData.profileName}"
-                )
+                    label = "Open EliteSkyBlock",
+                    url = "${EliteDevApi.ELITE_URL}/@${PlayerUtils.getName()}/${HypixelData.profileName}".addSkyHanniUtm(),
+                ),
             )
         }
 
         if (config.showSkyCryptButton.get()) {
+            val profileName = HypixelData.profileName.firstLetterUppercase()
             buttons.add(
                 Activity.Button(
                     label = "Open SkyCrypt",
-                    url = "https://sky.shiiyu.moe/stats/${PlayerUtils.getName()}/${HypixelData.profileName}"
-                )
+                    url = "https://sky.shiiyu.moe/stats/${PlayerUtils.getName()}/$profileName".addSkyHanniUtm(),
+                ),
             )
         }
 
+        progress?.update("start creating activity")
+        val entry = config.secondLine.get()
+        val statusByConfigId = getStatusByConfigId(entry)
+        val state = statusByConfigId.getDisplayString()
+        progress?.update("firstLine: ${config.firstLine.get()}")
+        progress?.update("secondLine: ${config.secondLine.get()}")
+        val details = getStatusByConfigId(config.firstLine.get()).getDisplayString()
+        progress?.update("details: $details")
+        progress?.update("state: $state")
         client?.activityManager?.setActivity(
             Activity(
-                details = getStatusByConfigId(config.firstLine.get()).getDisplayString(),
-                state = getStatusByConfigId(config.secondLine.get()).getDisplayString(),
+                details = details,
+                state = state,
                 timestamps = Activity.Timestamps(
-                    start = startTimestamp,
-                    end = null
+                    start = startTimestamp.toMillis(),
+                    end = null,
                 ),
                 assets = Activity.Assets(
                     largeImage = discordIconKey,
-                    largeText = location
+                    largeText = location,
                 ),
-                buttons = buttons.ifEmpty { null }
-            )
+                buttons = buttons.ifEmpty { null },
+            ),
         )
     }
 
 
-    private fun onReady() {
-        updateDebugStatus("Discord RPC Ready.")
-    }
-
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isConnected()) return
-        if (event.repeatSeconds(5)) {
-            coroutineScope.launch {
-                updatePresence()
-            }
-        }
+    fun onSecondPassed() {
+        if (!isConnected()) return presenceJob?.cancel() ?: Unit
+        else if (presenceJob?.isActive == true) return
+        val progress = progressCategory.start("onSecondPassed")
+        setupPresenceJob(progress)
+        progress.end("Successfully updated")
     }
 
     private fun onIPCDisconnect() {
@@ -202,14 +252,10 @@ object DiscordRPCManager {
 
     @HandleEvent
     fun onTick() {
-        // The mod has already started the connection process. This variable is my way of running a function when
-        // the player joins SkyBlock but only running it again once they join and leave.
         if (started || !isEnabled()) return
         if (SkyBlockUtils.inSkyBlock) {
-            // todo discord rpc doesnt connect on 1.21
-            //#if TODO
-            start()
-            //#endif
+            val progress = progressCategory.start("auto start in onTick")
+            SkyHanniMod.launchNoScopeCoroutine("discord rpc start", timeout = Duration.INFINITE) { start(progress) }
             started = true
         }
     }
@@ -217,33 +263,44 @@ object DiscordRPCManager {
     @HandleEvent
     fun onWorldChange() {
         if (nextUpdate.isInFuture()) return
-        // wait 5 seconds to check if the new world is skyblock or not before stopping the function
+
         nextUpdate = DelayedRun.runDelayed(5.seconds) {
-            if (!SkyBlockUtils.inSkyBlock) {
-                stop()
-            }
+            if (!SkyBlockUtils.inSkyBlock) stop()
         }
     }
 
     @HandleEvent(ClientDisconnectEvent::class)
     fun onDisconnect() {
+        retryJob?.cancel()
+        retryHelper.reset()
         stop()
     }
 
     private fun startCommand() {
+        val progress = progressCategory.start("init /shrpcstart")
         if (!isEnabled()) {
+            progress.end("disabled in config")
             ChatUtils.userError("Discord Rich Presence is disabled. Enable it in the config §e/sh discord")
             return
         }
 
         if (isConnected()) {
+            progress.end("already connected")
             ChatUtils.userError("Discord Rich Presence is already active!")
             return
         }
 
+        retryJob?.cancel()
+        retryHelper.reset()
+        progress.update("attempting to start")
         ChatUtils.chat("Attempting to start Discord Rich Presence...")
         try {
-            start(true)
+            progress.end("launchCoroutine")
+            SkyHanniMod.launchCoroutine("discord rpc manual start") {
+                val startProgress = progressCategory.start("discord rpc manual start")
+                start(startProgress, true)
+            }
+
             updateDebugStatus("Successfully started")
         } catch (e: Exception) {
             updateDebugStatus("Unable to start: ${e.message}", error = true)
@@ -276,28 +333,14 @@ object DiscordRPCManager {
         }
     }
 
-    // Events that change things in DiscordStatus
     @HandleEvent(KeyPressEvent::class)
     fun onKeyPress() {
-        if (!isEnabled() || !PriorityEntry.AFK.isSelected()) return // autoPriority 4 is dynamic afk
+        if (!isEnabled() || !PriorityEntry.AFK.isSelected()) return
         beenAfkFor = SimpleTimeMark.now()
     }
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(11, "misc.discordRPC.firstLine") { element ->
-            ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
-        }
-        event.transform(11, "misc.discordRPC.secondLine") { element ->
-            ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
-        }
-        event.transform(11, "misc.discordRPC.auto") { element ->
-            ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
-        }
-        event.transform(11, "misc.discordRPC.autoPriority") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, PriorityEntry::class.java)
-        }
-
         event.move(31, "misc.discordRPC", "gui.discordRPC")
     }
 
@@ -305,10 +348,10 @@ object DiscordRPCManager {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shrpcstart") {
+        event.registerBrigadier("shrpcstart") {
             description = "Manually starts the Discord Rich Presence feature"
             category = CommandCategory.USERS_ACTIVE
-            callback { startCommand() }
+            simpleCallback { startCommand() }
         }
     }
 }

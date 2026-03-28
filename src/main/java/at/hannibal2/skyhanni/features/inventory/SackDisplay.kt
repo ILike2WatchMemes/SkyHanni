@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.SortingTypeEntry
@@ -10,14 +9,13 @@ import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
@@ -32,6 +30,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.buildSearchableTable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
 private typealias GemstoneQuality = SkyBlockItemModifierUtils.GemstoneQuality
 
@@ -50,7 +49,7 @@ object SackDisplay {
     init {
         RenderDisplayHelper(
             inventory = SackApi.inventory,
-            condition = { isEnabled() },
+            condition = ::isEnabled,
         ) {
             config.position.renderRenderables(
                 display, extraSpace = config.extraSpace, posLabel = "Sacks Items",
@@ -63,7 +62,7 @@ object SackDisplay {
         if (!SackApi.inventory.isInside()) return
         if (!config.highlightFull) return
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            val lore = slot.stack.getLore()
+            val lore = slot.item.getLore()
             if (lore.any { it.startsWith("§7Stored: §a") }) {
                 slot.highlight(LorenzColor.RED)
             }
@@ -71,7 +70,10 @@ object SackDisplay {
     }
 
     fun update(savingSacks: Boolean) {
-        display = drawDisplay(savingSacks)
+        // Ensure we're running on the render thread - this gets called from the network thread in SackApi
+        DelayedRun.runOrNextTick {
+            display = drawDisplay(savingSacks)
+        }
     }
 
     private fun drawDisplay(savingSacks: Boolean) = buildList {
@@ -113,11 +115,11 @@ object SackDisplay {
                         name.replace("§k", ""),
                         onLeftClick = {
                             if (!SackApi.isTrophySack) {
-                                BazaarApi.searchForBazaarItem(internalName)
+                                BazaarApi.searchForBazaarItemOrRecipe(internalName)
                             }
                         },
                         highlightsOnHoverSlots = listOf(slot),
-                    ) { !NeuItems.neuHasFocus() }
+                    )
                     add(nameText)
 
 
@@ -154,7 +156,7 @@ object SackDisplay {
                         totalMagmaFish += magmaFish
                         add(
                             Renderable.hoverTips(
-                                Renderable.string(
+                                Renderable.text(
                                     "§d$magmaFish",
                                     horizontalAlign = config.alignment,
                                 ),
@@ -284,10 +286,10 @@ object SackDisplay {
                         Renderable.optionalLink(
                             name,
                             onLeftClick = {
-                                BazaarApi.searchForBazaarItem(name.removeColor().dropLast(1))
+                                BazaarApi.searchForBazaarItemOrRecipe(name.removeColor().dropLast(1))
                             },
                             highlightsOnHoverSlots = listOf(gem.slot),
-                        ) { !NeuItems.neuHasFocus() },
+                        ),
                     )
                     when (SackApi.gemstoneStackFilter) {
                         GemstoneQuality.ROUGH -> addAlignedNumber(gem.rough.addSeparators())
@@ -327,17 +329,4 @@ object SackDisplay {
     }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
-
-    @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(15, "inventory.sackDisplay.numberFormat") { element ->
-            ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)
-        }
-        event.transform(15, "inventory.sackDisplay.priceFormat") { element ->
-            ConfigUtils.migrateIntToEnum(element, PriceFormatEntry::class.java)
-        }
-        event.transform(15, "inventory.sackDisplay.sortingType") { element ->
-            ConfigUtils.migrateIntToEnum(element, SortingTypeEntry::class.java)
-        }
-    }
 }

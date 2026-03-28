@@ -1,12 +1,17 @@
 package at.hannibal2.skyhanni.config.features.event.hoppity
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityEventSummaryConfig
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class HoppityEggsConfig {
     @Expose
@@ -46,11 +51,11 @@ class HoppityEggsConfig {
 
     @Expose
     @ConfigOption(
-        name = "Adjust player opacity",
-        desc = "Adjust the opacity of players near shared & guessed egg waypoints. (in %)",
+        name = "Adjust player transparency",
+        desc = "Adjust the transparency of players near shared & guessed egg waypoints. (in %)",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 1f)
-    var playerOpacity: Int = 40
+    var playerTransparency: Int = 40
 
     @Expose
     @ConfigOption(
@@ -80,9 +85,36 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Prevent Missing Rabbit the Fish",
-        desc = "Prevent closing a Meal Egg's inventory if Rabbit the Fish is present.",
+        desc = "Prevent closing a Meal Egg's inventory if Rabbit the Fish is present.\n" +
+            "§eHold §cShift §eto bypass.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var preventMissingRabbitTheFish: Boolean = true
+
+    enum class EggSoundMode(private val displayName: String) {
+        NO_MODIFICATION("No Modification"),
+        MUTE("Mute Sounds"),
+        REVERT("Revert to Eat Sound"),
+        ;
+
+        override fun toString() = displayName
+    }
+
+    @Expose
+    @ConfigOption(
+        name = "Modify Egg Sounds",
+        desc = "Mute or revert the note block sounds when opening an egg."
+    )
+    @ConfigEditorDropdown
+    @SearchTag("rolling eat")
+    var soundMode: EggSoundMode = EggSoundMode.NO_MODIFICATION
+
+    @SkyHanniModule
+    companion object {
+        @HandleEvent
+        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            event.move(126, "event.hoppityEggs.playerOpacity", "event.hoppityEggs.playerTransparency")
+        }
+    }
 }

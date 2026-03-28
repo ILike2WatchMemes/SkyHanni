@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.events.minecraft.packet
 
 import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
-import net.minecraft.network.Packet
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
+import net.minecraft.network.protocol.Packet
 
+@PrimaryFunction("onPacketSent")
 class PacketSentEvent(val packet: Packet<*>) : CancellableSkyHanniEvent() {
 
     fun findOriginatingModCall(skipSkyhanni: Boolean = false): StackTraceElement? {
@@ -19,20 +21,11 @@ class PacketSentEvent(val packet: Packet<*>) : CancellableSkyHanniEvent() {
     }
 
     companion object {
-
-        //#if MC < 1.21
-        private fun isNetworkHandlerClass(className: String) = className == "net.minecraft.client.network.NetHandlerPlayClient"
-        //#else
-        //$$ private val networkClassName = net.minecraft.client.network.ClientPlayNetworkHandler::class.java.name
-        //$$ private fun isNetworkHandlerClass(className: String) = className == networkClassName
-        //#endif
+        private val networkClassName = net.minecraft.client.multiplayer.ClientPacketListener::class.java.name
+        private fun isNetworkHandlerClass(className: String) = className == networkClassName
 
         private fun startsWithMinecraft(string: String): Boolean {
-            //#if MC < 1.21
-            return string.startsWith("net.minecraft.")
-            //#else
-            //$$ return string.startsWith("net.minecraft.") || string.startsWith("com.mojang.") || string.startsWith("org.lwjgl.")
-            //#endif
+            return string.startsWith("net.minecraft.") || string.startsWith("com.mojang.") || string.startsWith("org.lwjgl.")
         }
     }
 }

@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -27,7 +26,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -36,6 +34,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonPrimitive
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -123,13 +122,13 @@ object GardenVisitorDropStatistics {
         gemstonePowderPattern to { storage, amount -> storage.gemstonePowder += amount },
     )
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onVisitorAccepted(event: VisitorAcceptedEvent) {
+    @HandleEvent(VisitorAcceptedEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onVisitorAccepted() {
         lastAccept = SimpleTimeMark.now()
     }
 
-    @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    @HandleEvent(ProfileJoinEvent::class)
+    fun onProfileJoin() {
         display = emptyList()
     }
 
@@ -147,12 +146,12 @@ object GardenVisitorDropStatistics {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!GardenApi.onBarnPlot) return
         if (!ProfileStorageData.loaded) return
         if (lastAccept.passedSince() > 1.seconds) return
 
-        val message = event.message.removeColor().trim()
+        val message = event.cleanMessage.trim()
         val storage = GardenApi.storage?.visitorDrops ?: return
 
         patternStorageAccessorMap.forEach { (pattern, accessor) ->
@@ -187,6 +186,7 @@ object GardenVisitorDropStatistics {
                             addString(countFormat)
                         }
                     }
+
                     false -> list.addString(format(count, reward.displayName, "§b"))
                 }
             }
@@ -267,17 +267,8 @@ object GardenVisitorDropStatistics {
         val storage = GardenApi.storage?.visitorDrops ?: return
         ChatUtils.clickableChat(
             "Click here to reset Visitor Drops Statistics.",
-            // Todo: Make the storage class extend `ResettableStorageSet`, so this can just be a .reset() call
-            //  This should happen at the same time as the tracker migration - see #profile.garden.visitorDrops
             onClick = {
-                storage.copper = 0
-                storage.bits = 0
-                storage.farmingExp = 0
-                storage.gardenExp = 0
-                storage.gemstonePowder = 0
-                storage.mithrilPowder = 0
-                storage.acceptedRarities = mutableMapOf()
-                storage.rewardsCount = mutableMapOf()
+                storage.reset()
                 ChatUtils.chat("Visitor Drop Statistics reset!")
                 saveAndUpdate()
             },
@@ -285,14 +276,14 @@ object GardenVisitorDropStatistics {
         )
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         saveAndUpdate()
         ConditionalUtils.onToggle(
             config.enabled,
             config.textFormat,
             config.displayNumbersFirst,
-            config.displayIcons
+            config.displayIcons,
         ) {
             saveAndUpdate()
         }
@@ -317,10 +308,6 @@ object GardenVisitorDropStatistics {
         event.move(3, "${originalPrefix}onlyOnBarn", "${newPrefix}onlyOnBarn")
         event.move(3, "${originalPrefix}visitorDropPos", "${newPrefix}pos")
 
-        event.transform(11, "${newPrefix}textFormat") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, DropsStatisticsTextEntry::class.java)
-        }
-
         // Was a list of longs, now a map of rarity to count
         event.move(
             85,
@@ -343,14 +330,21 @@ object GardenVisitorDropStatistics {
 
             ConfigManager.gson.toJsonTree(map, MutableMap::class.java)
         }
+
+        event.transform(113, "${newPrefix}textFormat") { element ->
+            element.asJsonArray.apply {
+                add(JsonPrimitive("HYPERCHARGE_CHIP"))
+                add(JsonPrimitive("QUICKDRAW_CHIP"))
+            }
+        }
     }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetvisitordrops") {
+        event.registerBrigadier("shresetvisitordrops") {
             description = "Resets the Visitors Drop Statistics"
             category = CommandCategory.USERS_RESET
-            callback { resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 }

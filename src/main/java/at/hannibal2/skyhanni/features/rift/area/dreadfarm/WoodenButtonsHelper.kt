@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RiftWoodenButtonsJson
-import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.data.model.GraphNodeTag
+import at.hannibal2.skyhanni.data.model.graph.GraphNode
+import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -17,17 +17,17 @@ import at.hannibal2.skyhanni.features.rift.everywhere.EnigmaSoulWaypoints.soulLo
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.block.BlockButtonWood
-import net.minecraft.init.Blocks
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.ButtonBlock
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -81,14 +81,10 @@ object WoodenButtonsHelper {
         if (!showButtons()) return
         val graph = IslandGraphs.currentIslandGraph ?: return
 
-        val closestNode = graph.nodes
-            .filter { it.hasTag(GraphNodeTag.RIFT_BUTTONS_QUEST) }
-            .filter { node ->
-                val spotName = "${node.name}:${node.position}"
-                val buttonsAtSpot = buttonLocations[spotName] ?: return@filter false
-                buttonsAtSpot.any { !hitButtons.contains(it) }
-            }
-            .minByOrNull { it.position.distanceToPlayer() }
+        val closestNode = graph.getNearestNode { node ->
+            node.hasTag(GraphNodeTag.RIFT_BUTTONS_QUEST) &&
+                buttonLocations["${node.name}:${node.position}"]?.any { !hitButtons.contains(it) } == true
+        }
 
         if (closestNode != currentSpot) {
             currentSpot = closestNode
@@ -96,7 +92,7 @@ object WoodenButtonsHelper {
                 IslandGraphs.pathFind(
                     it.position,
                     "Button Spot",
-                    config.color.toSpecialColor(),
+                    config.color.toColor(),
                     condition = { config.showPathFinder && config.showButtonsHelper },
                 )
             }
@@ -108,11 +104,7 @@ object WoodenButtonsHelper {
         if (!checkButtons()) return
 
         val location = event.position
-        //#if MC < 1.16
-        val oakButtonBlock = Blocks.wooden_button
-        //#else
-        //$$ val oakButtonBlock = Blocks.OAK_BUTTON
-        //#endif
+        val oakButtonBlock = Blocks.OAK_BUTTON
         if (location.getBlockAt() == oakButtonBlock && !hitButtons.contains(location)) {
             lastHitButton = event.position
         }
@@ -130,8 +122,8 @@ object WoodenButtonsHelper {
         if (lastBlowgunFire.passedSince() > 2.5.seconds) return
         buttonLocations.values.flatten().forEach { buttonLocation ->
             val blockState = buttonLocation.getBlockStateAt()
-            if (blockState.block is BlockButtonWood &&
-                blockState.getValue(BlockButtonWood.POWERED) == true &&
+            if (blockState.block is ButtonBlock &&
+                blockState.getValue(ButtonBlock.POWERED) == true &&
                 buttonLocation.canBeSeen(1..3) &&
                 lastHitButton != buttonLocation &&
                 !hitButtons.contains(buttonLocation)
@@ -149,7 +141,7 @@ object WoodenButtonsHelper {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!checkButtons()) return
 
         buttonHitPattern.matchMatcher(event.message) {
@@ -159,11 +151,11 @@ object WoodenButtonsHelper {
         if (event.message != "§eYou've hit all §r§b56 §r§ewooden buttons!") return
         RiftApi.allButtonsHit = true
         hitButtons = buttonLocations.values.flatten().toMutableSet()
-        soulLocations["Buttons"]?.let {
+        soulLocations["Dreadfarm"]?.get("Buttons")?.let {
             IslandGraphs.pathFind(
                 it,
                 "Buttons Enigma Soul",
-                config.color.toSpecialColor(),
+                config.color.toColor(),
                 condition = { config.showPathFinder },
             )
         }
@@ -183,7 +175,7 @@ object WoodenButtonsHelper {
         val spotName = "${spot.name}:${spot.position}"
         buttonLocations[spotName]?.forEach { button ->
             if (!hitButtons.contains(button)) {
-                event.drawWaypointFilled(button, config.color.toSpecialColor(), inverseAlphaScale = true)
+                event.drawWaypointFilled(button, config.color.toColor(), inverseAlphaScale = true)
             }
         }
     }

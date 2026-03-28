@@ -16,13 +16,14 @@ jobs:
             -   name: Checkout PR code
                 uses: actions/checkout@v4
             -   uses: ./.github/actions/setup-normal-workspace
-            -   name: Run detekt main (w/ typing analysis)
-                run: |
-                  ./gradlew detektMain --stacktrace
+            -   name: Run detekt main (w/ typing analysis) w/gradle retry
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: detektMain --stacktrace
             -   name: Check if SARIF file exists
                 id: check_sarif
                 run: |
-                    if [ -f "versions/1.8.9/build/reports/detekt/main.sarif" ]; then
+                    if [ -f "build/reports/detekt/main.sarif" ]; then
                         echo "exists=true" >> $GITHUB_OUTPUT
                     else
                         echo "exists=false" >> $GITHUB_OUTPUT
@@ -31,4 +32,4 @@ jobs:
                 if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
                 run: |
                     chmod +x .github/scripts/process_detekt_sarif.sh
-                    ./.github/scripts/process_detekt_sarif.sh versions/1.8.9/build/reports/detekt/main.sarif
+                    ./.github/scripts/process_detekt_sarif.sh build/reports/detekt/main.sarif

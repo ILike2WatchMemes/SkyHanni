@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.firstComponentMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playPlingSound
@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 import at.hannibal2.skyhanni.utils.Timer
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -34,18 +35,20 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object NonGodPotEffectDisplay {
 
-    private val config get() = SkyHanniMod.feature.misc.potionEffect
+    private val config get() = SkyHanniMod.feature.misc.nonGodPotEffect
     private var checkFooter = false
     private val effectDuration = mutableMapOf<NonGodPotEffect, Timer>()
     private val setRecently: TimeLimitedSet<NonGodPotEffect> = TimeLimitedSet(5.seconds)
     private var display = emptyList<String>()
 
+    fun isActive(effect: NonGodPotEffect): Boolean = effectDuration.any { it.key == effect && !it.value.ended }
+
     /**
-     * REGEX-TEST: §7You have §e10 §7non-god effects.
+     * REGEX-TEST: You have 10 non-god effects.
      */
     private val effectsCountPattern by RepoPattern.pattern(
-        "misc.nongodpot.effects",
-        "§7You have §e(?<name>\\d+) §7non-god effects\\.",
+        "misc.nongodpot.effects.colorless",
+        "You have (?<count>\\d+) non-god effects\\.",
     )
     private var totalEffectsCount = 0
 
@@ -56,7 +59,7 @@ object NonGodPotEffectDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (event.message == "§aYou cleared all of your active effects!") {
             effectDuration.clear()
             update()
@@ -101,13 +104,13 @@ object NonGodPotEffectDisplay {
             if (time.ended) continue
             if (effect == NonGodPotEffect.INVISIBILITY) continue
 
-            if (effect.isMixin && !config.nonGodPotEffectShowMixins) continue
+            if (effect.isMixin && !config.showMixins) continue
 
             val remaining = time.remaining.coerceAtLeast(0.seconds)
             val format = remaining.format(TimeUnit.HOUR)
             val color = remaining.timerColor()
 
-            val displayName = effect.tabListName
+            val displayName = effect.displayName
             newDisplay.add("$displayName $color$format")
         }
         val diff = totalEffectsCount - effectDuration.size
@@ -124,7 +127,7 @@ object NonGodPotEffectDisplay {
         if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
 
-        if (config.nonGodPotEffectDisplay) update()
+        if (config.displayEnabled) update()
 
         val effectWarning = config.expireWarning
         val effectSound = config.expireSound
@@ -134,7 +137,7 @@ object NonGodPotEffectDisplay {
         effectDuration.sorted().forEach { (effect, time) ->
             if (time.remaining.inWholeSeconds != config.expireWarnTime.toLong()) return
 
-            if (effectWarning) TitleManager.sendTitle(effect.tabListName)
+            if (effectWarning) TitleManager.sendTitle(effect.displayName)
             if (effectSound) repeat(5) { playPlingSound() }
         }
     }
@@ -147,26 +150,21 @@ object NonGodPotEffectDisplay {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTabUpdate(event: TablistFooterUpdateEvent) {
         if (!checkFooter) return
-        val lines = event.footer.split("\n")
-        if (!lines.any { it.contains("§a§lActive Effects") }) return
+        val lines = TextHelper.split(event.footer, "\n") ?: listOf(event.footer)
+        if (!lines.any { it.string.contains("Active Effects") }) return
 
         checkFooter = false
-        var effectsCount = 0
-        for (line in lines) {
-            effectsCountPattern.matchMatcher(line) {
-                val group = group("name")
-                effectsCount = group.toInt()
-            }
-        }
-        totalEffectsCount = effectsCount
+        totalEffectsCount = effectsCountPattern.firstComponentMatcher(lines) {
+            group("count").toIntOrNull()
+        } ?: 0
     }
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled() || !config.nonGodPotEffectDisplay) return
+        if (!isEnabled() || !config.displayEnabled) return
         if (RiftApi.inRift()) return
 
-        config.nonGodPotEffectPos.renderStrings(
+        config.position.renderStrings(
             display,
             extraSpace = 3,
             posLabel = "Non God Pot Effects",
@@ -178,6 +176,10 @@ object NonGodPotEffectDisplay {
         event.move(3, "misc.nonGodPotEffectDisplay", "misc.potionEffect.nonGodPotEffectDisplay")
         event.move(3, "misc.nonGodPotEffectShowMixins", "misc.potionEffect.nonGodPotEffectShowMixins")
         event.move(3, "misc.nonGodPotEffectPos", "misc.potionEffect.nonGodPotEffectPos")
+        event.move(95, "misc.potionEffect.nonGodPotEffectPos", "misc.potionEffect.position")
+        event.move(95, "misc.potionEffect.nonGodPotEffectDisplay", "misc.potionEffect.displayEnabled")
+        event.move(95, "misc.potionEfect.nonGodPotEffectShowMixins", "misc.potionEffect.showMixins")
+        event.move(95, "misc.potionEffect", "misc.nonGodPotEffect")
     }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && !DungeonApi.inDungeon() && !KuudraApi.inKuudra

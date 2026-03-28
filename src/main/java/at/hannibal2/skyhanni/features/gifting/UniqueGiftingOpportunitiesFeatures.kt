@@ -10,18 +10,19 @@ import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
-import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.player.Player
 
 @SkyHanniModule
 object UniqueGiftingOpportunitiesFeatures {
@@ -32,14 +33,14 @@ object UniqueGiftingOpportunitiesFeatures {
     private val patternGroup = RepoPattern.group("event.winter.uniquegifts")
 
     /**
-     * REGEX-TEST: §6+1 Unique Gift given! To oBlazin§r§6!
+     * REGEX-TEST: +1 Unique Gift given! To oBlazin!
      */
     private val giftedPattern by patternGroup.pattern(
-        "gifted",
-        "§6\\+1 Unique Gift given! To (?<player>[^§]+)§r§6!",
+        "gifted.colorless",
+        "\\+1 Unique Gift given! To (?<player>.+)!",
     )
 
-    private fun hasGiftedPlayer(player: EntityPlayer) = playerList?.contains(player.name) == true
+    private fun hasGiftedPlayer(player: Player) = playerList?.contains(player.name.formattedTextCompatLessResets()) == true
 
     private fun addGiftedPlayer(playerName: String) {
         playerList?.add(playerName)
@@ -54,29 +55,29 @@ object UniqueGiftingOpportunitiesFeatures {
     private const val HAS_NOT_GIFTED_NAMETAG = "§a§lꤥ"
     private const val HAS_GIFTED_NAMETAG = "§c§lꤥ"
 
-    private fun analyzeArmorStand(entity: EntityArmorStand) {
+    private fun analyzeArmorStand(entity: ArmorStand) {
         if (!config.useArmorStandDetection) return
-        if (entity.name != HAS_GIFTED_NAMETAG) return
+        if (entity.name.formattedTextCompatLessResets() != HAS_GIFTED_NAMETAG) return
 
-        val matchedPlayer = EntityUtils.getEntitiesNearby<EntityPlayer>(entity.getLorenzVec(), 2.0)
+        val matchedPlayer = entity.getLorenzVec().getEntitiesNearby<Player>(2.0)
             .singleOrNull { !it.isNpc() } ?: return
-        addGiftedPlayer(matchedPlayer.name)
+        addGiftedPlayer(matchedPlayer.name.formattedTextCompatLessResets())
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onEntityChangeName(event: EntityCustomNameUpdateEvent<EntityArmorStand>) {
+    fun onEntityChangeName(event: EntityCustomNameUpdateEvent<ArmorStand>) {
         analyzeArmorStand(event.entity)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onEntityJoinWorld(event: EntityEnterWorldEvent<Entity>) {
         playerColor(event)
-        val entity = event.entity as? EntityArmorStand ?: return
+        val entity = event.entity as? ArmorStand ?: return
         analyzeArmorStand(entity)
     }
 
     private fun playerColor(event: EntityEnterWorldEvent<Entity>) {
-        if (event.entity is EntityOtherPlayerMP) {
+        if (event.entity is RemotePlayer) {
             val entity = event.entity
             if (entity.isNpc() || isIronman(entity) || isBingo(entity)) return
 
@@ -87,15 +88,15 @@ object UniqueGiftingOpportunitiesFeatures {
         }
     }
 
-    private fun isBingo(entity: EntityLivingBase) =
-        !SkyBlockUtils.isBingoProfile && entity.displayName.formattedText.endsWith("Ⓑ§r")
+    private fun isBingo(entity: LivingEntity) =
+        !SkyBlockUtils.isBingoProfile && entity.displayName?.string.orEmpty().endsWith("Ⓑ")
 
-    private fun isIronman(entity: EntityLivingBase) =
-        !SkyBlockUtils.noTradeMode && entity.displayName.formattedText.endsWith("♲§r")
+    private fun isIronman(entity: LivingEntity) =
+        !SkyBlockUtils.noTradeMode && entity.displayName?.string.orEmpty().endsWith("♲")
 
-    @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
-        giftedPattern.matchMatcher(event.message) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent.Allow) {
+        giftedPattern.matchMatcher(event.cleanMessage) {
             addGiftedPlayer(group("player"))
             UniqueGiftCounter.addUniqueGift()
         }

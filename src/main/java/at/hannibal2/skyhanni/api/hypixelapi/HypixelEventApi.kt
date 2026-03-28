@@ -2,12 +2,10 @@ package at.hannibal2.skyhanni.api.hypixelapi
 
 import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiJoinEvent
 import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiServerChangeEvent
-import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.hypixel.data.region.Environment
 import net.hypixel.modapi.HypixelModAPI
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket
-import net.hypixel.modapi.packet.impl.clientbound.ClientboundPingPacket
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundVersionedPacket
 import kotlin.jvm.optionals.getOrNull
@@ -21,7 +19,6 @@ object HypixelEventApi {
         modApi.subscribeToEventPacket(ClientboundLocationPacket::class.java)
         modApi.createHandler(ClientboundHelloPacket::class.java, ::onHelloPacket)
         modApi.createHandler(ClientboundLocationPacket::class.java, ::onLocationPacket)
-        modApi.createHandler(ClientboundPingPacket::class.java, CurrentPing::onPingPacket)
     }
 
     private fun onHelloPacket(packet: ClientboundHelloPacket) {

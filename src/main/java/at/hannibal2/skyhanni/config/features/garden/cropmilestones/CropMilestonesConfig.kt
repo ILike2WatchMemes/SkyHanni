@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.garden.cropmilestones
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.utils.TimeUnit
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -31,6 +31,11 @@ class CropMilestonesConfig {
     val overflow: CropMilestonesOverflowConfig = CropMilestonesOverflowConfig()
 
     @Expose
+    @ConfigOption(name = "Show Without Tool", desc = "Show progress display when not holding a farming tool")
+    @ConfigEditorBoolean
+    var showWithoutTool: Boolean = false
+
+    @Expose
     @ConfigOption(
         name = "Warn When Close",
         desc = "Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. " +
@@ -44,20 +49,16 @@ class CropMilestonesConfig {
     @ConfigEditorDropdown
     val highestTimeFormat: Property<TimeFormatEntry> = Property.of(TimeFormatEntry.YEAR)
 
-    enum class TimeFormatEntry(
-        private val displayName: String,
-        private val legacyId: Int = -1,
-    ) : HasLegacyId {
-        YEAR("Year", 0),
-        DAY("Day", 1),
-        HOUR("Hour", 2),
-        MINUTE("Minute", 3),
-        SECOND("Second", 4),
+    enum class TimeFormatEntry(private val displayName: String) {
+        YEAR("Year"),
+        DAY("Day"),
+        HOUR("Hour"),
+        MINUTE("Minute"),
+        SECOND("Second"),
         ;
 
         @Transient
         val timeUnit = TimeUnit.entries.firstOrNull { it.name == this.name } ?: TimeUnit.SECOND
-        override fun getLegacyId(): Int = legacyId
         override fun toString(): String = displayName
     }
 
@@ -67,13 +68,28 @@ class CropMilestonesConfig {
         desc = "Calculate the progress and ETA till maxed milestone (46) instead of next milestone.",
     )
     @ConfigEditorBoolean
-    val bestShowMaxedNeeded: Property<Boolean> = Property.of(false)
+    val showMaxTier: Property<Boolean> = Property.of(false)
+
+    @Expose
+    @ConfigOption(
+        name = "Custom Milestone Goal",
+        desc = "What crops to set custom milestone goals for."
+    )
+    @ConfigEditorDraggableList
+    val customGoalCrops: Property<MutableList<CropType>> = Property.of(mutableListOf())
+
+    @Expose
+    @ConfigOption(
+        name = "Custom Milestone Goal Settings",
+        desc = ""
+    )
+    @Accordion
+    val customGoalConfig: CustomGoalConfig = CustomGoalConfig()
 
     @Expose
     @ConfigOption(
         name = "Milestone Text",
-        desc = "Drag text to change the appearance of the overlay.\n" +
-            "Hold a farming tool to show the overlay.",
+        desc = "Drag text to change the appearance of the overlay.\n"
     )
     @ConfigEditorDraggableList
     val text: MutableList<MilestoneTextEntry> = mutableListOf(
@@ -85,22 +101,18 @@ class CropMilestonesConfig {
         MilestoneTextEntry.BLOCKS_PER_SECOND,
     )
 
-    enum class MilestoneTextEntry(
-        private val displayName: String,
-        private val legacyId: Int = -1,
-    ) : HasLegacyId {
-        TITLE("§6Crop Milestones", 0),
-        MILESTONE_TIER("§7Pumpkin Tier 22", 1),
-        NUMBER_OUT_OF_TOTAL("§e12,300§8/§e100,000", 2),
-        TIME("§7In §b12m 34s", 3),
+    enum class MilestoneTextEntry(private val displayName: String) {
+        TITLE("§6Crop Milestones"),
+        MILESTONE_TIER("§7Pumpkin Tier 22"),
+        NUMBER_OUT_OF_TOTAL("§e12,300§8/§e100,000"),
+        TIME("§7In §b12m 34s"),
         CROPS_PER_SECOND("§7Crops/Second§8: §e205.75"),
-        CROPS_PER_MINUTE("§7Crops/Minute§8: §e12,345", 4),
+        CROPS_PER_MINUTE("§7Crops/Minute§8: §e12,345"),
         CROPS_PER_HOUR("§7Crops/Hour§8: §e740,700"),
-        BLOCKS_PER_SECOND("§7Blocks/Second§8: §e19.85", 5),
-        PERCENTAGE("§7Percentage: §e12.34%", 6),
+        BLOCKS_PER_SECOND("§7Blocks/Second§8: §e19.85"),
+        PERCENTAGE("§7Percentage: §e12.34%"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 

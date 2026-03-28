@@ -4,15 +4,13 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
-import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeHellionConfig.FirstDaggerEntry
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -20,10 +18,12 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.deceased
+import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -46,7 +46,7 @@ object BlazeSlayerDaggerHelper {
     private var lastNearest: HellionShield? = null
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.hideDaggerWarning) return
 
         val message = event.message
@@ -88,7 +88,7 @@ object BlazeSlayerDaggerHelper {
 
         val playerLocation = LocationUtils.playerLocation()
         return HellionShieldHelper.hellionShieldMobs
-            .filter { !it.key.isDead && it.key.getLorenzVec().distance(playerLocation) < 10 && it.key.health > 0 }
+            .filter { !it.key.deceased && it.key.getLorenzVec().distance(playerLocation) < 10 && it.key.findHealthReal() > 0 }
             .toSortedMap { a, b ->
                 if (a.getLorenzVec().distance(playerLocation) > b.getLorenzVec().distance(playerLocation)) 1 else 0
             }.firstNotNullOfOrNull { it.value }
@@ -166,7 +166,7 @@ object BlazeSlayerDaggerHelper {
     }
 
     private fun getDaggerFromStack(stack: ItemStack?): Dagger? {
-        val itemName = stack?.displayName.orEmpty()
+        val itemName = stack?.hoverName?.string.orEmpty()
         for (dagger in Dagger.entries) {
             if (dagger.daggerNames.any { itemName.contains(it) }) {
                 return dagger
@@ -181,7 +181,7 @@ object BlazeSlayerDaggerHelper {
         if (!isEnabled()) return
 
         for (shield in HellionShield.entries) {
-            if (shield.formattedName + "§r" == event.title) {
+            if (shield.formattedName in event.title) {
                 for (dagger in Dagger.entries.filter { shield in it.shields }) {
                     dagger.shields.forEach { it.active = false }
                     dagger.updated = true
@@ -199,7 +199,7 @@ object BlazeSlayerDaggerHelper {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onBlockClick(event: BlockClickEvent) {
+    fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         if (clientSideClicked) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
@@ -210,6 +210,7 @@ object BlazeSlayerDaggerHelper {
         clientSideClicked = true
     }
 
+    // TODO use internal names. see FixDoubleClicks.blazeDaggers
     enum class Dagger(val daggerNames: List<String>, vararg val shields: HellionShield, var updated: Boolean = false) {
         TWILIGHT(
             listOf("Twilight Dagger", "Mawdredge Dagger", "Deathripper Dagger"),
@@ -244,7 +245,7 @@ object BlazeSlayerDaggerHelper {
         if (!isEnabled()) return
 
         if (textTop == "") return
-        val currentScreen = Minecraft.getMinecraft().currentScreen
+        val currentScreen = Minecraft.getInstance().screen
         if (currentScreen != null && currentScreen !is GuiPositionEditor) return
 
         config.positionTop.renderString(textTop, posLabel = "Blaze Slayer Dagger Top")
@@ -258,9 +259,6 @@ object BlazeSlayerDaggerHelper {
         event.move(3, "slayer.blazeFirstDagger", "slayer.blazes.hellion.firstDagger")
         event.move(3, "slayer.blazeHideDaggerWarning", "slayer.blazes.hellion.hideDaggerWarning")
 
-        event.transform(15, "slayer.blazes.hellion.firstDagger") { element ->
-            ConfigUtils.migrateIntToEnum(element, FirstDaggerEntry::class.java)
-        }
         listOf("positionTop", "positionBottom").forEach {
             event.transform(72, "slayer.blazes.hellion.$it", Position::migrate)
         }

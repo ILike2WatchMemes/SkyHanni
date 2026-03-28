@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.mining
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.features.mining.caverns.DeepCavernsGuideConfig
+import at.hannibal2.skyhanni.config.features.mining.dwarves.DarkMonolithConfig
 import at.hannibal2.skyhanni.config.features.mining.dwarves.KingTalismanConfig
 import at.hannibal2.skyhanni.config.features.mining.glacite.ColdOverlayConfig
 import at.hannibal2.skyhanni.config.features.mining.glacite.FossilExcavatorConfig
@@ -12,14 +13,15 @@ import at.hannibal2.skyhanni.config.features.mining.glacite.TunnelMapsConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.AreaWallsConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalHighlighterConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig
+import at.hannibal2.skyhanni.config.features.mining.nucleus.MetalDetectorConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderChestTimerConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig
+import at.hannibal2.skyhanni.config.features.mining.orderedwaypoints.OrderedWaypointsConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class MiningConfig {
     @Expose
@@ -46,6 +48,11 @@ class MiningConfig {
     val kingTalisman: KingTalismanConfig = KingTalismanConfig()
 
     @Expose
+    @ConfigOption(name = "Dark Monolith", desc = "")
+    @Accordion
+    val darkMonolith: DarkMonolithConfig = DarkMonolithConfig()
+
+    @Expose
     @ConfigOption(name = "Deep Caverns Guide", desc = "")
     @Accordion
     val deepCavernsGuide: DeepCavernsGuideConfig = DeepCavernsGuideConfig()
@@ -59,6 +66,16 @@ class MiningConfig {
     @ConfigOption(name = "Crystal Nucleus Tracker", desc = "")
     @Accordion
     val crystalNucleusTracker: CrystalNucleusTrackerConfig = CrystalNucleusTrackerConfig()
+
+    @Expose
+    @ConfigOption(name = "Metal Detector", desc = "")
+    @Accordion
+    val metalDetector: MetalDetectorConfig = MetalDetectorConfig()
+
+    @Expose
+    @ConfigOption(name = "Ordered Waypoints", desc = "")
+    @Accordion
+    val orderedWaypoints: OrderedWaypointsConfig = OrderedWaypointsConfig()
 
     @Expose
     @ConfigOption(name = "Cold Overlay", desc = "")
@@ -108,6 +125,11 @@ class MiningConfig {
     val flowstateHelper: FlowstateHelperConfig = FlowstateHelperConfig()
 
     @Expose
+    @ConfigOption(name = "Gemstone Money per Hour Display", desc = "")
+    @Accordion
+    val gemstoneMoneyPerHour: GemstoneMoneyPerHourConfig = GemstoneMoneyPerHourConfig()
+
+    @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -121,13 +143,6 @@ class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var crystalHollowsNamesInCore: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Private Island Ability Block", desc = "Block the mining ability when on private island.")
-    @SearchTag("Pickaxe Pickobulus")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var privateIslandNoPickaxeAbility: Boolean = true
 
     @Expose
     @ConfigOption(name = "Highlight your Golden Goblin", desc = "Highlight golden goblins you have spawned in green.")

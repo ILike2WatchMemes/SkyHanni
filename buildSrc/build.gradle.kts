@@ -1,5 +1,12 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     `kotlin-dsl`
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 repositories {
@@ -12,6 +19,13 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib")
-    implementation("com.github.SkyHanniStudios:SkyHanniChangelogBuilder:1.1.2")
+    implementation(libs.gson)
+    implementation(libs.kotlin.stdlib)
+    implementation(libs.changelog.builder)
+    implementation(files("../sharedVariables/build/libs/sharedVariables.jar"))
+    implementation(libs.methanol)
+}
+
+tasks.withType<KotlinCompile> {
+    compilerOptions.jvmTarget.set(JvmTarget.fromTarget("21"))
 }

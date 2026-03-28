@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.features.combat.damageindicator.EntityData
-import net.minecraft.entity.EntityLivingBase
+import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorEntityData
+import net.minecraft.world.entity.LivingEntity
 
-class DamageIndicatorDeathEvent(val entity: EntityLivingBase, val data: EntityData) : SkyHanniEvent()
+class DamageIndicatorDeathEvent(val entity: LivingEntity, val data: DamageIndicatorEntityData) : SkyHanniEvent()
 

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import java.util.regex.Pattern
 
 @SkyHanniModule
 object ScoreboardPattern {
@@ -12,10 +13,13 @@ object ScoreboardPattern {
     // Lines from the scoreboard
     private val scoreboardGroup by group.exclusiveGroup("scoreboard")
 
-    @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        UnknownLinesHandler.remoteOnlyPatterns = scoreboardGroup.getUnusedPatterns().toTypedArray()
+    @HandleEvent(RepositoryReloadEvent::class)
+    fun onRepoReload() {
+        UnknownLinesHandler.invalidateRemoteOnlyPatterns()
     }
+
+    internal fun computeRemoteOnlyPatterns(): Array<Pattern> =
+        scoreboardGroup.getUnusedPatterns().toTypedArray()
 
     // Main scoreboard
     private val mainSB = scoreboardGroup.group("main")
@@ -34,6 +38,35 @@ object ScoreboardPattern {
     val copperPattern by mainSB.pattern(
         "copper",
         "(?:§.)*Copper: (?:§.)*(?<copper>[\\d,]+).*",
+    )
+
+    /**
+     * REGEX-TEST: Sowdust: §230,210,307
+     * WRAPPED-REGEX-TEST: " Sowdust: §r§230,120,093"
+     */
+    val sowdustPattern by mainSB.pattern(
+        "sowdust",
+        "\\s?(?:§.)*Sowdust: (?:§.)*(?<sowdust>[\\d,]+)",
+    )
+
+    /**
+     * REGEX-TEST: Sowdust: §26.5k §7(+912)
+     * REGEX-TEST: Sowdust: §230.1M §7(+798)
+     * REGEX-TEST: Sowdust: §22.7B §7(+12)
+     * REGEX-TEST: Sowdust: §210.7k §7(+3.3k)
+     * REGEX-TEST: Sowdust: §210.7k §7(+1.2M)
+     */
+    val sowdustGainedPattern by mainSB.pattern(
+        "sowdust-gained",
+        "^(?:§.)*Sowdust: (?:§.)*[\\d,.kKmMbB]+ §7\\(\\+[\\d.kKmMbB]+\\)",
+    )
+
+    /**
+     * REGEX-TEST: Gems: §a350
+     */
+    val gemsPattern by mainSB.pattern(
+        "gems",
+        "(?:§.)*Gems: (?:§.)*(?<gems>[\\d,]+).*",
     )
 
     /**
@@ -271,7 +304,7 @@ object ScoreboardPattern {
      */
     val pastingPattern by farmingSB.pattern(
         "pasting",
-        "\\s*§f(?:Barn )?Pasting§7: (?:§.)*[\\d,.]+%?",
+        "\\s*(?:§.)*(?:Barn )?Pasting§7: (?:§.)*[\\d,.]+%?",
     )
 
     /**
@@ -398,11 +431,13 @@ object ScoreboardPattern {
 
     /**
      * REGEX-TEST: Nearby Players: §a0
+     * REGEX-TEST: Nearby Players: §a1
+     * REGEX-TEST: Nearby Players: §a5 §cMAX
      * REGEX-TEST: Nearby Players: §cN/A
      */
     val nearbyPlayersPattern by miningSB.pattern(
         "nearbyplayers",
-        "Nearby Players: §.(?:\\d+|N/A)",
+        "Nearby Players: §.(?:\\d+|N/A)(?: §cMAX)?",
     )
     val goblinUselessPattern by miningSB.pattern(
         "goblinguseless",
@@ -444,10 +479,11 @@ object ScoreboardPattern {
 
     /**
      * REGEX-TEST: Fossil Dust: §f3,281 §e(+1)
+     * REGEX-TEST: Fossil Dust: 405 §e(+1)
      */
     val fossilDustPattern by miningSB.pattern(
         "fossildust",
-        "Fossil Dust: §f[\\d.,]+.*",
+        "Fossil Dust: (?:§f)*[\\d.,]+.*",
     )
 
     // combat
@@ -557,7 +593,7 @@ object ScoreboardPattern {
      */
     val flightDurationPattern by miscSB.pattern(
         "flightduration",
-        "^\\s*Flight Duration: §a(?::?\\d{1,3})*$",
+        "\\s*Flight Duration: §a(?::?\\d{1,3})*",
     )
 
     /**
@@ -641,15 +677,6 @@ object ScoreboardPattern {
         "(?:§d\\d+(?:st|nd|rd|th) Anniversary|§bCentury Raffle)§f (?:\\d|:)+",
     )
 
-    /**
-     * REGEX-TEST: §bCentury Raffle§f 124:00:00
-     * To fix custom scoreboard erroring every second
-     */
-    val tempRafflePattern by miscSB.pattern(
-        "tempfix",
-        "§bCentury Raffle§f (?:\\d|:)+",
-    )
-
     // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third (and fourth) scoreboard line
     /**
      * REGEX-TEST: §eProtect Elle §7(§a98%§7)
@@ -660,7 +687,7 @@ object ScoreboardPattern {
     @Suppress("MaxLineLength")
     val thirdObjectiveLinePattern by miscSB.pattern(
         "thirdobjectiveline",
-        "§eProtect Elle §7\\(§.\\d+%§7\\)|\\s*§.\\(§.\\w+§.\\/§.\\w+§.\\)|§f Mages.*|§f Barbarians.*|§edefeat Kuudra|§eand stun him|§.Fish \\d .*[fF]ish §.[✖✔]",
+        "§eProtect Elle §7\\(§.\\d+%§7\\)|\\s*§.\\(§.[\\w,.]+§.\\/§.[\\w,.]+§.\\)|§f Mages.*|§f Barbarians.*|§edefeat Kuudra|§eand stun him|§.Fish \\d .*[fF]ish §.[✖✔]",
     )
 
     /**
@@ -699,7 +726,7 @@ object ScoreboardPattern {
      */
     val newYearPattern by eventsSB.pattern(
         "newyear",
-        "§dNew Year Event!§f \\d*?:?\\d+",
+        "§dNew Year Event!§f \\d*:?\\d+",
     )
 
     /**
@@ -707,7 +734,7 @@ object ScoreboardPattern {
      */
     val spookyPattern by eventsSB.pattern(
         "spooky",
-        "§6Spooky Festival§f \\d*?:?\\d+",
+        "§6Spooky Festival§f \\d*:?\\d+",
     )
 
     /**
@@ -841,10 +868,11 @@ object ScoreboardPattern {
 
     /**
      * REGEX-TEST: §eCarnival§f 85:33:57
+     * REGEX-TEST: §eCarnival§f 118:41:05
      */
     val carnivalPattern by carnivalSB.pattern(
         "carnival",
-        "§eCarnival§f (?:\\d+:?)*",
+        "§eCarnival§f \\d+(?::\\d+)*",
     )
 
     /**
@@ -914,10 +942,11 @@ object ScoreboardPattern {
     /**
      * REGEX-TEST: Whispers: §3141§b (+1)
      * REGEX-TEST: Whispers: §317.5k§b (+50)
+     * REGEX-TEST: §fWhispers: §317k§b (+40)
      */
     val whispersPattern by galateaSB.pattern(
         "whispers",
-        "Whispers: §3[\\w,.]+.*"
+        "(?:§f)?Whispers: §3[\\w,.]+.*",
     )
 
     /**
@@ -938,7 +967,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * Somtimes when the scoreboard updates, it only updates half way,
+     * Sometimes when the scoreboard updates, it only updates half way,
      * causing some lines to become mixed with other lines -> broken.
      * This should already get handled fine but sometimes these errors still occur with some lines way too often.
      * This pattern is to catch those lines.
@@ -960,21 +989,21 @@ object ScoreboardPattern {
     )
 
     // Lines from the tablist
-    private val tablistGroup = group.group("tablist")
+    private val tablistGroup = group.group("tablist-no-color")
 
     /**
-     * REGEX-TEST:  Ends In: §r§e27h
+     * REGEX-TEST:  Ends In: 27h
      */
     val eventTimeEndsPattern by tablistGroup.pattern(
         "eventtime",
-        "\\s+Ends In: §r§e(?<time>.*)",
+        "\\s+Ends In: (?<time>.*)",
     )
 
     /**
-     * REGEX-TEST:  Starts In: §r§e7h
+     * REGEX-TEST:  Starts In: 7h
      */
     val eventTimeStartsPattern by tablistGroup.pattern(
         "eventtimestarts",
-        "\\s+Starts In: §r§e(?<time>.*)",
+        "\\s+Starts In: (?<time>.*)",
     )
 }

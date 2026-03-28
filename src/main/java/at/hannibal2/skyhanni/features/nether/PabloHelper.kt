@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveSta
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
 
 // https://wiki.hypixel.net/Pablo
@@ -21,35 +21,28 @@ object PabloHelper {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle
 
-    // TODO RepoPattern.list does not work, find out why
-
-//     /**
-//      * REGEX-TEST: §e[NPC] §5Pablo§f: §b✆ §f§rBring me that §aEnchanted Dandelion §fas soon as you can!
-//      */
-//     private val patterns by RepoPattern.list(
-//         "crimson.pablo.helper",
-//         "\\[NPC] Pablo: (?:✆ )?Could you bring me an (?<flower>[\\w ]+).*",
-//         "\\[NPC] Pablo: (?:✆ )?Bring me that (?<flower>[\\w ]+) as soon as you can!",
-//     )
-
-    private val patterns = listOf(
-        "\\[NPC] Pablo: (?:✆ )?Are you available\\? I desperately need an? (?<flower>[\\w ]+) today\\.".toPattern(),
-        "\\[NPC] Pablo: (?:✆ )?Bring me that (?<flower>[\\w ]+) as soon as you can!".toPattern(),
-        "\\[NPC] Pablo: (?:✆ )?Could you bring me an? (?<flower>[\\w ]+)\\?".toPattern(),
-        "\\[NPC] Pablo: (?:✆ )?I really need an? (?<flower>[\\w ]+) today, do you have one you could spare\\?".toPattern(),
+    /**
+     * REGEX-TEST: §e[NPC] §5Pablo§f: §b✆ §f§rBring me that §aEnchanted Dandelion §fas soon as you can!
+     */
+    private val patterns by RepoPattern.list(
+        "crimson.pablo.helper",
+        "\\[NPC] Pablo: (?:✆ )?Are you available\\? I desperately need an? (?<flower>[\\w ]+) today\\.",
+        "\\[NPC] Pablo: (?:✆ )?Bring me that (?<flower>[\\w ]+) as soon as you can!",
+        "\\[NPC] Pablo: (?:✆ )?Could you bring me an? (?<flower>[\\w ]+)\\?",
+        "\\[NPC] Pablo: (?:✆ )?I really need an? (?<flower>[\\w ]+) today, do you have one you could spare\\?",
     )
 
     private var lastSentMessage = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         if (lastSentMessage.passedSince() < 5.minutes) return
-        val itemName = patterns.matchMatchers(event.message.removeColor()) {
+        val itemName = patterns.matchMatchers(event.cleanMessage) {
             group("flower")
         } ?: return
 
-        if (InventoryUtils.countItemsInLowerInventory { it.displayName.contains(itemName) } > 0) return
+        if (InventoryUtils.countItemsInLowerInventory { it.hoverName.string.contains(itemName) } > 0) return
 
         DelayedRun.runNextTick {
             GetFromSackApi.getFromChatMessageSackItems(

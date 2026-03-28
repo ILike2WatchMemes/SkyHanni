@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.chat.PowderMiningChatFilter.genericMiningRewardMessage
@@ -27,6 +28,14 @@ object ChatFilter {
     private val generalConfig get() = SkyHanniMod.feature.chat
     private val config get() = SkyHanniMod.feature.chat.filterType
     private val dungeonConfig get() = SkyHanniMod.feature.dungeon.messageFilter
+    private val foragingConfig get() = config.foraging
+    private val huntingConfig get() = config.hunting
+
+    private val chatFilterGroup = RepoPattern.group("chat-filter")
+    private val huntingPatternGroup = chatFilterGroup.group("hunting")
+    private val foragingPatternGroup = chatFilterGroup.group("foraging")
+    private val miscPatternGroup = chatFilterGroup.group("hypixel-misc")
+    private val eventPatternGroup = chatFilterGroup.group("event")
 
     // <editor-fold desc="Regex Patterns & Messages">
     // Lobby Messages
@@ -90,21 +99,24 @@ object ChatFilter {
         "§eWelcome to §r§aHypixel SkyBlock§r§e!",
     )
 
-    // Guild EXP
+    // Guild & Event EXP
     /**
      * REGEX-TEST: §aYou earned §r§22 GEXP §r§afrom playing SkyBlock!
      * REGEX-TEST: §aYou earned §r§22 GEXP §r§a+ §r§c210 Event EXP §r§afrom playing SkyBlock!
+     * REGEX-TEST: §aYou earned §r§510 Event EXP §r§afrom playing SkyBlock!
      */
-    private val guildExpPatterns = listOf(
-        "§aYou earned §r§2.* GEXP (§r§a\\+ §r§.* Event EXP )?§r§afrom playing SkyBlock!".toPattern(),
+    @Suppress("MaxLineLength")
+    private val guildEventExpPatterns = listOf(
+        "§aYou earned §r§[0-9a-f][\\d,]+ (?:GEXP|Event EXP) (?:§r§a\\+ §r§[0-9a-f][\\d,]+ Event EXP )?§r§afrom playing SkyBlock!".toPattern(),
     )
 
     // Kill Combo
     /**
-     * REGEX-TEST: §a§l+5 Kill Combo §r§8+§r§b3% §r§b? Magic Find
+     * REGEX-TEST: §6§l+175 Kill Combo
+     * REGEX-TEST: §a§l+5 Kill Combo §r§8+§r§b3% §r§b✯ Magic Find
      */
     private val killComboPatterns = listOf(
-        "§.§l\\+(.*) Kill Combo (.*)".toPattern(),
+        "§.§l\\+(.*) Kill Combo(.*)".toPattern(),
         "§cYour Kill Combo has expired! You reached a (.*) Kill Combo!".toPattern(),
     )
     private val killComboMessages = listOf(
@@ -225,7 +237,7 @@ object ChatFilter {
     // TODO update patterns for 1.21
     // Useless Notification
     private val uselessNotificationPatterns = listOf(
-        "§aYou tipped \\d+ players? in \\d+(?: different)? games?!".toPattern(),
+        "(?:§a)?§aYou tipped \\d+ players? in \\d+(?: different)? games?!".toPattern(),
     )
     private val uselessNotificationMessages = listOf(
         "§eYour previous §r§6Plasmaflux Power Orb §r§ewas removed!",
@@ -305,20 +317,17 @@ object ChatFilter {
         "§8§oYou can disable this messaging by toggling Sky Mall in your /hotm!",
     )
 
+    private val lotteryMessages = listOf(
+        "§bNew day! §r§eYour §r§2Lottery §r§ebuff changed!",
+        "§8§oYou can disable this messaging by toggling Lottery in your /hotf!",
+    )
+
     /**
      * REGEX-TEST: §e[NPC] Jacob§f: §rYour §9Anita's Talisman §fis giving you §6+25☘ Carrot Fortune §fduring the contest!
      */
     private val anitaFortunePattern by RepoPattern.pattern(
         "chat.jacobevent.accessory",
         "§e\\[NPC] Jacob§f: §rYour §9Anita's \\w+ §fis giving you §6\\+\\d{1,2}☘ .+ Fortune §fduring the contest!",
-    )
-
-    /**
-     * REGEX-TEST: §eNew buff§r§r§r: §r§fGain §r§6+50☘ Mining Fortune§r§f.
-     */
-    private val skymallPerkPattern by RepoPattern.pattern(
-        "chat.skymall.perk",
-        "§eNew buff§r§r§r:.*",
     )
 
     // Winter Gift
@@ -349,12 +358,12 @@ object ChatFilter {
         "§c {3}♨ §eAnd \\d+ more!".toPattern(),
     )
     private val eventPatterns = listOf(
-        "§f +§r§7You are now §r§.Event Level §r§.*§r§7!".toPattern(),
-        "§f +§r§7You earned §r§.* Event Silver§r§7!".toPattern(),
-        "§f +§r§.§k#§r§. LEVEL UP! §r§.§k#".toPattern(),
+        "(?:§f)? +§r§7You are now §r§.Event Level §r§.*§r§7!".toPattern(),
+        "(?:§f)? +§r§7You earned §r§.* Event Silver§r§7!".toPattern(),
+        "(?:§f)? +§r§.§k#§r§. LEVEL UP! §r§.§k#".toPattern(),
     )
     private val factoryUpgradePatterns = listOf(
-        "§.* §r§7has been promoted to §r§7\\[.*§r§7] §r§.*§r§7!".toPattern(),
+        ".* §r§7has been promoted to §r§7\\[.*§r§7] §r§.*§r§7!".toPattern(),
         "§7Your §r§aRabbit Barn §r§7capacity has been increased to §r§a.* Rabbits§r§7!".toPattern(),
         "§7You will now produce §r§6.* Chocolate §r§7per click!".toPattern(),
         "§7You upgraded to §r§d.*?§r§7!".toPattern(),
@@ -451,10 +460,67 @@ object ChatFilter {
         "§4This Teleport Pad does not have a destination set!",
     )
 
+    /**
+     ** REGEX-TEST: §eYou haven't claimed your §r§6Summer Rewards §r§eyet!
+     ** REGEX-TEST: §eTalk to the §r§bSummer Sloth §r§ein the §r§aHub§r§e!
+     ** REGEX-TEST: §eTalk to the §r§bRandom NPC §r§ein the §r§aForbidden Zone§r§e!
+     */
+    private val rewardBundlePatterns by miscPatternGroup.list(
+        "seasonal-bundles",
+        "(?:§.)*You haven't claimed your (?:§.)*\\w+ Rewards (?:§.)*yet!",
+        "(?:§.)*Talk to the (?:§.)*.+(?:§.)*in the (?:§.)*.+(?:§.)*!",
+    )
+
+    /**
+     ** REGEX-TEST: §cYou cannot damage a tree while it is regenerating!
+     ** REGEX-TEST: §c§oThe toughness of this tree is way too high!
+     */
+    private val unmineableTreePatterns by foragingPatternGroup.list(
+        "unmineable-tree",
+        "(?:§.)*You cannot damage a tree while it is regenerating!",
+        "(?:§.)*The toughness of this tree is way too high!",
+    )
+
+    /**
+     ** REGEX-TEST: §7§oMochibear ate too much and passed out! You caught it!
+     ** REGEX-TEST: §7§oYou caught yourself an invisibug! The shard was sent to your Hunting Box!
+     ** REGEX-TEST: §7§oThe Frog is exhausted...
+     */
+    private val redundantShardsPatterns by huntingPatternGroup.list(
+        "redundant-comments",
+        "(?:§.)*Mochibear ate too much and passed out! You caught it!",
+        "(?:§.)*You caught yourself an invisibug! The shard was sent to your Hunting Box!",
+        "(?:§.)*The Frog is exhausted\\.\\.\\.",
+    )
+
+    /**
+     * REGEX-TEST: §e[NPC] §bSwoop§f: §rWow! I forgot to tell you, monsters around here can only take damage from Axes!
+     */
+    private val swoopAxePattern by huntingPatternGroup.pattern(
+        "swoop-axe-message",
+        "§e\\[NPC] §bSwoop§f: §rWow! I forgot to tell you, monsters around here can only take damage from Axes!",
+    )
+
+    /**
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dA §r§aChocolate Dinner Egg §r§dhas appeared!
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dA §r§9Chocolate Déjeuner Egg §r§dhas appeared!
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dA §r§6Chocolate Brunch Egg §r§dhas appeared!
+     */
+    private val hoppityAppearPattern by eventPatternGroup.pattern(
+        "hoppity-egg-appear",
+        "§d§lHOPPITY'S HUNT §r§dA .* §r§dhas appeared!",
+    )
+
+    @Suppress("MaxLineLength")
+    private val hoppityBeginPattern by eventPatternGroup.pattern(
+        "hoppity-begin",
+        "§dHoppity's Hunt §r§ehas begun! Help §r§aHoppity §r§efind his §r§6Chocolate Rabbit Eggs §r§eacross SkyBlock each day during the §r§aSpring§r§e!",
+    )
+
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
         "lobby" to lobbyPatterns,
         "warping" to warpingPatterns,
-        "guild_exp" to guildExpPatterns,
+        "guild_event_exp" to guildEventExpPatterns,
         "kill_combo" to killComboPatterns,
         "slayer" to slayerPatterns,
         "slayer_drop" to slayerDropPatterns,
@@ -478,6 +544,15 @@ object ChatFilter {
         "teleport_pads" to teleportPadPatterns,
     )
 
+    private val repoPatternsMap: Map<String, List<Pattern>> = mapOf(
+        "reward_bundles" to rewardBundlePatterns,
+        "redundant_hunting" to redundantShardsPatterns,
+        "unmineable_tree" to unmineableTreePatterns,
+        "swoop_axe" to listOf(swoopAxePattern),
+        "hoppity_appear" to listOf(hoppityAppearPattern),
+        "hoppity_begin" to listOf(hoppityBeginPattern),
+    )
+
     private val messagesMap: Map<String, List<String>> = mapOf(
         "lobby" to lobbyMessages,
         "warping" to warpingMessages,
@@ -495,6 +570,7 @@ object ChatFilter {
         "fire_sale" to fireSaleMessages,
         "event" to eventMessage,
         "skymall" to skymallMessages,
+        "lottery" to lotteryMessages,
         "parkour" to parkourCancelMessages,
         "teleport_pads" to teleportPadMessages,
     )
@@ -510,12 +586,18 @@ object ChatFilter {
     // </editor-fold>
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         var blockReason = block(event.message)
         if (blockReason == null && config.powderMining.enabled) blockReason = powderMiningBlock(event)
         if (blockReason == null && config.crystalNucleus.enabled) blockReason = crystalNucleusBlock(event)
 
         event.blockedReason = blockReason ?: return
+    }
+
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent.Modify) {
+        if (config.powderMining.enabled) powderMiningBlock(event)
+        if (config.crystalNucleus.enabled) crystalNucleusBlock(event)
     }
 
     /**
@@ -529,7 +611,7 @@ object ChatFilter {
         config.empty && StringUtils.isEmpty(message) -> "empty"
         config.warping && message.isPresent("warping") -> "warping"
         config.welcome && message.isPresent("welcome") -> "welcome"
-        config.guildExp && message.isPresent("guild_exp") -> "guild_exp"
+        config.guildEventExp && message.isPresent("guild_event_exp") -> "guild_event_exp"
         config.killCombo && message.isPresent("kill_combo") -> "kill_combo"
         config.profileJoin && message.isPresent("profile_join") -> "profile_join"
         config.parkour && message.isPresent("parkour") -> "parkour"
@@ -545,14 +627,21 @@ object ChatFilter {
         config.eventLevelUp && (message.isPresent("event")) -> "event"
 
         config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
+        config.rewardBundles && message.isPresent("reward_bundles") -> "reward_bundles"
         config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
+        config.hoppityEggs && message.isPresent("hoppity_appear") -> "hoppity_appear"
+        config.hoppityBegun && message.isPresent("hoppity_begin") -> "hoppity_begin"
         config.sacrifice && message.isPresent("sacrifice") -> "sacrifice"
         generalConfig.hideJacob && !GardenApi.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
-        generalConfig.hideSkyMall && !IslandTypeTags.MINING.inAny() && (skymallPerkPattern.matches(message) || message.isPresent("skymall")) -> "skymall"
+        generalConfig.hideSkyMall && !IslandTypeTags.MINING.inAny() && message.isPresent("skymall") -> "skymall"
+        generalConfig.hideLottery && !IslandTypeTags.FORAGING.inAny() && message.isPresent("lottery") -> "lottery"
         dungeonConfig.rareDrops && message.isPresent("rare_drops") -> "rare_drops"
         dungeonConfig.soloClass && DungeonApi.inDungeon() && message.isPresent("solo_class") -> "solo_class"
         dungeonConfig.soloStats && DungeonApi.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"
         dungeonConfig.fairy && DungeonApi.inDungeon() && message.isPresent("fairy") -> "fairy"
+        foragingConfig.unmineable && IslandTypeTags.FORAGING_CUSTOM_TREES.inAny() && message.isPresent("unmineable_tree") -> "unmineable_tree"
+        huntingConfig.redundantComments && IslandType.GALATEA.isCurrent() && message.isPresent("redundant_hunting") -> "redundant_hunting"
+        huntingConfig.swoopAxeMessage && message.isPresent("swoop_axe") -> "swoop_axe"
         config.gardenNoPest && GardenApi.inGarden() && PestApi.noPestsChatPattern.matches(message) -> "garden_pest"
         config.legacyItemsWarning && message.isPresent("legacy_items") -> "legacy_items"
 
@@ -561,12 +650,26 @@ object ChatFilter {
 
     /**
      * Checks if the message is a blocked powder mining message, as defined in PowderMiningChatFilter.
-     * Will modify un-filtered Mining rewards, or return a resultant blocking code
+     * Will return a resultant blocking code
      * @param event The event to check
      * @return Block reason if applicable
      * @see block
      */
-    private fun powderMiningBlock(event: SkyHanniChatEvent): String? {
+    private fun powderMiningBlock(event: SkyHanniChatEvent.Allow): String? {
+        val powderMiningMatchResult = PowderMiningChatFilter.block(event.message)
+        if (powderMiningMatchResult == "no_filter") {
+            return null
+        }
+        return powderMiningMatchResult
+    }
+
+    /**
+     * Checks if the message is a blocked powder mining message, as defined in PowderMiningChatFilter.
+     * Will modify un-filtered Mining reward
+     * @param event The event to check
+     * @see block
+     */
+    private fun powderMiningBlock(event: SkyHanniChatEvent.Modify) {
         val powderMiningMatchResult = PowderMiningChatFilter.block(event.message)
         if (powderMiningMatchResult == "no_filter") {
             genericMiningRewardMessage.matchMatcher(event.message) {
@@ -574,25 +677,35 @@ object ChatFilter {
                 val amountFormat = groupOrNull("amount")?.let {
                     "§a+ §b$it§r"
                 } ?: "§a+§r"
-                event.chatComponent = "$amountFormat $reward".asComponent()
+                event.replaceComponent("$amountFormat $reward".asComponent(), "powder_gain")
             }
-            return null
         }
-        return powderMiningMatchResult
     }
 
     /**
      * Checks if the message is a blocked Crystal Nucleus Run message, as defined in CrystalNucleusChatFilter.
-     * Will conditionally modify/compact messages in some cases, or return a blocking code
+     * Will conditionally return a blocking code
      * @param event The event to check
      * @return Block reason if applicable
      * @see block
      */
-    private fun crystalNucleusBlock(event: SkyHanniChatEvent): String? {
-        val (blockCode, newMessage) = CrystalNucleusChatFilter.block(event.message)?.getPair() ?: Pair(null, null)
-        newMessage?.let { event.chatComponent = it.asComponent() }
+    private fun crystalNucleusBlock(event: SkyHanniChatEvent.Allow): String? {
+        val blockCode = CrystalNucleusChatFilter.block(event.message)?.getPair()?.first
         blockCode?.let { return it }
         return null
+    }
+
+    /**
+     * Checks if the message is a blocked Crystal Nucleus Run message, as defined in CrystalNucleusChatFilter.
+     * Will conditionally modify/compact messages in some cases
+     * @param event The event to check
+     * @see block
+     */
+    private fun crystalNucleusBlock(event: SkyHanniChatEvent.Modify) {
+        val newMessage = CrystalNucleusChatFilter.block(event.message)?.getPair()?.second
+        newMessage?.let {
+            event.replaceComponent(it.asComponent(), "nuc_run")
+        }
     }
 
     private var othersMsg: String? = null
@@ -631,11 +744,13 @@ object ChatFilter {
      * @return True if the message is present in any of the maps
      * @see messagesMap
      * @see patternsMap
+     * @see repoPatternsMap
      * @see messagesContainsMap
      * @see messagesStartsWithMap
      */
     private fun String.isPresent(key: String) = this in (messagesMap[key].orEmpty()) ||
         (patternsMap[key].orEmpty()).any { it.matches(this) } ||
+        (repoPatternsMap[key].orEmpty()).any { it.matches(this) } ||
         (messagesContainsMap[key].orEmpty()).any { this.contains(it) } ||
         (messagesStartsWithMap[key].orEmpty()).any { this.startsWith(it) }
 
@@ -661,5 +776,6 @@ object ChatFilter {
         }
         event.move(61, "chat.filterType.powderMiningFilter", "chat.filterType.powderMining")
         event.move(61, "chat.filterType.gemstoneFilterConfig", "chat.filterType.powderMining.gemstone")
+        event.move(107, "chat.filterType.guildExp", "chat.filterType.guildEventExp")
     }
 }

@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -15,12 +14,17 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
@@ -56,21 +60,12 @@ object VerminTracker {
     )
 
     /**
-     * REGEX-TEST: §fVermin Bin: §a27 Silverfishes
-     * REGEX-TEST: §fVermin Bin: §a19 Flies
+     * REGEX-TEST: Vermin Bin: 27 Silverfishes
+     * REGEX-TEST: Vermin Bin: 19 Flies
      */
     private val verminBinPattern by patternGroup.pattern(
-        "binline",
-        "§fVermin Bin: §\\w(?<count>\\d+) (?<vermin>\\w+)",
-    )
-
-    /**
-     * REGEX-TEST: §fVacuum Bag: §72 Silverfishes
-     * REGEX-TEST: §fVacuum Bag: §70 Spiders
-     */
-    private val verminBagPattern by patternGroup.pattern(
-        "bagline",
-        "§fVacuum Bag: §\\w(?<count>\\d+) (?<vermin>\\w+)",
+        "binline-nocolor",
+        "Vermin Bin: (?<count>\\d+) (?<vermin>\\w+)",
     )
 
     private var hasVacuum = false
@@ -78,19 +73,18 @@ object VerminTracker {
 
     private val config get() = RiftApi.config.area.westVillage.verminTracker
 
-    private val tracker = SkyHanniTracker("Vermin Tracker", { Data() }, { it.rift.verminTracker }) {
+    private val tracker = SkyHanniTracker(
+        "Vermin Tracker",
+        ::Data,
+        { it.rift.verminTracker },
+        trackerConfig = { config.perTrackerConfig }
+    ) {
         drawDisplay(it)
     }
 
-    class Data : TrackerData() {
-
-        override fun reset() {
-            count.clear()
-        }
-
-        @Expose
-        var count: MutableMap<VerminType, Int> = mutableMapOf()
-    }
+    data class Data(
+        @Expose var count: MutableMap<VerminType, Int> = mutableMapOf()
+    ) : TrackerData<SessionUptime.Normal>(SessionUptime.Normal::class)
 
     enum class VerminType(val order: Int, val vermin: String, val pattern: Pattern) {
         FLY(1, "§aFlies", flyPattern),
@@ -99,7 +93,7 @@ object VerminTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         checkVacuum()
     }
 
@@ -109,7 +103,7 @@ object VerminTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         for (verminType in VerminType.entries) {
             if (verminType.pattern.matches(event.message)) {
                 tracker.modify { it.count.addOrPut(verminType, 1) }
@@ -126,35 +120,31 @@ object VerminTracker {
         if (event.inventoryName != "Vermin Bin") return
 
         val bin = event.inventoryItems[13]?.getLore() ?: return
-        val bag = InventoryUtils.getItemsInOwnInventory()
-            .firstOrNull { it.getInternalName() == TURBOMAX_VACUUM }
-            ?.getLore().orEmpty()
 
-        val binCounts = countVermin(bin, verminBinPattern)
+        val binCounts = countVerminBin(bin)
         VerminType.entries.forEach { setVermin(it, binCounts[it] ?: 0) }
 
-        if (bag.isEmpty()) return
+        val bag = InventoryUtils.getItemsInOwnInventory()
+            .firstOrNull { it.getInternalName() == TURBOMAX_VACUUM }
+            ?.getExtraAttributes() ?: return
 
-        val bagCounts = countVermin(bag, verminBagPattern)
+        val bagCounts = mapOf(
+            VerminType.SILVERFISH to bag.getIntOrDefault("vacuumed_silverfish"),
+            VerminType.SPIDER to bag.getIntOrDefault("vacuumed_spider"),
+            VerminType.FLY to bag.getIntOrDefault("vacuumed_mosquito"),
+        )
         VerminType.entries.forEach { addVermin(it, bagCounts[it] ?: 0) }
     }
 
-    private fun countVermin(lore: List<String>, pattern: Pattern): Map<VerminType, Int> {
-        val verminCounts = mutableMapOf(
-            VerminType.SILVERFISH to 0,
-            VerminType.SPIDER to 0,
-            VerminType.FLY to 0,
-        )
-        for (line in lore) {
-            pattern.matchMatcher(line) {
-                val vermin = group("vermin")?.lowercase() ?: continue
-                val verminCount = group("count")?.toInt() ?: continue
+    private fun countVerminBin(lore: List<String>): Map<VerminType, Int> =
+        buildMap {
+            verminBinPattern.matchAll(lore.map { it.removeColor() }) {
+                val vermin = group("vermin").lowercase()
+                val verminCount = group("count").formatInt()
                 val verminType = getVerminType(vermin)
-                verminCounts[verminType] = verminCount
+                put(verminType, verminCount)
             }
         }
-        return verminCounts
-    }
 
     private fun getVerminType(vermin: String): VerminType {
         return when (vermin) {
@@ -202,10 +192,10 @@ object VerminTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetvermintracker") {
+        event.registerBrigadier("shresetvermintracker") {
             description = "Resets the Vermin Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 

@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 
 @SkyHanniModule
@@ -40,8 +41,8 @@ object CraftMaterialCollector {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         val items = event.inventoryItems
-        val correctItem = items[23]?.displayName == "§aCrafting Table"
-        val correctSuperCraftItem = items[32]?.displayName == "§aSupercraft"
+        val correctItem = items[23]?.hoverName?.string == "Crafting Table"
+        val correctSuperCraftItem = items[32]?.hoverName?.string == "Supercraft"
 
         inRecipeInventory = correctSuperCraftItem && correctItem && !purchasing
         if (!inRecipeInventory) return
@@ -57,7 +58,7 @@ object CraftMaterialCollector {
         val neededMaterials = mutableListOf<PrimitiveItemStack>()
         display = buildList {
             val totalPrice = calculateTotalPrice(recipeMaterials, 1)
-            add(Renderable.string("§7Craft $recipeName §7(§6${totalPrice.shortFormat()}§7)"))
+            addString("§7Craft $recipeName §7(§6${totalPrice.shortFormat()}§7)")
             for (item in recipeMaterials) {
                 val material = item.internalName
                 val amount = item.amount
@@ -66,7 +67,7 @@ object CraftMaterialCollector {
                     neededMaterials.add(item)
                     text += " §6${(material.getPrice() * amount).shortFormat()}"
                 }
-                add(Renderable.string(text))
+                addString(text)
             }
             if (neededMaterials.isNotEmpty()) {
                 add(
@@ -101,7 +102,7 @@ object CraftMaterialCollector {
 
     private fun updateDisplay() {
         display = buildList {
-            add(Renderable.string("§7Buy items:"))
+            addString("§7Buy items:")
             for ((material, amount) in neededMaterials) {
                 val priceMultiplier = amount * multiplier
                 val itemName = material.repoItemName
@@ -163,7 +164,7 @@ object CraftMaterialCollector {
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!inRecipeInventory && !purchasing) return
 

@@ -11,16 +11,17 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 
 @SkyHanniModule
 object JoinCrystalHollows {
 
     private var lastWrongPassTime = 0L
+    private val location = LorenzVec(88, 198, -99)
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         val message = event.message
@@ -62,7 +63,6 @@ object JoinCrystalHollows {
         if (!isEnabled()) return
 
         if (inTime()) {
-            val location = LorenzVec(88, 198, -99)
             event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor())
             event.drawDynamicText(location, "§eBuy Crystal Hollows Pass", 1.3)
         }

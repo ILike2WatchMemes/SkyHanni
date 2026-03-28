@@ -24,22 +24,30 @@ jobs:
                     ref: ${{ github.event.pull_request.head.ref }}
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
-            -   uses: ./.github/actions/setup-normal-workspace
-            -   name: Build with Gradle
-                run: ./gradlew assemble -x test --stacktrace
+            -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@beta
+            -   name: Disable preprocessor
+                run: |
+                    mkdir -p .gradle
+                    echo skyhanni.multi-version=off > .gradle/private.properties
+            -   name: Build with Gradle w/retry
+                uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta
+                with:
+                    gradle-command: assemble -x test --stacktrace -PskipDetekt=true
             -   uses: actions/upload-artifact@v4
                 name: Upload development build
                 with:
                     name: "Development Build"
                     path: build/libs/*.jar
-            -   name: Test with Gradle
-                run: ./gradlew test
+            -   name: Test with Gradle w/retry
+                uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta
+                with:
+                    gradle-command: test
             -   uses: actions/upload-artifact@v4
                 name: "Upload test report"
                 if: ${{ !cancelled() }}
                 with:
                     name: "Test Results"
-                    path: versions/1.8.9/build/reports/tests/test/
+                    path: build/reports/tests/test/
 
     preprocess:
         runs-on: ubuntu-latest
@@ -51,13 +59,15 @@ jobs:
                     ref: ${{ github.event.pull_request.head.ref }}
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
-            -   uses: ./.github/actions/setup-normal-workspace
+            -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@beta
             -   name: Enable preprocessor
                 run: |
                     mkdir -p .gradle
                     echo skyhanni.multi-version=compile > .gradle/private.properties
-            -   name: Build with Gradle
-                run: ./gradlew build --stacktrace -PskipDetekt=true
+            -   name: Build with Gradle w/retry
+                uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta
+                with:
+                    gradle-command: build --stacktrace -PskipDetekt=true
 
             -   name: Add label if build fails
                 if: ${{ failure() && github.event_name == 'pull_request_target' && github.event.pull_request.state == 'open' }}

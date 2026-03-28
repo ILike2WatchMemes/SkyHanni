@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 
 @SkyHanniModule
@@ -21,7 +21,7 @@ object ConfigGuiManager {
         }
     }
 
-    var editor: MoulConfigEditor<Features>? = null
+    var editor: MoulConfigEditor<SkyHanniConfig>? = null
 
     fun getEditorInstance() = editor ?: MoulConfigEditor(SkyHanniMod.configManager.processor).also { editor = it }
 
@@ -31,6 +31,6 @@ object ConfigGuiManager {
         if (search != null) {
             editor.search(search)
         }
-        SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
+        ConfigUtils.openEditor(editor)
     }
 }
