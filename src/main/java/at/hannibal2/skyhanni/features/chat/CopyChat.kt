@@ -54,13 +54,8 @@ object CopyChat {
     private fun getChatLine(mouseX: Int, mouseY: Int): GuiMessage? {
         val mc = Minecraft.getInstance()
         val chatGui = mc.gui.chat ?: return null
-        //? if < 1.21.11 {
-        val chatLineY = chatGui.screenToChatY(mouseY.toDouble())
-        val chatLineX = chatGui.screenToChatX(mouseX.toDouble())
-        //?} else {
-        /*val chatLineY = screenToChatY(mouseY.toDouble())
+        val chatLineY = screenToChatY(mouseY.toDouble())
         val chatLineX = screenToChatX(mouseX.toDouble())
-        *///?}
         val lineIndex = (chatGui.chatScrollbarPos + chatLineY).toInt()
 
         if (chatLineX < -4.0 || chatLineX > Mth.floor(chatGui.width.toDouble() / chatGui.scale).toDouble()) return null

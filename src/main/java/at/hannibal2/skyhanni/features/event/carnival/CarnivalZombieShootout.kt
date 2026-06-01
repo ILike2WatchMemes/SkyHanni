@@ -15,13 +15,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
@@ -82,7 +82,7 @@ object CarnivalZombieShootout {
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!isEnabled() || (!config.coloredHitboxes && !config.coloredLines && !config.zombieTimer)) return
+        if (!isEnabled()) return
 
         if (config.zombieTimer) event.renderZombieTimer()
         if (config.coloredHitboxes) event.renderHitBoxes()
@@ -141,7 +141,7 @@ object CarnivalZombieShootout {
     }
 
     private fun SkyHanniRenderWorldEvent.renderLines() = lamp?.let {
-        drawLineToEye(
+        drawLineToCrosshair(
             it.pos.add(0.5, 0.5, 0.5),
             Color.RED,
             3,
@@ -150,7 +150,7 @@ object CarnivalZombieShootout {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onRenderOverlay() {
+    fun onGuiRenderOverlay() {
         if (!isEnabled() || !config.lampTimer) return
 
         config.lampPosition.renderRenderable(content, posLabel = "Lantern Timer")
@@ -188,7 +188,7 @@ object CarnivalZombieShootout {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled() || (!config.coloredHitboxes && !config.zombieTimer && !config.lampTimer) || !event.isMod(2)) return
+        if (!isEnabled() || !event.isMod(2)) return
 
         if (config.coloredHitboxes || config.zombieTimer) {
             updateZombies()
@@ -236,6 +236,7 @@ object CarnivalZombieShootout {
         EntityUtils.getEntitiesNearby<Zombie>(50.0).mapNotNull { zombie ->
             if (zombie.findHealthReal() <= 0) return@mapNotNull null
             val helmet = zombie.getEntityHelmet() ?: return@mapNotNull null
+            if (helmet.item == Items.AIR) return@mapNotNull null
             val type = toType(helmet) ?: run {
                 ErrorManager.logErrorStateWithData(
                     "Could not identify Zombie Shootout type",

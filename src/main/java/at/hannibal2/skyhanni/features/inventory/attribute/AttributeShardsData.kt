@@ -96,13 +96,13 @@ object AttributeShardsData {
     )
 
     /**
-     * REGEX-TEST: §7Syphon §b3 §7more to level up!
      * REGEX-TEST: §7Syphon §b1 §7shard to unlock!
-     * REGEX-TEST: §7Syphon §b1 §7more to level up!
+     * REGEX-TEST: §7Syphon §b1 §7shard to level up!
+     * REGEX-TEST: §7Syphon §b3 §7shards to level up!
      */
     private val syphonAmountPattern by patternGroup.pattern(
         "syphon.amount",
-        "§7Syphon §b(?<amount>\\d+) §7(?:more to level up|shard to unlock)!",
+        "§7Syphon §b(?<amount>\\d+) §7shards? to (?:level up|unlock)!",
     )
 
     /**
@@ -264,7 +264,8 @@ object AttributeShardsData {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        shardSyphonedPattern.matchMatcher(event.message) {
+        val message = event.message
+        shardSyphonedPattern.matchMatcher(message) {
             val attributeName = group("attributeName")
             val level = group("level").toInt()
             val untilNext = group("untilNext").toInt()
@@ -278,7 +279,7 @@ object AttributeShardsData {
             return
         }
 
-        shardSyphonedMaxedPattern.matchMatcher(event.message) {
+        shardSyphonedMaxedPattern.matchMatcher(message) {
             val attributeName = group("attributeName")
             val shardName = abilityNameToShardName(attributeName) ?: return
             val shardInternalName = shardNameToInternalName(shardName) ?: return
@@ -290,7 +291,7 @@ object AttributeShardsData {
             return
         }
 
-        andMoreMessagePattern.matchMatcher(event.message) {
+        andMoreMessagePattern.matchMatcher(message) {
             if (lastSyphonedMessage.passedSince() > 1.seconds) return
             if (!config.enabled) return
             val amount = group("amount").toInt()
@@ -302,14 +303,14 @@ object AttributeShardsData {
             }
         }
 
-        attributeEnabledPattern.matchMatcher(event.message) {
+        attributeEnabledPattern.matchMatcher(message) {
             val attributeName = group("attributeName")
             val shardName = abilityNameToShardName(attributeName) ?: return
             val shardInternalName = shardNameToInternalName(shardName) ?: return
             setAttributeState(shardInternalName, true)
         }
 
-        attributeDisabledPattern.matchMatcher(event.message) {
+        attributeDisabledPattern.matchMatcher(message) {
             val attributeName = group("attributeName")
             val shardName = abilityNameToShardName(attributeName) ?: return
             val shardInternalName = shardNameToInternalName(shardName) ?: return
@@ -317,7 +318,7 @@ object AttributeShardsData {
         }
 
         for ((pattern, shouldPostGainEvent) in shardGainChatPatterns) {
-            pattern.matchMatcher(event.message) {
+            pattern.matchMatcher(message) {
                 val shardName = group("shardName")
                 val amount = groupOrNull("amount")?.toInt() ?: 1
 
@@ -330,14 +331,12 @@ object AttributeShardsData {
                 val source = shouldPostGainEvent.second
                 val newSource = if (source == null) {
                     val type = groupOrNull("charmType")
-                    if (type == "CHARM") {
-                        ShardSource.CHARM
-                    } else if (type == "NAGA") {
-                        ShardSource.NAGA
-                    } else if (type == "SALT") {
-                        ShardSource.SALT
-                    } else {
-                        ShardSource.UNKNOWN
+                    when (type) {
+                        "CHARM" -> ShardSource.CHARM
+                        "NAGA" -> ShardSource.NAGA
+                        "SALT" -> ShardSource.SALT
+
+                        else -> ShardSource.UNKNOWN
                     }
                 } else {
                     source
@@ -352,7 +351,7 @@ object AttributeShardsData {
             }
         }
 
-        fusionShardPattern.matchMatcher(event.message) {
+        fusionShardPattern.matchMatcher(message) {
             val currentFusionData = FusionData.currentFusionData ?: return
             val amount = groupOrNull("amount")?.toInt() ?: 1
             ShardEvent(currentFusionData.outputShard, amount, ShardSource.FUSE).post()
@@ -362,7 +361,7 @@ object AttributeShardsData {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Active Attribute Levels")
         event.addIrrelevant {
             for (shardName in attributeInfo.keys) {
@@ -576,7 +575,7 @@ object AttributeShardsData {
         ChatUtils.clickableChat(
             "Reset hunting box shards data. Open the hunting box or click here to update the saved data.",
             { HypixelCommands.huntingBox() },
-            "§eClick here to open the hunting box!"
+            "§eClick here to open the hunting box!",
         )
     }
 

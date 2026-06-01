@@ -9,12 +9,13 @@ object GuiChatHook {
     @JvmStatic
     var currentComponent: Component? = null
 
+    @JvmStatic
     var replacementComponent: Component? = null
 
     fun replaceEntireComponent(title: String, chatStyle: Style) {
         // Initialise new component
         val newComponent = title.asComponent()
-        newComponent.setStyle(chatStyle)
+        newComponent.style = chatStyle
 
         replacementComponent = newComponent
     }
@@ -23,6 +24,7 @@ object GuiChatHook {
         replacementComponent = component
     }
 
+    @JvmStatic
     fun getReplacement(): Component {
         return replacementComponent ?: "No replacement component was set".asComponent()
     }

@@ -100,9 +100,7 @@ object FarmingWeightData {
     fun getWeight(leaderboardMode: EliteLeaderboardMode, override: Boolean = false, cropWeightOnly: Boolean = false): Double? {
         if (weightMap[leaderboardMode] == null || override) {
             when (leaderboardMode) {
-                EliteLeaderboardMode.ALL_TIME -> {
-                    // we only update collections on garden join
-                }
+                EliteLeaderboardMode.ALL_TIME -> {}
 
                 EliteLeaderboardMode.MONTHLY ->
                     getLeaderboardPosition(EliteLeaderboardType.Weight(FarmingWeight.FARMING_WEIGHT, leaderboardMode))
@@ -227,7 +225,7 @@ object FarmingWeightData {
         if (value != 0.0) return value else error("Crop $this weight factor is 0!")
     }
 
-    // still needed when first joining garden and if they cant make https requests
+    // still needed when first joining garden and if they can't make https requests
     private val backupCropWeights = mapOf(
         CropType.WHEAT to 100_000.0,
         CropType.CARROT to 300_000.0,

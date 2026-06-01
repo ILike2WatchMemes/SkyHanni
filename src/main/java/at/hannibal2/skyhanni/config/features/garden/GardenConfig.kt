@@ -54,6 +54,15 @@ class GardenConfig {
     val keyBind: KeyBindConfig = KeyBindConfig()
 
     @Expose
+    @ConfigOption(
+        name = "Prevent Breaking with Rod",
+        desc = "Stops you from breaking blocks while holding a fishing rod.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var noRodBreak: Boolean = true
+
+    @Expose
     @Category(name = "Optimal Speed", desc = "Optimal Speed Settings")
     val optimalSpeeds: OptimalSpeedConfig = OptimalSpeedConfig()
 
@@ -82,9 +91,9 @@ class GardenConfig {
     val jacobContest: JacobContestConfig = JacobContestConfig()
 
     @Expose
-    @ConfigOption(name = "Armor Drop Tracker", desc = "")
+    @ConfigOption(name = "Rare Crop Tracker", desc = "")
     @Accordion
-    val armorDropTracker: ArmorDropTrackerConfig = ArmorDropTrackerConfig()
+    val rareCropTracker: RareCropTrackerConfig = RareCropTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Crop Break Tracker", desc = "")
@@ -177,6 +186,11 @@ class GardenConfig {
     @ConfigOption(name = "See Through Farming", desc = "")
     @Accordion
     val seeThroughWindow: SeeThroughWindowConfig = SeeThroughWindowConfig()
+
+    @Expose
+    @ConfigOption(name = "Farming Toolkit", desc = "")
+    @Accordion
+    val farmingToolkit: FarmingToolkitIconConfig = FarmingToolkitIconConfig()
 
     @Expose
     @ConfigOption(

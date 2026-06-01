@@ -5,11 +5,11 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.data.mob.MobCategory
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNpc
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
-import at.hannibal2.skyhanni.data.mob.MobCategory
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -25,12 +25,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getEquipmentSlots
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-import at.hannibal2.skyhanni.utils.compat.getInventoryItems
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Display
@@ -114,6 +114,11 @@ object CopyNearbyEntitiesCommand {
                 }
             }
 
+            if (entity is Display) {
+                // separate because the when also needs to trigger
+                addDisplayEntity(entity)
+            }
+
             when (entity) {
                 is ArmorStand -> addArmorStand(entity)
                 is EnderMan -> addEnderman(entity)
@@ -122,11 +127,12 @@ object CopyNearbyEntitiesCommand {
                 is RemotePlayer -> addOtherPlayer(entity)
                 is Creeper -> addCreeper(entity)
                 is WitherBoss -> addWither(entity)
-                is Display.ItemDisplay -> addItemDisplayEntity(entity)
                 is TropicalFish -> addTropicalFish(entity)
                 is Shulker -> addShulker(entity)
                 is Panda -> addPanda(entity)
+                is Display.ItemDisplay -> addItemDisplayEntity(entity)
                 is Display.BlockDisplay -> addBlockDisplayEntity(entity)
+                is Display.TextDisplay -> addTextDisplayEntity(entity)
                 is Frog -> addFrogEntity(entity)
             }
             if (mob != null && mob.category != MobCategory.PLAYER) {
@@ -146,10 +152,10 @@ object CopyNearbyEntitiesCommand {
         add("-  headRotation: $headRotation")
         add("-  bodyRotation: $bodyRotation")
 
-        add("-  inventory:")
-        for ((id, stack) in entity.getInventoryItems().withIndex()) {
+        add("-  inventory equipment:")
+        for ((equipSlot, stack) in entity.getEquipmentSlots()) {
             val adjustedStack = stack.orNull()
-            add("-  id $id ($adjustedStack)")
+            add("-     ${equipSlot.name} (id ${equipSlot.id}) ($adjustedStack)")
             printItemStackData(adjustedStack)
         }
     }
@@ -208,20 +214,10 @@ object CopyNearbyEntitiesCommand {
 
     private fun MutableList<String>.addWither(entity: WitherBoss) {
         add("EntityWither:")
-        val invulTime = entity.invulnerableTicks
+        val invulnerableTime = entity.invulnerableTicks
         val isArmored = entity.isPowered
-        add("-  invulTime: '$invulTime'")
+        add("-  invulnerableTime: '$invulnerableTime'")
         add("-  armored: '$isArmored'")
-    }
-
-    private fun MutableList<String>.addItemDisplayEntity(entity: Display.ItemDisplay) {
-        add("EntityItemDisplay:")
-        val stack = entity.itemStack
-        val rotation = entity.lookAngle
-
-        add("-  itemStack:")
-        printItemStackData(stack)
-        add("-  rotation: $rotation")
     }
 
     private fun MutableList<String>.addTropicalFish(entity: TropicalFish) {
@@ -250,13 +246,39 @@ object CopyNearbyEntitiesCommand {
         add("-  hiddenGene: $hiddenGene")
     }
 
+
+    private fun MutableList<String>.addDisplayEntity(entity: Display) {
+        add("EntityDisplay:")
+        val rotation = entity.lookAngle
+        val transformation = entity.renderState()?.transformation?.get(0f) ?: return
+
+        add("-  rotation: $rotation")
+        add("-  transformation scale: ${transformation.scale}")
+        add("-  transformation left rotation: ${transformation.leftRotation}")
+        add("-  transformation right rotation: ${transformation.rightRotation}")
+        add("-  transformation translations: ${transformation.translation}")
+    }
+
+    private fun MutableList<String>.addItemDisplayEntity(entity: Display.ItemDisplay) {
+        add("EntityItemDisplay:")
+        val stack = entity.itemStack
+
+        add("-  itemStack:")
+        printItemStackData(stack)
+    }
+
     private fun MutableList<String>.addBlockDisplayEntity(entity: Display.BlockDisplay) {
         add("EntityBlockDisplay:")
         val block = entity.blockState.block
-        val rotation = entity.lookAngle
 
         add("-  block: ${block.name.formattedTextCompat()}")
-        add("-  rotation: $rotation")
+    }
+
+    private fun MutableList<String>.addTextDisplayEntity(entity: Display.TextDisplay) {
+        add("EntityTextDisplay:")
+        val text = entity.text
+
+        add("-  text: $text")
     }
 
     private fun MutableList<String>.addFrogEntity(entity: Frog) {
@@ -268,7 +290,7 @@ object CopyNearbyEntitiesCommand {
 
     private fun MutableList<String>.printItemStackData(stack: ItemStack?) {
         if (stack != null) {
-            val skullTexture = stack.getSkullTexture()
+            val skullTexture = stack.getSkullTexture()?.trim()?.replace("\n", "")
             if (skullTexture != null) {
                 add("-     skullTexture:")
                 add("-     $skullTexture")
@@ -362,6 +384,7 @@ object CopyNearbyEntitiesCommand {
         } else {
             ChatUtils.chat("No entities found in a search radius of $searchRadius!")
         }
+        entityCounter = 0
     }
 
     private fun LivingEntity.asString() =

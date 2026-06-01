@@ -29,11 +29,11 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -47,7 +47,7 @@ import at.hannibal2.skyhanni.utils.compat.addTallGrass
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -128,7 +128,7 @@ object GriffinBurrowHelper {
         }
     }
 
-    // used because insta-breaking a block makes it invalid would be better to store valid blocks in repo
+    // used because instant-breaking a block makes it invalid would be better to store valid blocks in repo
     private val recentClickedBlocks = TimeLimitedSet<LorenzVec>(1.seconds)
 
     private var shouldFocusOnRareMob = false
@@ -314,8 +314,7 @@ object GriffinBurrowHelper {
             val nearby = allGuesses.filter { it.getCurrent().distanceSq(location) < 10 }.toSet()
             removeGuess(nearby, "chain finished with leftover burrow within 3 blocks")
             if (config.warnOnChainComp) {
-                val playerLoc = PlayerUtils.getLocation()
-                val anyClose = allGuesses.filter { it.getCurrent().distanceSq(playerLoc) < 8100 }
+                val anyClose = allGuesses.filter { it.getCurrent().distanceSqToPlayer() < 8100 }
                 if (anyClose.isEmpty()) showUseSpadeTitle()
             }
         }
@@ -469,7 +468,7 @@ object GriffinBurrowHelper {
                 3
             } else 2
             if (currentWarp == null) {
-                event.drawLineToEye(renderLocation, color, lineWidth, false)
+                event.drawLineToCrosshair(renderLocation, color, lineWidth, false)
             }
         }
 
@@ -587,7 +586,7 @@ object GriffinBurrowHelper {
     private fun isEnabled() = DianaApi.isDoingDiana()
 
     private fun setTestBurrow(arg: String) {
-        if (!IslandType.HUB.isCurrent()) {
+        if (!IslandType.HUB.isInIsland()) {
             ChatUtils.userError("You can only create test burrows on the hub island!")
             return
         }

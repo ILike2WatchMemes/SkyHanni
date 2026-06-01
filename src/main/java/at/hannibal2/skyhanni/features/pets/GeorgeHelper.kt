@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.pets
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -30,7 +29,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object GeorgeHelper {
 
     private val config get() = SkyHanniMod.feature.misc.pets.tamingSixty
-    private val useUnofficialWiki get() = SkyHanniMod.feature.misc.commands.betterWiki.useUnofficial
+    private val useIndependentWiki get() = SkyHanniMod.feature.misc.commands.betterWiki.useIndependent
     private const val SPAWN_EGG_SLOT = 41
 
     private val patternGroup = RepoPattern.group("george.taming-sixty")
@@ -104,12 +103,12 @@ object GeorgeHelper {
                 onLeftClick = { HypixelCommands.auctionSearch("] $petName") },
             )
         } else {
-            val wiki = if (useUnofficialWiki) WikiManager.data.unofficial else WikiManager.data.official
+            val wiki = if (useIndependentWiki) WikiManager.data.unofficial else WikiManager.data.official
             Renderable.clickable(
                 text = " §7- $formattedPet: §cNo price found. §eSee the ${wiki.name}.",
                 tips = listOf("§eView the ${wiki.name} article for $formattedPet§e."),
                 onLeftClick = {
-                    OSUtils.openBrowser(WikiManager.getSearchUrl("$petName Pet", useUnofficial = useUnofficialWiki))
+                    OSUtils.openBrowser(WikiManager.getSearchUrl("$petName Pet", useIndependent = useIndependentWiki))
                 },
             )
         }
@@ -134,8 +133,8 @@ object GeorgeHelper {
         var renderableInfo: HorizontalContainerRenderable,
     )
 
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class, onlyOnIsland = IslandType.HUB)
-    fun onRenderOverlay() {
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
+    fun onChestGuiRender() {
         if (!config.enabled) return
         if (display.isEmpty()) return
         config.position.renderRenderables(display, posLabel = "Taming 60 Helper")

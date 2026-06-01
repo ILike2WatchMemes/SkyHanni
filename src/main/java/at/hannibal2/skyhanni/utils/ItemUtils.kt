@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.ge
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
+import at.hannibal2.skyhanni.utils.ItemCategory.Companion.isDeprecatedAtErrorLevel
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -30,6 +31,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PetUtils.getMaxLevel
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
@@ -51,6 +53,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
+import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
@@ -60,7 +63,8 @@ import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.compat.stackHover
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.compat.withColor
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.common.collect.ImmutableMultimap
@@ -75,6 +79,7 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.contents.objects.PlayerSprite
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
@@ -90,9 +95,19 @@ import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+// TODO refactor
 @SkyHanniModule
 @Suppress("LargeClass")
 object ItemUtils {
+
+    private val patternGroup = RepoPattern.group("utils.item")
+
+    // <editor-fold desc="Patterns">
+    private val anvilCombinablePattern by patternGroup.pattern(
+        "anvil-combinable",
+        "Combinable in Anvil",
+    )
+    // </editor-fold>
 
     private val itemNameCache = mutableMapOf<NeuInternalName, String>() // internal name -> item name
     private val compactItemNameCache = mutableMapOf<NeuInternalName, String>() // internal name -> compact item name
@@ -288,8 +303,7 @@ object ItemUtils {
 
             if (this.getPetLevel() == 100) {
                 internalName = "${internalName.asString()}+100".toInternalName()
-            } else if (this.getPetLevel() == 200 && internalName == "GOLDEN_DRAGON;4".toInternalName()) {
-                // NEU Lbin API only supports lvl 200 for Golden Dragon, this is an awful solution but is the most correct way.
+            } else if (this.getPetLevel() == 200) {
                 internalName = "${internalName.asString()}+200".toInternalName()
             } else if (maxLevel == 200 && this.getPetLevel() >= 100) {
                 internalName = "${internalName.asString()}+100".toInternalName()
@@ -308,7 +322,7 @@ object ItemUtils {
         }
         val rawInternalName = NeuItems.getInternalName(this)?.asString()?.replace(
             "ULTIMATE_ULTIMATE_",
-            "ULTIMATE_"
+            "ULTIMATE_",
         )
         return rawInternalName?.let { ItemNameResolver.fixEnchantmentName(it) }
     }
@@ -407,36 +421,59 @@ object ItemUtils {
         if (this.getPetInfo() != null) return getPetRarity(this) to ItemCategory.PET
 
         val cleanName = this.cleanName()
-        for (line in this.getLore().reversed()) {
+        val cleanLore = this.getLoreComponent().map { it.string.removeColor() }
+        for (line in cleanLore.reversed()) {
+            if (UtilsPatterns.notRarityLoreLinePattern.matches(line)) continue
             val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
-                group("itemCategory").replace(" ", "_") to group("rarity").replace(" ", "_")
+                val category = (groupOrNull("itemCategory") ?: "").replace(" ", "_")
+                val rarity = group("rarity").replace(" ", "_")
+                category to rarity
             } ?: continue
 
-            val itemCategory = getItemCategory(category, hoverName.formattedTextCompatLeadingWhiteLessResets(), cleanName)
+            val name = hoverName.formattedTextCompatLeadingWhiteLessResets()
+            val itemCategory = getItemCategory(category, name, cleanName)
             val itemRarity = LorenzRarity.getByName(rarity)
 
             if (itemCategory == null) {
+                val pattern = UtilsPatterns.rarityLoreLinePattern.pattern()
                 ErrorManager.logErrorStateWithData(
-                    "Could not read category for item ${this.hoverName.formattedTextCompatLeadingWhiteLessResets()}",
+                    "Could not read category for item $name",
                     "Failed to read category from item rarity via item lore",
                     "internal name" to getInternalName(),
-                    "item name" to hoverName.formattedTextCompatLeadingWhiteLessResets(),
+                    "item name" to name,
                     "inventory name" to InventoryUtils.openInventoryName(),
+                    "pattern" to pattern,
                     "pattern result" to category,
-                    "lore" to getLore(),
+                    "lore" to cleanLore,
                     betaOnly = true,
                     condition = { !itemCategoryRepoCheckPattern.matches(category) },
                 )
+            } else {
+                if (itemCategory.isDeprecatedAtErrorLevel()) {
+                    ErrorManager.logErrorStateWithData(
+                        "Item category $itemCategory for item $name is outdated",
+                        "ItemCategory $itemCategory is deprecated at error level",
+                        "item category" to itemCategory,
+                        "internal name" to getInternalName(),
+                        "item name" to name,
+                        "inventory name" to InventoryUtils.openInventoryName(),
+                        "pattern result" to category,
+                        "lore" to cleanLore,
+                        betaOnly = true,
+                    )
+                }
             }
             if (itemRarity == null) {
+                val pattern = UtilsPatterns.rarityLoreLinePattern.pattern()
                 ErrorManager.logErrorStateWithData(
-                    "Could not read rarity for item name().formattedTextCompatLeadingWhiteLessResets()",
+                    "Could not read rarity for item $name",
                     "Failed to read rarity from item rarity via item lore",
                     "internal name" to getInternalName(),
-                    "item name" to hoverName.formattedTextCompatLeadingWhiteLessResets(),
+                    "item name" to name,
                     "inventory name" to InventoryUtils.openInventoryName(),
+                    "pattern" to pattern,
                     "pattern result" to rarity,
-                    "lore" to getLore(),
+                    "lore" to cleanLore,
                     betaOnly = true,
                     condition = { !rarityCategoryRepoCheckPattern.matches(rarity) },
                 )
@@ -448,7 +485,7 @@ object ItemUtils {
     }
 
     private fun getItemCategory(itemCategory: String, name: String, cleanName: String = name.removeColor()) =
-        if (itemCategory.isEmpty()) when {
+        if (itemCategory.isEmpty() || itemCategory == "ITEM") when {
             UtilsPatterns.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
             UtilsPatterns.baitPattern.matches(cleanName) -> ItemCategory.FISHING_BAIT
             UtilsPatterns.enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
@@ -675,7 +712,15 @@ object ItemUtils {
 
         // show enchanted book name
         if (itemStack.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK) {
-            return ReplaceRomanNumerals.replaceLine(itemStack.getLore()[0])
+            val enchantName = itemStack.getLore().firstOrNull {
+                val clean = it.removeColor()
+                clean.isNotBlank() && !anvilCombinablePattern.matches(clean)
+            } ?: run {
+                val name = toString()
+                addMissingRepoItem(name, "Could not find enchanted book name for $name")
+                return "§c$name"
+            }
+            return ReplaceRomanNumerals.replaceLine(enchantName)
         }
         if (name.endsWith("Enchanted Book Bundle")) {
             return name.replace("Enchanted Book", ReplaceRomanNumerals.replaceLine(itemStack.getLore()[0]).removeColor())
@@ -744,16 +789,16 @@ object ItemUtils {
         }
     }
 
-    private val testItemCoroutineConfig = CoroutineConfig("shtestitem").withIOContext()
+    private val testItemCoroutineSettings = CoroutineSettings("shtestitem").withIOContext()
     private fun testItemCommand(args: String) {
         TextHelper.text("§eProcessing..").send(testItemMessageId)
         // running .getPrice() on thousands of items may take ~500ms
-        testItemCoroutineConfig.launch {
+        testItemCoroutineSettings.launch {
             buildTestItemMessage(args).send(testItemMessageId)
         }
     }
 
-    private val testItemMessageId = ChatUtils.getUniqueMessageId()
+    private val testItemMessageId = ChatUtils.getUniqueCustomMessageId()
 
     private fun buildTestItemMessage(input: String) = buildList {
         add("".asComponent())
@@ -940,5 +985,15 @@ object ItemUtils {
         val identifier = this.get(DataComponents.ITEM_MODEL)
         val itemModel = BuiltInRegistries.ITEM.getValue(identifier)
         return if (itemModel == Items.AIR || itemModel == this.item) null else itemModel
+    }
+
+    fun ItemStack.asTextComponent(): Component? {
+        if (item != Items.PLAYER_HEAD) return null
+        val profile = get(DataComponents.PROFILE) ?: return null
+        return componentBuilder {
+            append(Component.`object`(PlayerSprite(profile, true))) {
+                withColor(ChatFormatting.WHITE)
+            }
+        }
     }
 }

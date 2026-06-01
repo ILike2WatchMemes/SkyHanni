@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -25,9 +25,9 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.json.addElementsAfter
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.network.chat.Component
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import java.awt.Color
 
@@ -38,7 +38,7 @@ object VisitorApi {
     var inInventory = false
     var lastClickedNpc = 0
     val config get() = GardenApi.config.visitors
-    private val logger = LorenzLogger("garden/visitors/api")
+    private val logger = SkyHanniLogger("garden/visitors/api")
 
     const val INFO_SLOT = 13
     const val ACCEPT_SLOT = 29
@@ -310,6 +310,17 @@ object VisitorApi {
         }
         event.transform(124, "garden.visitors.rewardWarning.drops") { element ->
             element.addElementsAfter(arrayOf(VisitorReward.DYE_WILD_STRAWBERRY))
+        }
+        event.transform(134, "garden.visitors.rewardWarning.drops") { element ->
+            element.addElementsAfter(
+                arrayOf(
+                    VisitorReward.VISITORS_GRATITUDE,
+                    VisitorReward.FARMING_CONTEST_DISPLAY,
+                    VisitorReward.ASTRONAUT_PERSONALITY,
+                    VisitorReward.FAST_FOOD_BARN_SKIN,
+                    VisitorReward.JELLY_GREENHOUSE_SKIN,
+                )
+            )
         }
 
         event.move(18, "garden.visitors.needs", "garden.visitors.shoppingList")

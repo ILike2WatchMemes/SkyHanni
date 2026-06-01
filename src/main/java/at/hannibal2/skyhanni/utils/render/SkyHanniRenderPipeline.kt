@@ -155,6 +155,15 @@ enum class SkyHanniRenderPipeline(
         vertexShaderPath = "rounded_rect_outline_deferred",
         depthWrite = false,
     ),
+    GUI_TEXTURED_TRANSLUCENT(
+        snippet = RenderPipelines.GUI_SNIPPET,
+        vFormat = DefaultVertexFormat.POSITION_TEX_COLOR,
+        blend = BlendFunction.TRANSLUCENT,
+        vertexShaderPath = "gui_textured_translucent",
+        sampler = "Sampler0",
+        depthWrite = false,
+        irisProgram = IrisCompat.IrisProgram.TEXTURED,
+    ),
     ;
 
     private val _pipe: RenderPipeline = RenderPipelines.register(
@@ -185,5 +194,5 @@ private object SkyHanniRenderPipelineUtils {
     fun getCommonRoundedUniforms(): Map<String, UniformType> = mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
     val commonChromaUniforms = mapOf("SkyHanniChromaUniforms" to UniformType.UNIFORM_BUFFER)
     val PosColorNormal: VertexFormat =
-        DefaultVertexFormat./*? if < 1.21.11 {*/ POSITION_COLOR_NORMAL /*?} else {*/ /*POSITION_COLOR_NORMAL_LINE_WIDTH *//*?}*/
+        DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH
 }

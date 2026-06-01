@@ -7,8 +7,9 @@ import net.minecraft.client.gui.render.state.BlitRenderState
 import net.minecraft.client.gui.render.state.GuiRenderState
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
 import net.minecraft.client.renderer.RenderPipelines
-//? if > 1.21.10
-// import com.mojang.blaze3d.textures.FilterMode
+import kotlin.math.roundToInt
+
+import com.mojang.blaze3d.textures.FilterMode
 
 internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractItemTexture() {
 
@@ -61,17 +62,14 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
         guiRenderState.submitBlitToCurrentLayer(
             BlitRenderState(
                 RenderPipelines.GUI_TEXTURED,
-                //? if < 1.21.11 {
-                TextureSetup.singleTexture(textureView),
-                //?} else
-                // TextureSetup.singleTexture(textureView, RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
+                TextureSetup.singleTexture(textureView, RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
                 state.pose(),
                 state.x0(), state.y0(), state.x1(), state.y1(),
                 0f,
                 1f,
                 1f,
                 0f,
-                -1,
+                ((state.alpha * 255).roundToInt() shl 24) or 0x00FFFFFF,
                 state.scissorArea(),
             )
         )

@@ -106,10 +106,11 @@ class MiscConfig {
     @Accordion
     val bits: BitsConfig = BitsConfig()
 
+    // TODO rename to coordsWaypoint
     @Expose
-    @ConfigOption(name = "Patcher Coords Waypoints", desc = "")
+    @ConfigOption(name = "Coords Waypoints", desc = "")
     @Accordion
-    val patcherCoordsWaypoint: PatcherCoordsWaypointConfig = PatcherCoordsWaypointConfig()
+    val patcherCoordsWaypoint: CoordsWaypointConfig = CoordsWaypointConfig()
 
     @Expose
     @ConfigOption(name = "Reminders", desc = "")
@@ -157,6 +158,11 @@ class MiscConfig {
     val colorfulItemTooltips: ColorfulItemTooltips = ColorfulItemTooltips()
 
     @Expose
+    @ConfigOption(name = "Boop Party", desc = "")
+    @Accordion
+    val boopParty: BoopPartyConfig = BoopPartyConfig()
+
+    @Expose
     @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
     @ConfigEditorBoolean
     var resetSearchGuiOnClose: Boolean = true
@@ -202,9 +208,14 @@ class MiscConfig {
     var brewingStandOverlay: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Crash On Death", desc = "Crashes your game every time you die in Skyblock")
+    @ConfigOption(name = "Crash on Death", desc = "Crashes your game every time you die in SkyBlock")
     @ConfigEditorBoolean
     var crashOnDeath: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Crash on TTT Fail", desc = "Crashes your game every time you fail Tic-Tac-Toe in Dungeons")
+    @ConfigEditorBoolean
+    var crashOnTttFail: Boolean = false
 
     @Expose
     @ConfigOption(
@@ -300,15 +311,6 @@ class MiscConfig {
     var accountUpgradeReminder: Boolean = true
 
     @Expose
-    @ConfigOption(
-        name = "Fix Patcher Lines",
-        desc = "Suggest in chat to disable Patcher's `parallax fix` that breaks SkyHanni's line from middle of player to somewhere else.",
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var fixPatcherLines: Boolean = true
-
-    @Expose
     @ConfigOption(name = "Time In Limbo", desc = "Show the time since you entered the limbo.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -339,7 +341,7 @@ class MiscConfig {
     @NoConfigLink
     val lockedMouseDisplay: Position = Position(400, 200, 0.8f)
 
-    // doesnt work properly
+    // doesn't work properly
     /*@ConfigOption(
         name = "Fix Ghost Entities",
         desc = "Remove ghost entities caused by a Hypixel bug.\n" +
@@ -401,10 +403,19 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Fast Fairy Souls",
-        desc = "Uses a fast pathfinder route to get to all Fairy Souls on the current island. §eDoes not require NEU. ",
+        desc = "Uses a fast pathfinder route to get to all Fairy Souls on the current island.",
     )
     @ConfigEditorBoolean
     var fastFairySouls: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Spider Den Relic Pathfinder",
+        desc = "Uses a fast pathfinder route to get to all Relics in Spider's Den.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var spiderRelicPathfinder: Boolean = false
 
     @Expose
     @ConfigOption(
@@ -430,6 +441,11 @@ class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var warnAboutPcTimeOffset: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "NPC Daily Limit Tracker", desc = "")
+    @Accordion
+    val npcDayLimitTracker: NpcDayLimitTrackerConfig = NpcDayLimitTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Coral Fish Helper", desc = "Shows a helper for which fish are cheapest to buy for the NPC §dCoral§7.")
@@ -497,4 +513,13 @@ class MiscConfig {
     )
     @ConfigEditorBoolean
     var rainbowActionBar: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Show Achievement Messages",
+        desc = "You can do §e/shachievements§7 to see them all!"
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var achievementMessages: Boolean = true
 }

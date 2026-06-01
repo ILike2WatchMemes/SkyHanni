@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper
 
 import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.data.model.GraphNodeTag
+import at.hannibal2.skyhanni.data.model.graph.GraphNode
+import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 
 enum class FactionType(val factionName: String, val apiName: String) {
     BARBARIAN("Barbarian", "barbarians"),
@@ -17,6 +17,6 @@ enum class FactionType(val factionName: String, val apiName: String) {
 
     companion object {
         fun fromName(name: String): FactionType? = entries.firstOrNull { it.factionName.equals(name, ignoreCase = true) }
-        fun fromAPIName(name: String): FactionType? = entries.firstOrNull { it.apiName.equals(name, ignoreCase = true) }
+        fun fromAPIName(name: String?): FactionType? = entries.firstOrNull { it.apiName.equals(name, ignoreCase = true) }
     }
 }

@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.LorenzVecArgumentType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
-import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.data.model.GraphNodeTag
+import at.hannibal2.skyhanni.data.model.graph.GraphNode
+import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
@@ -26,7 +26,7 @@ import at.hannibal2.skyhanni.utils.compat.hover
 object NavigationHelper {
     private val config get() = SkyHanniMod.feature.misc.navigation
 
-    private val messageId = ChatUtils.getUniqueMessageId()
+    private val messageId = ChatUtils.getUniqueCustomMessageId()
 
     val allowedTags = listOf(
         GraphNodeTag.NPC,
@@ -37,7 +37,6 @@ object NavigationHelper {
         GraphNodeTag.GRIND_MOBS,
         GraphNodeTag.GRIND_ORES,
         GraphNodeTag.GRIND_CROPS,
-        GraphNodeTag.MINES_EMISSARY,
         GraphNodeTag.CRIMSON_MINIBOSS,
     )
 
@@ -47,7 +46,7 @@ object NavigationHelper {
 
         val goBack = {
             doCommandAsync(searchTerm)
-            IslandGraphs.stop()
+            IslandGraphs.stopNavigation()
         }
         val title = if (searchTerm.isBlank()) "SkyHanni Navigation Locations" else "SkyHanni Navigation Locations Matching: \"$searchTerm\""
 

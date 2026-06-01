@@ -1,9 +1,9 @@
 plugins {
-    id("net.fabricmc.fabric-loom-remap") version "1.15-SNAPSHOT" apply false
-    kotlin("jvm") version "2.2.21" apply false
-    kotlin("plugin.power-assert") version "2.0.0" apply false
-    id("com.google.devtools.ksp") version "2.2.21-2.0.4" apply false
-    id("io.gitlab.arturbosch.detekt") version "1.23.7" apply false
+    alias(libs.plugins.loom) apply false
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.powerAssert) apply false
+    alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.detekt) apply false
     id("dev.kikugie.stonecutter")
 }
 
@@ -118,11 +118,10 @@ allprojects {
                 includeGroupByRegex("(com|io)\\.github\\..*")
             }
         }
-        maven("https://maven.gegy.dev/releases/") // mojbackward
     }
 }
 
-stonecutter active "1.21.10"
+stonecutter active "1.21.11"
 
 stonecutter handlers {
     inherit("accesswidener", "classtweaker")
@@ -133,11 +132,5 @@ stonecutter handlers {
 }
 
 stonecutter parameters {
-    replacements {
-        string(current.parsed >= "1.21.11") {
-            replace("com.google.gson.internal.`\$Gson\$Types`", "com.google.gson.internal.GsonTypes")
-        }
-    }
-
     filters.include("**/*.fsh", "**/*.vsh")
 }
