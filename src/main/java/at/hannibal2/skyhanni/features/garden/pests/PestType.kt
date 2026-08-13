@@ -125,6 +125,7 @@ enum class PestType(
         VinylType.PRAY_FOR_ME,
         "PEST_PRAYING_MANTIS_MONSTER".toInternalName(),
         CropType.WILD_ROSE,
+        pluralName = "Praying Mantises",
         eliteLbName = "mantis",
     ),
     FIREFLY(
@@ -143,6 +144,7 @@ enum class PestType(
         "PEST_DRAGONFLY_MONSTER".toInternalName(),
         CropType.SUNFLOWER,
     ),
+
     // TODO replace with null
     // For use in the Pest Profit Tracker, in cases where an item cannot have an identified PestType
     // Display name intentionally omitted to aid in filtering out this entry.
